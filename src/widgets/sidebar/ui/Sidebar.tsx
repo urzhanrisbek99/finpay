@@ -8,10 +8,10 @@ import {
   ArrowLeftRight,
   BarChart3,
   Settings,
-  LogOut,
 } from "lucide-react";
 import { cn } from "@/src/shared/lib/utils";
 import { ROUTES } from "@/src/shared/config/routes";
+import { LogoutButton } from "@/src/features/logout/ui";
 
 const navItems = [
   { icon: LayoutDashboard, href: ROUTES.DASHBOARD, label: "Dashboard" },
@@ -52,12 +52,7 @@ export function Sidebar() {
         >
           <Settings size={18} />
         </button>
-        <button
-          title="Logout"
-          className="text-muted-foreground flex h-9 w-9 items-center justify-center rounded-lg transition-colors hover:bg-red-50 hover:text-red-500"
-        >
-          <LogOut size={18} />
-        </button>
+        <LogoutButton />
       </div>
     </aside>
   );
