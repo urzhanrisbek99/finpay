@@ -6,6 +6,7 @@ import { SpendingChart } from "@/src/widgets/spending-chart/ui/SpendingChart";
 import { TransactionList } from "@/src/widgets/transaction-list/ui/TransactionList";
 import { UserBalance } from "@/src/entities/user/ui/UserBalance";
 import { QRModal } from "@/src/features/qr-payment/ui";
+import { TransferModal } from "@/src/features/transfer/ui";
 import { useUser } from "@/src/entities/user/model/useUser";
 import { formatCurrency } from "@/src/shared/lib/formatters";
 
@@ -18,6 +19,7 @@ const statsCards = [
 export function Dashboard() {
   const { user } = useUser();
   const [qrOpen, setQrOpen] = useState(false);
+  const [transferOpen, setTransferOpen] = useState(false);
 
   return (
     <div className="mx-auto max-w-6xl">
@@ -60,14 +62,15 @@ export function Dashboard() {
             >
               QR payment
             </button>
-            {["Transfer by phone", "Payment history"].map((action) => (
-              <button
-                key={action}
-                className="bg-muted hover:bg-muted/80 flex items-center gap-2 rounded-lg px-3 py-2 text-left text-sm transition-colors"
-              >
-                {action}
-              </button>
-            ))}
+            <button
+              onClick={() => setTransferOpen(true)}
+              className="bg-muted hover:bg-muted/80 flex items-center gap-2 rounded-lg px-3 py-2 text-left text-sm transition-colors"
+            >
+              Transfer by phone
+            </button>
+            <button className="bg-muted hover:bg-muted/80 flex items-center gap-2 rounded-lg px-3 py-2 text-left text-sm transition-colors">
+              Payment history
+            </button>
           </div>
         </div>
       </div>
@@ -75,6 +78,10 @@ export function Dashboard() {
       <TransactionList />
 
       <QRModal open={qrOpen} onClose={() => setQrOpen(false)} />
+      <TransferModal
+        open={transferOpen}
+        onClose={() => setTransferOpen(false)}
+      />
     </div>
   );
 }
