@@ -1,3 +1,5 @@
+import { Dashboard } from "@/src/pages/dashboard/ui";
+
 export default function DashboardPage() {
-  return <div>Dashboard — coming soon</div>;
+  return <Dashboard />;
 }

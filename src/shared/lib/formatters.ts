@@ -1,10 +1,11 @@
 // форматирование суммы → ₸1,240,500
 export function formatCurrency(amount: number): string {
-  return new Intl.NumberFormat("kk-KZ", {
-    style: "currency",
-    currency: "KZT",
-    maximumFractionDigits: 0,
-  }).format(amount);
+  return (
+    new Intl.NumberFormat("ru-KZ", {
+      style: "decimal",
+      maximumFractionDigits: 0,
+    }).format(amount) + " ₸"
+  );
 }
 
 // форматирование даты → Today, 09:00
