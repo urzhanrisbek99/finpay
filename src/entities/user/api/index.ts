@@ -34,4 +34,18 @@ export const userApi = {
 
     return { error: error ? error.message : null };
   },
+  createProfile: async (profile: {
+    id: string;
+    email: string;
+    full_name: string;
+  }): Promise<{ error: string | null }> => {
+    const supabase = createClient();
+
+    const { error } = await supabase.from("profiles").insert({
+      ...profile,
+      balance: 1_240_500,
+    });
+
+    return { error: error ? error.message : null };
+  },
 };

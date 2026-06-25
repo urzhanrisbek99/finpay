@@ -6,6 +6,6 @@ export type Card = {
   expires_at: string;
   type: "visa" | "mastercard";
   is_frozen: boolean;
-  limit: number;
+  spending_limit: number;
   spent: number;
 };
