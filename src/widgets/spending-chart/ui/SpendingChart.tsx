@@ -29,7 +29,7 @@ export function SpendingChart() {
           {["Week", "Month", "Year"].map((period) => (
             <button
               key={period}
-              className="text-xs px-3 py-1 rounded-full bg-muted text-muted-foreground first:bg-violet-100 first:text-violet-600"
+              className="bg-muted text-muted-foreground rounded-full px-3 py-1 text-xs first:bg-violet-100 first:text-violet-600"
             >
               {period}
             </button>
@@ -59,14 +59,14 @@ export function SpendingChart() {
             />
           </AreaChart>
         </ResponsiveContainer>
-        <div className="flex justify-between mt-2 pt-3 border-t">
+        <div className="mt-2 flex justify-between border-t pt-3">
           <div>
-            <p className="text-xs text-muted-foreground">Total this month</p>
+            <p className="text-muted-foreground text-xs">Total this month</p>
             <p className="text-sm font-medium">{formatCurrency(435000)}</p>
           </div>
           <div className="text-right">
-            <p className="text-xs text-muted-foreground">vs last month</p>
-            <p className="text-xs text-green-600 font-medium">
+            <p className="text-muted-foreground text-xs">vs last month</p>
+            <p className="text-xs font-medium text-green-600">
               ↓ −12% less spent
             </p>
           </div>

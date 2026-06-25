@@ -38,15 +38,15 @@ function TransactionRow({ transaction }: { transaction: Transaction }) {
     categoryColors[transaction.category] ?? "bg-muted text-muted-foreground";
 
   return (
-    <div className="flex items-center gap-3 py-2.5 border-b last:border-0">
+    <div className="flex items-center gap-3 border-b py-2.5 last:border-0">
       <div
-        className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${iconColor}`}
+        className={`flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full ${iconColor}`}
       >
         {icon}
       </div>
-      <div className="flex-1 min-w-0">
-        <p className="text-sm font-medium truncate">{transaction.merchant}</p>
-        <p className="text-xs text-muted-foreground">
+      <div className="min-w-0 flex-1">
+        <p className="truncate text-sm font-medium">{transaction.merchant}</p>
+        <p className="text-muted-foreground text-xs">
           {formatDate(transaction.created_at)}
         </p>
       </div>
@@ -56,7 +56,7 @@ function TransactionRow({ transaction }: { transaction: Transaction }) {
           {formatCurrency(transaction.amount)}
         </p>
         <span
-          className={`text-xs px-2 py-0.5 rounded-full ${statusColors[transaction.status]}`}
+          className={`rounded-full px-2 py-0.5 text-xs ${statusColors[transaction.status]}`}
         >
           {transaction.status}
         </span>
@@ -93,7 +93,7 @@ export function TransactionList() {
           {["All", "Income", "Expense"].map((filter) => (
             <button
               key={filter}
-              className="text-xs px-3 py-1 rounded-full bg-muted text-muted-foreground first:bg-violet-100 first:text-violet-600"
+              className="bg-muted text-muted-foreground rounded-full px-3 py-1 text-xs first:bg-violet-100 first:text-violet-600"
             >
               {filter}
             </button>
@@ -105,16 +105,16 @@ export function TransactionList() {
           <div className="space-y-3">
             {[1, 2, 3].map((i) => (
               <div key={i} className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-full bg-muted animate-pulse" />
+                <div className="bg-muted h-8 w-8 animate-pulse rounded-full" />
                 <div className="flex-1 space-y-1">
-                  <div className="h-3 bg-muted rounded animate-pulse w-32" />
-                  <div className="h-2 bg-muted rounded animate-pulse w-20" />
+                  <div className="bg-muted h-3 w-32 animate-pulse rounded" />
+                  <div className="bg-muted h-2 w-20 animate-pulse rounded" />
                 </div>
               </div>
             ))}
           </div>
         ) : transactions.length === 0 ? (
-          <p className="text-sm text-muted-foreground text-center py-6">
+          <p className="text-muted-foreground py-6 text-center text-sm">
             No transactions yet
           </p>
         ) : (
@@ -123,7 +123,7 @@ export function TransactionList() {
           ))
         )}
         {transactions.length > 0 && (
-          <button className="w-full text-xs text-violet-600 text-center mt-3">
+          <button className="mt-3 w-full text-center text-xs text-violet-600">
             View all transactions →
           </button>
         )}

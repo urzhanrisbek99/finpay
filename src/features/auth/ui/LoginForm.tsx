@@ -12,14 +12,14 @@ export function LoginForm() {
   const { login, isLoading, error } = useLogin();
 
   return (
-    <div className="min-h-screen bg-muted flex items-center justify-center p-4">
-      <div className="bg-background border rounded-xl p-8 w-full max-w-sm">
-        <div className="text-center mb-6">
-          <div className="w-10 h-10 rounded-full bg-violet-600 text-white flex items-center justify-center text-lg font-medium mx-auto mb-3">
+    <div className="bg-muted flex min-h-screen items-center justify-center p-4">
+      <div className="bg-background w-full max-w-sm rounded-xl border p-8">
+        <div className="mb-6 text-center">
+          <div className="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-violet-600 text-lg font-medium text-white">
             ₸
           </div>
           <h1 className="text-lg font-medium">Welcome back</h1>
-          <p className="text-sm text-muted-foreground mt-1">
+          <p className="text-muted-foreground mt-1 text-sm">
             Sign in to your FinPay account
           </p>
         </div>
@@ -36,9 +36,9 @@ export function LoginForm() {
           </div>
 
           <div className="space-y-1.5">
-            <div className="flex justify-between items-center">
+            <div className="flex items-center justify-between">
               <Label>Password</Label>
-              <span className="text-xs text-violet-600 cursor-pointer">
+              <span className="cursor-pointer text-xs text-violet-600">
                 Forgot password?
               </span>
             </div>
@@ -61,9 +61,9 @@ export function LoginForm() {
           </Button>
         </div>
 
-        <p className="text-center text-xs text-muted-foreground mt-4">
+        <p className="text-muted-foreground mt-4 text-center text-xs">
           Don&apos;t have an account?
-          <a href="/register" className="text-violet-600 font-medium">
+          <a href="/register" className="font-medium text-violet-600">
             Sign up
           </a>
         </p>

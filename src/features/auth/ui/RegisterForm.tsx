@@ -24,14 +24,14 @@ export function RegisterForm() {
   };
 
   return (
-    <div className="min-h-screen bg-muted flex items-center justify-center p-4">
-      <div className="bg-background border rounded-xl p-8 w-full max-w-sm">
-        <div className="text-center mb-6">
-          <div className="w-10 h-10 rounded-full bg-violet-600 text-white flex items-center justify-center text-lg font-medium mx-auto mb-3">
+    <div className="bg-muted flex min-h-screen items-center justify-center p-4">
+      <div className="bg-background w-full max-w-sm rounded-xl border p-8">
+        <div className="mb-6 text-center">
+          <div className="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-violet-600 text-lg font-medium text-white">
             ₸
           </div>
           <h1 className="text-lg font-medium">Create account</h1>
-          <p className="text-sm text-muted-foreground mt-1">
+          <p className="text-muted-foreground mt-1 text-sm">
             Start managing your finances
           </p>
         </div>
@@ -89,9 +89,9 @@ export function RegisterForm() {
           </Button>
         </div>
 
-        <p className="text-center text-xs text-muted-foreground mt-4">
+        <p className="text-muted-foreground mt-4 text-center text-xs">
           Already have an account?{" "}
-          <a href="/login" className="text-violet-600 font-medium">
+          <a href="/login" className="font-medium text-violet-600">
             Sign in
           </a>
         </p>

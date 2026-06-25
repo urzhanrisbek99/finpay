@@ -19,20 +19,20 @@ export function Header({ onNewPayment }: HeaderProps) {
   };
 
   return (
-    <div className="flex items-center justify-between mb-6">
+    <div className="mb-6 flex items-center justify-between">
       <div>
-        <p className="text-xs text-muted-foreground">{getGreeting()}</p>
+        <p className="text-muted-foreground text-xs">{getGreeting()}</p>
         <h1 className="text-base font-medium">
           {user?.full_name ?? "Loading..."}
         </h1>
       </div>
 
       <div className="flex items-center gap-2">
-        <button className="w-8 h-8 rounded-full bg-muted flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors">
+        <button className="bg-muted text-muted-foreground hover:text-foreground flex h-8 w-8 items-center justify-center rounded-full transition-colors">
           <Bell size={15} />
         </button>
         <Button
-          className="bg-violet-600 hover:bg-violet-700 text-white rounded-full text-xs px-4 h-8"
+          className="h-8 rounded-full bg-violet-600 px-4 text-xs text-white hover:bg-violet-700"
           onClick={onNewPayment}
         >
           <Plus size={13} />
