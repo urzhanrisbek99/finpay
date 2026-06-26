@@ -2,9 +2,26 @@
 
 import { useTheme } from "next-themes";
 import { Sun, Moon } from "lucide-react";
+import { useSyncExternalStore } from "react";
+
+const emptySubscribe = () => () => {};
 
 export function ThemeToggle() {
   const { theme, setTheme } = useTheme();
+
+  const mounted = useSyncExternalStore(
+    emptySubscribe,
+    () => true,
+    () => false,
+  );
+
+  if (!mounted) {
+    return (
+      <div className="flex h-9 w-9 items-center justify-center rounded-lg">
+        <Moon size={18} className="text-muted-foreground" />
+      </div>
+    );
+  }
 
   return (
     <button
