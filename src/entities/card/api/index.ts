@@ -34,4 +34,14 @@ export const cardApi = {
 
     return { error: error ? error.message : null };
   },
+
+  // удалить карту
+  deleteCard: async (cardId: string): Promise<{ error: string | null }> => {
+    const supabase = createClient();
+
+    const { error } = await supabase.from("cards").delete().eq("id", cardId);
+    console.log("Delete card result:", { cardId, error });
+
+    return { error: error ? error.message : null };
+  },
 };

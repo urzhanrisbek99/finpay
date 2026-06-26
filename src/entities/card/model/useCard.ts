@@ -21,27 +21,7 @@ export function useCard() {
       }
 
       const { data } = await cardApi.getCard(user.id);
-
-      if (data) {
-        setCard(data);
-      } else {
-        const { data: newCard } = await supabase
-          .from("cards")
-          .insert({
-            user_id: user.id,
-            number: "4821",
-            holder_name: "Urzhan Rysbek",
-            expires_at: "08/28",
-            type: "visa",
-            is_frozen: false,
-            spending_limit: 500000,
-            spent: 184300,
-          })
-          .select()
-          .single();
-
-        if (newCard) setCard(newCard);
-      }
+      setCard(data);
       setLoading(false);
     };
 

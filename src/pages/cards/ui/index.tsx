@@ -11,12 +11,14 @@ import { cardApi } from "@/src/entities/card/api";
 import { useCardStore } from "@/src/entities/card/model/store";
 import { ShowCVVModal } from "@/src/features/show-cvv/ui";
 import { ReissueCardModal } from "@/src/features/reissue-card/ui";
+import { RemoveCardModal } from "@/src/features/remove-card/ui";
 
 export function Cards() {
   const { card, isLoading } = useCard();
   const { toggleFreeze } = useCardStore();
   const [cvvOpen, setCvvOpen] = useState(false);
   const [reissueOpen, setReissueOpen] = useState(false);
+  const [removeOpen, setRemoveOpen] = useState(false);
 
   const handleToggleFreeze = async () => {
     if (!card) return;
@@ -111,7 +113,10 @@ export function Cards() {
                   <RefreshCw size={18} />
                   <span className="text-xs">Reissue</span>
                 </button>
-                <button className="flex flex-col items-center gap-2 rounded-lg border border-red-100 p-3 text-red-500 transition-colors hover:bg-red-50">
+                <button
+                  onClick={() => setRemoveOpen(true)}
+                  className="flex flex-col items-center gap-2 rounded-lg border border-red-100 p-3 text-red-500 transition-colors hover:bg-red-50"
+                >
                   <Trash2 size={18} />
                   <span className="text-xs">Remove</span>
                 </button>
@@ -193,6 +198,7 @@ export function Cards() {
         open={reissueOpen}
         onClose={() => setReissueOpen(false)}
       />
+      <RemoveCardModal open={removeOpen} onClose={() => setRemoveOpen(false)} />
     </div>
   );
 }
