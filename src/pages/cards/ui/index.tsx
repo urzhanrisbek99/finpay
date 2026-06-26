@@ -1,17 +1,20 @@
 "use client";
 
+import { useState } from "react";
 import { CreditCard, Lock, Eye, RefreshCw, Trash2 } from "lucide-react";
 import { Header } from "@/src/widgets/header/ui/Header";
 import { Card, CardContent, CardHeader, CardTitle } from "@/src/shared/ui/card";
+import { Skeleton } from "@/src/shared/ui/skeleton";
 import { formatCurrency } from "@/src/shared/lib/formatters";
 import { useCard } from "@/src/entities/card/model/useCard";
 import { cardApi } from "@/src/entities/card/api";
 import { useCardStore } from "@/src/entities/card/model/store";
-import { Skeleton } from "@/src/shared/ui/skeleton";
+import { ShowCVVModal } from "@/src/features/show-cvv/ui";
 
 export function Cards() {
   const { card, isLoading } = useCard();
   const { toggleFreeze } = useCardStore();
+  const [cvvOpen, setCvvOpen] = useState(false);
 
   const handleToggleFreeze = async () => {
     if (!card) return;
@@ -92,7 +95,10 @@ export function Cards() {
                     {card?.is_frozen ? "Unfreeze" : "Freeze"}
                   </span>
                 </button>
-                <button className="hover:bg-muted flex flex-col items-center gap-2 rounded-lg border p-3 transition-colors">
+                <button
+                  onClick={() => setCvvOpen(true)}
+                  className="hover:bg-muted flex flex-col items-center gap-2 rounded-lg border p-3 transition-colors"
+                >
                   <Eye size={18} />
                   <span className="text-xs">Show CVV</span>
                 </button>
@@ -176,6 +182,8 @@ export function Cards() {
           </Card>
         </div>
       </div>
+
+      <ShowCVVModal open={cvvOpen} onClose={() => setCvvOpen(false)} />
     </div>
   );
 }
