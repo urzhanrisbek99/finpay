@@ -12,6 +12,7 @@ import {
 import { cn } from "@/src/shared/lib/utils";
 import { ROUTES } from "@/src/shared/config/routes";
 import { LogoutButton } from "@/src/features/logout/ui";
+import { ThemeToggle } from "@/src/features/theme-toggle/ui";
 
 const navItems = [
   { icon: LayoutDashboard, href: ROUTES.DASHBOARD, label: "Dashboard" },
@@ -52,6 +53,7 @@ export function Sidebar() {
         >
           <Settings size={18} />
         </button>
+        <ThemeToggle />
         <LogoutButton />
       </div>
     </aside>
