@@ -10,11 +10,13 @@ import { useCard } from "@/src/entities/card/model/useCard";
 import { cardApi } from "@/src/entities/card/api";
 import { useCardStore } from "@/src/entities/card/model/store";
 import { ShowCVVModal } from "@/src/features/show-cvv/ui";
+import { ReissueCardModal } from "@/src/features/reissue-card/ui";
 
 export function Cards() {
   const { card, isLoading } = useCard();
   const { toggleFreeze } = useCardStore();
   const [cvvOpen, setCvvOpen] = useState(false);
+  const [reissueOpen, setReissueOpen] = useState(false);
 
   const handleToggleFreeze = async () => {
     if (!card) return;
@@ -102,7 +104,10 @@ export function Cards() {
                   <Eye size={18} />
                   <span className="text-xs">Show CVV</span>
                 </button>
-                <button className="hover:bg-muted flex flex-col items-center gap-2 rounded-lg border p-3 transition-colors">
+                <button
+                  onClick={() => setReissueOpen(true)}
+                  className="hover:bg-muted flex flex-col items-center gap-2 rounded-lg border p-3 transition-colors"
+                >
                   <RefreshCw size={18} />
                   <span className="text-xs">Reissue</span>
                 </button>
@@ -184,6 +189,10 @@ export function Cards() {
       </div>
 
       <ShowCVVModal open={cvvOpen} onClose={() => setCvvOpen(false)} />
+      <ReissueCardModal
+        open={reissueOpen}
+        onClose={() => setReissueOpen(false)}
+      />
     </div>
   );
 }

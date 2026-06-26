@@ -12,7 +12,7 @@ export const cardApi = {
       .from("cards")
       .select("*")
       .eq("user_id", userId)
-      .single();
+      .maybeSingle();
 
     return {
       data: data as Card | null,
