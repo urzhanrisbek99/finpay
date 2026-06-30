@@ -9,7 +9,7 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import { Card, CardContent, CardHeader, CardTitle } from "@/src/shared/ui/card";
-import { formatCurrency } from "@/src/shared/lib/formatters";
+import { formatCurrency } from "@/src/shared/lib";
 
 const data = [
   { month: "Jan", amount: 320000 },

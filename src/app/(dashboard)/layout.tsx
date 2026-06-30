@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { createClient } from "@/src/shared/api/supabase/server";
+import { createServerClient } from "@/src/shared/api/supabase/server";
 import { Sidebar } from "@/src/widgets/sidebar/ui/Sidebar";
 
 export default async function DashboardLayout({
@@ -7,7 +7,7 @@ export default async function DashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const supabase = await createClient();
+  const supabase = await createServerClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();

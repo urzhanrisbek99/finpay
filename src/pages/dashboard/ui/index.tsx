@@ -8,7 +8,7 @@ import { UserBalance } from "@/src/entities/user/ui/UserBalance";
 import { QRModal } from "@/src/features/qr-payment/ui";
 import { TransferModal } from "@/src/features/transfer/ui";
 import { useUser } from "@/src/entities/user/model/useUser";
-import { formatCurrency } from "@/src/shared/lib/formatters";
+import { formatCurrency } from "@/src/shared/lib";
 
 const statsCards = [
   { label: "Monthly income", amount: 520000, trend: "+8%", positive: true },

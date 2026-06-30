@@ -1,4 +1,4 @@
-import { createClient } from "@/src/shared/api/supabase/client";
+import { createBrowserClient } from "@/src/shared/api/supabase/client";
 import type { Transaction } from "../model/types";
 
 export const transactionApi = {
@@ -6,7 +6,7 @@ export const transactionApi = {
   getAll: async (
     userId: string,
   ): Promise<{ data: Transaction[] | null; error: string | null }> => {
-    const supabase = createClient();
+    const supabase = createBrowserClient();
 
     const { data, error } = await supabase
       .from("transactions")
@@ -24,7 +24,7 @@ export const transactionApi = {
   add: async (
     transaction: Omit<Transaction, "id" | "created_at">,
   ): Promise<{ data: Transaction | null; error: string | null }> => {
-    const supabase = createClient();
+    const supabase = createBrowserClient();
 
     const { data, error } = await supabase
       .from("transactions")

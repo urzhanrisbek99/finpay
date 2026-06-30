@@ -2,10 +2,10 @@
 
 import { useRouter } from "next/navigation";
 import { LogOut } from "lucide-react";
-import { createClient } from "@/src/shared/api/supabase/client";
+import { createBrowserClient } from "@/src/shared/api/supabase/client";
 import { useUserStore } from "@/src/entities/user/model/store";
 import { useTransactionStore } from "@/src/entities/transaction/model/store";
-import { ROUTES } from "@/src/shared/config/routes";
+import { ROUTES } from "@/src/shared/config";
 
 export function LogoutButton() {
   const router = useRouter();
@@ -13,7 +13,7 @@ export function LogoutButton() {
   const setTransactions = useTransactionStore((s) => s.setTransactions);
 
   const handleLogout = async () => {
-    const supabase = createClient();
+    const supabase = createBrowserClient();
     await supabase.auth.signOut();
 
     // очищаем сторы

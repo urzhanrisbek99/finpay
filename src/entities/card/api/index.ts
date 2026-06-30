@@ -1,4 +1,4 @@
-import { createClient } from "@/src/shared/api/supabase/client";
+import { createBrowserClient } from "@/src/shared/api/supabase/client";
 import type { Card } from "../model/types";
 
 export const cardApi = {
@@ -6,7 +6,7 @@ export const cardApi = {
   getCard: async (
     userId: string,
   ): Promise<{ data: Card | null; error: string | null }> => {
-    const supabase = createClient();
+    const supabase = createBrowserClient();
 
     const { data, error } = await supabase
       .from("cards")
@@ -25,7 +25,7 @@ export const cardApi = {
     cardId: string,
     isFrozen: boolean,
   ): Promise<{ error: string | null }> => {
-    const supabase = createClient();
+    const supabase = createBrowserClient();
 
     const { error } = await supabase
       .from("cards")
@@ -37,7 +37,7 @@ export const cardApi = {
 
   // удалить карту
   deleteCard: async (cardId: string): Promise<{ error: string | null }> => {
-    const supabase = createClient();
+    const supabase = createBrowserClient();
 
     const { error } = await supabase.from("cards").delete().eq("id", cardId);
     console.log("Delete card result:", { cardId, error });

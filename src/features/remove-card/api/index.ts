@@ -1,11 +1,11 @@
-import { createClient } from "@/src/shared/api/supabase/client";
+import { createBrowserClient } from "@/src/shared/api/supabase/client";
 
 export const removeCardApi = {
   request: async (
     userId: string,
     cardId: string,
   ): Promise<{ error: string | null }> => {
-    const supabase = createClient();
+    const supabase = createBrowserClient();
 
     const { error } = await supabase.from("card_requests").insert({
       user_id: userId,

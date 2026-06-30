@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import { Building2, QrCode, Send, Clock, ShoppingBag } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/src/shared/ui/card";
 
-import { formatCurrency, formatDate } from "@/src/shared/lib/formatters";
+import { formatCurrency, formatDate } from "@/src/shared/lib";
 import { useTransactionStore } from "@/src/entities/transaction/model/store";
 import { transactionApi } from "@/src/entities/transaction/api";
 import { useUserStore } from "@/src/entities/user/model/store";

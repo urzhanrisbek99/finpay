@@ -7,7 +7,7 @@ import { Button } from "@/src/shared/ui/button";
 import { Input } from "@/src/shared/ui/input";
 import { Label } from "@/src/shared/ui/label";
 import { useTransfer } from "../model/useTransfer";
-import { formatCurrency } from "@/src/shared/lib/formatters";
+import { formatCurrency } from "@/src/shared/lib";
 
 const QUICK_AMOUNTS = [5000, 10000, 30000, 50000];
 

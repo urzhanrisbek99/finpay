@@ -1,4 +1,4 @@
-import { createClient } from "@/src/shared/api/supabase/client";
+import { createBrowserClient } from "@/src/shared/api/supabase/client";
 import type { User } from "../model/types";
 
 export const userApi = {
@@ -6,7 +6,7 @@ export const userApi = {
   getProfile: async (
     userId: string,
   ): Promise<{ data: User | null; error: string | null }> => {
-    const supabase = createClient();
+    const supabase = createBrowserClient();
 
     const { data, error } = await supabase
       .from("profiles")
@@ -25,7 +25,7 @@ export const userApi = {
     userId: string,
     balance: number,
   ): Promise<{ error: string | null }> => {
-    const supabase = createClient();
+    const supabase = createBrowserClient();
 
     const { error } = await supabase
       .from("profiles")
@@ -39,7 +39,7 @@ export const userApi = {
     email: string;
     full_name: string;
   }): Promise<{ error: string | null }> => {
-    const supabase = createClient();
+    const supabase = createBrowserClient();
 
     const { error } = await supabase.from("profiles").insert({
       ...profile,

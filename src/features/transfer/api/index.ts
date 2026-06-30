@@ -1,4 +1,4 @@
-import { createClient } from "@/src/shared/api/supabase/client";
+import { createBrowserClient } from "@/src/shared/api/supabase/client";
 import type { Transaction } from "@/src/entities/transaction/model/types";
 
 export const transferApi = {
@@ -8,7 +8,7 @@ export const transferApi = {
     phone: string,
     comment?: string,
   ): Promise<{ data: Transaction | null; error: string | null }> => {
-    const supabase = createClient();
+    const supabase = createBrowserClient();
 
     const { data, error } = await supabase
       .from("transactions")

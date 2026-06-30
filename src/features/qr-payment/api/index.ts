@@ -1,4 +1,4 @@
-import { createClient } from "@/src/shared/api/supabase/client";
+import { createBrowserClient } from "@/src/shared/api/supabase/client";
 import type { Transaction } from "@/src/entities/transaction/model/types";
 
 export const qrPaymentApi = {
@@ -7,7 +7,7 @@ export const qrPaymentApi = {
     merchant: string,
     userId: string,
   ): Promise<{ data: Transaction | null; error: string | null }> => {
-    const supabase = createClient();
+    const supabase = createBrowserClient();
 
     const { data, error } = await supabase
       .from("transactions")
@@ -33,7 +33,7 @@ export const qrPaymentApi = {
     transactionId: string,
     onStatusChange: (status: string) => void,
   ) => {
-    const supabase = createClient();
+    const supabase = createBrowserClient();
 
     const channel = supabase
       .channel(`transaction-${transactionId}`)
@@ -60,7 +60,7 @@ export const qrPaymentApi = {
   // для демо — симулируем подтверждение через 3 сек
   simulateConfirm: (transactionId: string): void => {
     setTimeout(async () => {
-      const supabase = createClient();
+      const supabase = createBrowserClient();
       const { error } = await supabase
         .from("transactions")
         .update({ status: "completed" })

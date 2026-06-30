@@ -9,8 +9,8 @@ import {
   BarChart3,
   Settings,
 } from "lucide-react";
-import { cn } from "@/src/shared/lib/utils";
-import { ROUTES } from "@/src/shared/config/routes";
+import { cn } from "@/src/shared/lib";
+import { ROUTES } from "@/src/shared/config";
 import { LogoutButton } from "@/src/features/logout/ui";
 import { ThemeToggle } from "@/src/features/theme-toggle/ui";
 

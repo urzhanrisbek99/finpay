@@ -2,7 +2,7 @@
 
 import { Header } from "@/src/widgets/header/ui/Header";
 import { Card, CardContent, CardHeader, CardTitle } from "@/src/shared/ui/card";
-import { formatCurrency } from "@/src/shared/lib/formatters";
+import { formatCurrency } from "@/src/shared/lib";
 import {
   XAxis,
   YAxis,

@@ -14,7 +14,7 @@
   "rtl": false,
   "aliases": {
     "components": "@/src/shared/ui",
-    "utils": "@/src/shared/lib/utils",
+    "utils": "@/src/shared/lib",
     "ui": "@/src/shared/ui",
     "lib": "@/src/shared/lib",
     "hooks": "@/src/shared/hooks"

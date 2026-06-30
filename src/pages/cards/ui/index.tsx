@@ -5,7 +5,7 @@ import { CreditCard, Lock, Eye, RefreshCw, Trash2 } from "lucide-react";
 import { Header } from "@/src/widgets/header/ui/Header";
 import { Card, CardContent, CardHeader, CardTitle } from "@/src/shared/ui/card";
 import { Skeleton } from "@/src/shared/ui/skeleton";
-import { formatCurrency } from "@/src/shared/lib/formatters";
+import { formatCurrency } from "@/src/shared/lib";
 import { useCard } from "@/src/entities/card/model/useCard";
 import { cardApi } from "@/src/entities/card/api";
 import { useCardStore } from "@/src/entities/card/model/store";

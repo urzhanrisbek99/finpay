@@ -20,7 +20,6 @@
     ],
     "paths": {
       "@/*": ["./*"],
-      "@/lib/utils": ["./src/shared/lib/utils.ts"],
       "@/src/shared/*": ["./src/shared/*"],
       "@/src/features/*": ["./src/features/*"],
       "@/src/entities/*": ["./src/entities/*"],

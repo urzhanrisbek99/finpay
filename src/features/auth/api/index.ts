@@ -1,8 +1,8 @@
-import { createClient } from "@/src/shared/api/supabase/client";
+import { createBrowserClient } from "@/src/shared/api/supabase/client";
 
 export const authApi = {
   signIn: async (email: string, password: string) => {
-    const supabase = createClient();
+    const supabase = createBrowserClient();
     const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,
@@ -11,7 +11,7 @@ export const authApi = {
   },
 
   signUp: async (email: string, password: string, fullName: string) => {
-    const supabase = createClient();
+    const supabase = createBrowserClient();
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
@@ -23,13 +23,13 @@ export const authApi = {
   },
 
   signOut: async () => {
-    const supabase = createClient();
+    const supabase = createBrowserClient();
     const { error } = await supabase.auth.signOut();
     return { error: error ? error.message : null };
   },
 
   getUser: async () => {
-    const supabase = createClient();
+    const supabase = createBrowserClient();
     const {
       data: { user },
       error,

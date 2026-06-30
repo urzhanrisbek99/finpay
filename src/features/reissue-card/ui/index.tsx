@@ -5,7 +5,7 @@ import { CheckCircle } from "lucide-react";
 import { Dialog, DialogContent } from "@/src/shared/ui/dialog";
 import { Button } from "@/src/shared/ui/button";
 import { reissueCardApi } from "../api";
-import { createClient } from "@/src/shared/api/supabase/client";
+import { createBrowserClient } from "@/src/shared/api/supabase/client";
 import { useCardStore } from "@/src/entities/card/model/store";
 
 interface ReissueCardModalProps {
@@ -22,7 +22,7 @@ export function ReissueCardModal({ open, onClose }: ReissueCardModalProps) {
     if (!card) return;
     setIsLoading(true);
 
-    const supabase = createClient();
+    const supabase = createBrowserClient();
     const {
       data: { user },
     } = await supabase.auth.getUser();

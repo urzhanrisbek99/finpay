@@ -5,8 +5,8 @@ import { qrPaymentApi } from "../api";
 import { useUserStore } from "@/src/entities/user/model/store";
 import { useTransactionStore } from "@/src/entities/transaction/model/store";
 import type { Transaction } from "@/src/entities/transaction/model/types";
-import { createClient } from "@/src/shared/api/supabase/client";
-import { POLLING_INTERVAL } from "@/src/shared/config/constants";
+import { createBrowserClient } from "@/src/shared/api/supabase/client";
+import { POLLING_INTERVAL } from "@/src/shared/config";
 
 type PaymentState = "idle" | "pending" | "completed" | "failed";
 
@@ -28,7 +28,7 @@ export function useQRPayment() {
 
   const startPolling = useCallback(
     (transactionId: string, txData: Transaction) => {
-      const supabase = createClient();
+      const supabase = createBrowserClient();
 
       intervalRef.current = setInterval(async () => {
         const { data } = await supabase

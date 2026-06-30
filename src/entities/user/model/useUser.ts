@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { createClient } from "@/src/shared/api/supabase/client";
+import { createBrowserClient } from "@/src/shared/api/supabase/client";
 import { userApi } from "../api";
 import { useUserStore } from "./store";
 
@@ -11,7 +11,7 @@ export function useUser() {
   useEffect(() => {
     const load = async () => {
       setLoading(true);
-      const supabase = createClient();
+      const supabase = createBrowserClient();
       const {
         data: { user: authUser },
       } = await supabase.auth.getUser();
