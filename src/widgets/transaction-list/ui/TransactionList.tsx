@@ -5,10 +5,9 @@ import { Building2, QrCode, Send, Clock, ShoppingBag } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/src/shared/ui/card";
 
 import { formatCurrency, formatDate } from "@/src/shared/lib";
-import { useTransactionStore } from "@/src/entities/transaction/model/store";
-import { transactionApi } from "@/src/entities/transaction/api";
-import { useUserStore } from "@/src/entities/user/model/store";
-import type { Transaction } from "@/src/entities/transaction/model/types";
+import { transactionModel } from "@/src/entities/transaction";
+import { transactionApi } from "@/src/entities/transaction";
+import { userModel } from "@/src/entities/user";
 
 const categoryIcons: Record<string, React.ReactNode> = {
   salary: <Building2 size={15} />,
@@ -32,7 +31,11 @@ const statusColors: Record<string, string> = {
   failed: "bg-red-100 text-red-700",
 };
 
-function TransactionRow({ transaction }: { transaction: Transaction }) {
+function TransactionRow({
+  transaction,
+}: {
+  transaction: transactionModel.Transaction;
+}) {
   const icon = categoryIcons[transaction.category] ?? <QrCode size={15} />;
   const iconColor =
     categoryColors[transaction.category] ?? "bg-muted text-muted-foreground";
@@ -67,8 +70,8 @@ function TransactionRow({ transaction }: { transaction: Transaction }) {
 
 export function TransactionList() {
   const { transactions, isLoading, setTransactions, setLoading } =
-    useTransactionStore();
-  const user = useUserStore((state) => state.user);
+    transactionModel.useTransactionStore();
+  const user = userModel.useUserStore((state) => state.user);
 
   useEffect(() => {
     if (!user) return;

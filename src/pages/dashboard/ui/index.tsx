@@ -4,10 +4,10 @@ import { useState } from "react";
 import { Header } from "@/src/widgets/header/ui/Header";
 import { SpendingChart } from "@/src/widgets/spending-chart/ui/SpendingChart";
 import { TransactionList } from "@/src/widgets/transaction-list/ui/TransactionList";
-import { UserBalance } from "@/src/entities/user/ui/UserBalance";
+import { UserBalance } from "@/src/entities/user";
 import { QRModal } from "@/src/features/qr-payment/ui";
 import { TransferModal } from "@/src/features/transfer/ui";
-import { useUser } from "@/src/entities/user/model/useUser";
+import { userModel } from "@/src/entities/user";
 import { formatCurrency } from "@/src/shared/lib";
 
 const statsCards = [
@@ -17,7 +17,7 @@ const statsCards = [
 ];
 
 export function Dashboard() {
-  const { user } = useUser();
+  const { user } = userModel.useUser();
   const [qrOpen, setQrOpen] = useState(false);
   const [transferOpen, setTransferOpen] = useState(false);
 

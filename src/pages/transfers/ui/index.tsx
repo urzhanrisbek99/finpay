@@ -5,7 +5,7 @@ import { Header } from "@/src/widgets/header/ui/Header";
 import { TransferModal } from "@/src/features/transfer/ui";
 import { Card, CardContent, CardHeader, CardTitle } from "@/src/shared/ui/card";
 import { formatCurrency, formatDate } from "@/src/shared/lib";
-import { useTransactionStore } from "@/src/entities/transaction/model/store";
+import { transactionModel } from "@/src/entities/transaction";
 import { Send, ArrowDownLeft } from "lucide-react";
 
 const recentRecipients = [
@@ -17,9 +17,9 @@ const recentRecipients = [
 
 export function Transfers() {
   const [transferOpen, setTransferOpen] = useState(false);
-  const transactions = useTransactionStore((s) => s.transactions).filter(
-    (tx) => tx.type === "transfer",
-  );
+  const transactions = transactionModel
+    .useTransactionStore((s) => s.transactions)
+    .filter((tx) => tx.type === "transfer");
 
   return (
     <div className="mx-auto max-w-4xl">

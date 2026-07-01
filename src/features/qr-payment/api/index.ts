@@ -1,12 +1,15 @@
 import { createBrowserClient } from "@/src/shared/api/supabase/client";
-import type { Transaction } from "@/src/entities/transaction/model/types";
+import { transactionModel } from "@/src/entities/transaction";
 
 export const qrPaymentApi = {
   create: async (
     amount: number,
     merchant: string,
     userId: string,
-  ): Promise<{ data: Transaction | null; error: string | null }> => {
+  ): Promise<{
+    data: transactionModel.Transaction | null;
+    error: string | null;
+  }> => {
     const supabase = createBrowserClient();
 
     const { data, error } = await supabase
@@ -23,7 +26,7 @@ export const qrPaymentApi = {
       .single();
 
     return {
-      data: data as Transaction | null,
+      data: data as transactionModel.Transaction | null,
       error: error ? error.message : null,
     };
   },

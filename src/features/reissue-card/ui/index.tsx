@@ -6,7 +6,7 @@ import { Dialog, DialogContent } from "@/src/shared/ui/dialog";
 import { Button } from "@/src/shared/ui/button";
 import { reissueCardApi } from "../api";
 import { createBrowserClient } from "@/src/shared/api/supabase/client";
-import { useCardStore } from "@/src/entities/card/model/store";
+import { cardModel } from "@/src/entities/card";
 
 interface ReissueCardModalProps {
   open: boolean;
@@ -16,7 +16,7 @@ interface ReissueCardModalProps {
 export function ReissueCardModal({ open, onClose }: ReissueCardModalProps) {
   const [confirmed, setConfirmed] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const card = useCardStore((s) => s.card);
+  const card = cardModel.useCardStore((s) => s.card);
 
   const handleConfirm = async () => {
     if (!card) return;

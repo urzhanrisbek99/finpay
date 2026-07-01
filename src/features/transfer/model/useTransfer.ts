@@ -2,8 +2,8 @@
 
 import { useState, useCallback } from "react";
 import { transferApi } from "../api";
-import { useUserStore } from "@/src/entities/user/model/store";
-import { useTransactionStore } from "@/src/entities/transaction/model/store";
+import { userModel } from "@/src/entities/user";
+import { transactionModel } from "@/src/entities/transaction";
 
 type TransferState = "idle" | "loading" | "success" | "failed";
 
@@ -11,8 +11,10 @@ export function useTransfer() {
   const [state, setState] = useState<TransferState>("idle");
   const [error, setError] = useState<string | null>(null);
 
-  const user = useUserStore((s) => s.user);
-  const addTransaction = useTransactionStore((s) => s.addTransaction);
+  const user = userModel.useUserStore((s) => s.user);
+  const addTransaction = transactionModel.useTransactionStore(
+    (s) => s.addTransaction,
+  );
 
   const send = useCallback(
     async (amount: number, phone: string, comment?: string) => {

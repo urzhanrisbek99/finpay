@@ -40,7 +40,6 @@ export const cardApi = {
     const supabase = createBrowserClient();
 
     const { error } = await supabase.from("cards").delete().eq("id", cardId);
-    console.log("Delete card result:", { cardId, error });
 
     return { error: error ? error.message : null };
   },

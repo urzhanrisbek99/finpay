@@ -3,14 +3,16 @@
 import { useRouter } from "next/navigation";
 import { LogOut } from "lucide-react";
 import { createBrowserClient } from "@/src/shared/api/supabase/client";
-import { useUserStore } from "@/src/entities/user/model/store";
-import { useTransactionStore } from "@/src/entities/transaction/model/store";
+import { userModel } from "@/src/entities/user";
+import { transactionModel } from "@/src/entities/transaction";
 import { ROUTES } from "@/src/shared/config";
 
 export function LogoutButton() {
   const router = useRouter();
-  const setUser = useUserStore((s) => s.setUser);
-  const setTransactions = useTransactionStore((s) => s.setTransactions);
+  const setUser = userModel.useUserStore((s) => s.setUser);
+  const setTransactions = transactionModel.useTransactionStore(
+    (s) => s.setTransactions,
+  );
 
   const handleLogout = async () => {
     const supabase = createBrowserClient();

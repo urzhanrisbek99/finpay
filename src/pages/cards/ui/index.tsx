@@ -6,16 +6,14 @@ import { Header } from "@/src/widgets/header/ui/Header";
 import { Card, CardContent, CardHeader, CardTitle } from "@/src/shared/ui/card";
 import { Skeleton } from "@/src/shared/ui/skeleton";
 import { formatCurrency } from "@/src/shared/lib";
-import { useCard } from "@/src/entities/card/model/useCard";
-import { cardApi } from "@/src/entities/card/api";
-import { useCardStore } from "@/src/entities/card/model/store";
+import { cardModel, cardApi } from "@/src/entities/card";
 import { ShowCVVModal } from "@/src/features/show-cvv/ui";
 import { ReissueCardModal } from "@/src/features/reissue-card/ui";
 import { RemoveCardModal } from "@/src/features/remove-card/ui";
 
 export function Cards() {
-  const { card, isLoading } = useCard();
-  const { toggleFreeze } = useCardStore();
+  const { card, isLoading } = cardModel.useCard();
+  const { toggleFreeze } = cardModel.useCardStore();
   const [cvvOpen, setCvvOpen] = useState(false);
   const [reissueOpen, setReissueOpen] = useState(false);
   const [removeOpen, setRemoveOpen] = useState(false);

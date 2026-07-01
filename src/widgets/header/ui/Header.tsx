@@ -2,14 +2,14 @@
 
 import { Bell, Plus } from "lucide-react";
 import { Button } from "@/src/shared/ui/button";
-import { useUserStore } from "@/src/entities/user/model/store";
+import { userModel } from "@/src/entities/user";
 
 interface HeaderProps {
   onNewPayment?: () => void;
 }
 
 export function Header({ onNewPayment }: HeaderProps) {
-  const user = useUserStore((state) => state.user);
+  const user = userModel.useUserStore((state) => state.user);
 
   const getGreeting = () => {
     const hour = new Date().getHours();

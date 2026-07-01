@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { authApi } from "../api";
-import { userApi } from "@/src/entities/user/api";
+import { userApi } from "@/src/entities/user";
 
 export function useRegister() {
   const [isLoading, setIsLoading] = useState(false);

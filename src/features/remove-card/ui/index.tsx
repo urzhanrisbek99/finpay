@@ -6,8 +6,7 @@ import { Dialog, DialogContent } from "@/src/shared/ui/dialog";
 import { Button } from "@/src/shared/ui/button";
 import { removeCardApi } from "../api";
 import { createBrowserClient } from "@/src/shared/api/supabase/client";
-import { useCardStore } from "@/src/entities/card/model/store";
-import { cardApi } from "@/src/entities/card/api";
+import { cardModel, cardApi } from "@/src/entities/card";
 
 interface RemoveCardModalProps {
   open: boolean;
@@ -17,8 +16,8 @@ interface RemoveCardModalProps {
 export function RemoveCardModal({ open, onClose }: RemoveCardModalProps) {
   const [confirmed, setConfirmed] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const card = useCardStore((s) => s.card);
-  const setCard = useCardStore((s) => s.setCard);
+  const card = cardModel.useCardStore((s) => s.card);
+  const setCard = cardModel.useCardStore((s) => s.setCard);
 
   const handleConfirm = async () => {
     if (!card) return;

@@ -1,5 +1,5 @@
 import { createBrowserClient } from "@/src/shared/api/supabase/client";
-import type { Transaction } from "@/src/entities/transaction/model/types";
+import { transactionModel } from "@/src/entities/transaction";
 
 export const transferApi = {
   send: async (
@@ -7,7 +7,10 @@ export const transferApi = {
     amount: number,
     phone: string,
     comment?: string,
-  ): Promise<{ data: Transaction | null; error: string | null }> => {
+  ): Promise<{
+    data: transactionModel.Transaction | null;
+    error: string | null;
+  }> => {
     const supabase = createBrowserClient();
 
     const { data, error } = await supabase
@@ -24,7 +27,7 @@ export const transferApi = {
       .single();
 
     return {
-      data: data as Transaction | null,
+      data: data as transactionModel.Transaction | null,
       error: error ? error.message : null,
     };
   },
