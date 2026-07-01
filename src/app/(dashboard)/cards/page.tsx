@@ -1,4 +1,4 @@
-import { Cards } from "@/src/pages/cards/ui";
+import { Cards } from "@/src/pages/cards";
 
 export default function CardsPage() {
   return <Cards />;
