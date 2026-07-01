@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { CreditCard, Lock, Eye, RefreshCw, Trash2 } from "lucide-react";
-import { Header } from "@/src/widgets/header/ui/Header";
+import { Header } from "@/src/widgets/header";
 import { Card, CardContent, CardHeader, CardTitle } from "@/src/shared/ui/card";
 import { Skeleton } from "@/src/shared/ui/skeleton";
 import { formatCurrency } from "@/src/shared/lib";

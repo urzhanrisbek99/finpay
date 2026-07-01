@@ -1,9 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { Header } from "@/src/widgets/header/ui/Header";
-import { SpendingChart } from "@/src/widgets/spending-chart/ui/SpendingChart";
-import { TransactionList } from "@/src/widgets/transaction-list/ui/TransactionList";
+import { Header } from "@/src/widgets/header";
+import { SpendingChart } from "@/src/widgets/spending-chart";
+import { TransactionList } from "@/src/widgets/transaction-list";
 import { UserBalance } from "@/src/entities/user";
 import { QRModal } from "@/src/features/qr-payment";
 import { TransferModal } from "@/src/features/transfer";

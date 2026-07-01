@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Header } from "@/src/widgets/header/ui/Header";
+import { Header } from "@/src/widgets/header";
 import { TransferModal } from "@/src/features/transfer";
 import { Card, CardContent, CardHeader, CardTitle } from "@/src/shared/ui/card";
 import { formatCurrency, formatDate } from "@/src/shared/lib";

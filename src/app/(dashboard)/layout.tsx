@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { createServerClient } from "@/src/shared/api/supabase/server";
-import { Sidebar } from "@/src/widgets/sidebar/ui/Sidebar";
+import { Sidebar } from "@/src/widgets/sidebar";
 
 export default async function DashboardLayout({
   children,
