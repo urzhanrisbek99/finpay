@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useLogin } from "../model/useLogin";
+import { useLogin } from "../model";
 import { Button } from "@/src/shared/ui/button";
 import { Input } from "@/src/shared/ui/input";
 import { Label } from "@/src/shared/ui/label";

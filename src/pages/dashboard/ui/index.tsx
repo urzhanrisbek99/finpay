@@ -5,8 +5,8 @@ import { Header } from "@/src/widgets/header/ui/Header";
 import { SpendingChart } from "@/src/widgets/spending-chart/ui/SpendingChart";
 import { TransactionList } from "@/src/widgets/transaction-list/ui/TransactionList";
 import { UserBalance } from "@/src/entities/user";
-import { QRModal } from "@/src/features/qr-payment/ui";
-import { TransferModal } from "@/src/features/transfer/ui";
+import { QRModal } from "@/src/features/qr-payment";
+import { TransferModal } from "@/src/features/transfer";
 import { userModel } from "@/src/entities/user";
 import { formatCurrency } from "@/src/shared/lib";
 

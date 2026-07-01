@@ -1,7 +1,10 @@
+"use client";
+
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { authApi } from "../api";
 import { userApi } from "@/src/entities/user";
+import { ROUTES } from "@/src/shared/config";
 
 export function useRegister() {
   const [isLoading, setIsLoading] = useState(false);
@@ -31,7 +34,7 @@ export function useRegister() {
         email,
         full_name: fullName,
       });
-      router.push("/");
+      router.push(ROUTES.DASHBOARD);
     }
 
     setIsLoading(false);

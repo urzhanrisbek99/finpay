@@ -7,7 +7,7 @@ import { Dialog, DialogContent } from "@/src/shared/ui/dialog";
 import { Button } from "@/src/shared/ui/button";
 import { Input } from "@/src/shared/ui/input";
 import { Label } from "@/src/shared/ui/label";
-import { useQRPayment } from "../model/useQRPayment";
+import { useQRPayment } from "../model";
 import { formatCurrency } from "@/src/shared/lib";
 
 interface QRModalProps {

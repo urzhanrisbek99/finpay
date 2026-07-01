@@ -1,6 +1,9 @@
+"use client";
+
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { authApi } from "../api";
+import { ROUTES } from "@/src/shared/config";
 
 export function useLogin() {
   const [isLoading, setIsLoading] = useState(false);
@@ -16,7 +19,7 @@ export function useLogin() {
     if (error) {
       setError(error);
     } else {
-      router.push("/");
+      router.push(ROUTES.DASHBOARD);
     }
 
     setIsLoading(false);

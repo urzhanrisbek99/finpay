@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useRegister } from "../model/useRegister";
+import { useRegister } from "../model";
 import { Button } from "@/src/shared/ui/button";
 import { Input } from "@/src/shared/ui/input";
 import { Label } from "@/src/shared/ui/label";
