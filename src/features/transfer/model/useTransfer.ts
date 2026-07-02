@@ -2,8 +2,8 @@
 
 import { useState, useCallback } from "react";
 import { transferApi } from "../api";
-import { userModel } from "@/src/entities/user";
-import { transactionModel } from "@/src/entities/transaction";
+import { userModel } from "#entities/user";
+import { transactionModel } from "#entities/transaction";
 
 type TransferState = "idle" | "loading" | "success" | "failed";
 

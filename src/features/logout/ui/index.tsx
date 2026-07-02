@@ -2,10 +2,10 @@
 
 import { useRouter } from "next/navigation";
 import { LogOut } from "lucide-react";
-import { createBrowserClient } from "@/src/shared/api/supabase/client";
-import { userModel } from "@/src/entities/user";
-import { transactionModel } from "@/src/entities/transaction";
-import { ROUTES } from "@/src/shared/config";
+import { createBrowserClient } from "#shared/api/supabase/client";
+import { userModel } from "#entities/user";
+import { transactionModel } from "#entities/transaction";
+import { ROUTES } from "#shared/config";
 
 export function LogoutButton() {
   const router = useRouter();

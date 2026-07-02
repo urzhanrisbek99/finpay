@@ -2,12 +2,12 @@
 
 import { useEffect } from "react";
 import { Building2, QrCode, Send, Clock, ShoppingBag } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/src/shared/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "#shared/ui/card";
 
-import { formatCurrency, formatDate } from "@/src/shared/lib";
-import { transactionModel } from "@/src/entities/transaction";
-import { transactionApi } from "@/src/entities/transaction";
-import { userModel } from "@/src/entities/user";
+import { formatCurrency, formatDate } from "#shared/lib";
+import { transactionModel } from "#entities/transaction";
+import { transactionApi } from "#entities/transaction";
+import { userModel } from "#entities/user";
 
 const categoryIcons: Record<string, React.ReactNode> = {
   salary: <Building2 size={15} />,

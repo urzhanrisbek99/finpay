@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { createBrowserClient } from "@/src/shared/api/supabase/client";
+import { createBrowserClient } from "#shared/api/supabase/client";
 import { cardApi } from "../api";
 import { useCardStore } from "./store";
 

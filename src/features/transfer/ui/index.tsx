@@ -2,12 +2,12 @@
 
 import { useState } from "react";
 import { Loader2, CheckCircle } from "lucide-react";
-import { Dialog, DialogContent } from "@/src/shared/ui/dialog";
-import { Button } from "@/src/shared/ui/button";
-import { Input } from "@/src/shared/ui/input";
-import { Label } from "@/src/shared/ui/label";
+import { Dialog, DialogContent } from "#shared/ui/dialog";
+import { Button } from "#shared/ui/button";
+import { Input } from "#shared/ui/input";
+import { Label } from "#shared/ui/label";
 import { useTransfer } from "../model";
-import { formatCurrency } from "@/src/shared/lib";
+import { formatCurrency } from "#shared/lib";
 
 const QUICK_AMOUNTS = [5000, 10000, 30000, 50000];
 

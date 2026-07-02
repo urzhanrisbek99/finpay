@@ -2,11 +2,11 @@
 
 import { useState } from "react";
 import { CheckCircle } from "lucide-react";
-import { Dialog, DialogContent } from "@/src/shared/ui/dialog";
-import { Button } from "@/src/shared/ui/button";
+import { Dialog, DialogContent } from "#shared/ui/dialog";
+import { Button } from "#shared/ui/button";
 import { removeCardApi } from "../api";
-import { createBrowserClient } from "@/src/shared/api/supabase/client";
-import { cardModel, cardApi } from "@/src/entities/card";
+import { createBrowserClient } from "#shared/api/supabase/client";
+import { cardModel, cardApi } from "#entities/card";
 
 interface RemoveCardModalProps {
   open: boolean;

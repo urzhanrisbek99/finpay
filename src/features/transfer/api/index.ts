@@ -1,5 +1,5 @@
-import { createBrowserClient } from "@/src/shared/api/supabase/client";
-import { transactionModel } from "@/src/entities/transaction";
+import { createBrowserClient } from "#shared/api/supabase/client";
+import { transactionModel } from "#entities/transaction";
 
 export const transferApi = {
   send: async (

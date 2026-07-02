@@ -1,6 +1,6 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
-import { ROUTES } from "./src/shared/config";
+import { ROUTES } from "#shared/config";
 
 export async function proxy(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request });

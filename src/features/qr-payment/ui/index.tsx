@@ -3,12 +3,12 @@
 import { useState } from "react";
 import { QRCodeSVG } from "qrcode.react";
 import { CheckCircle, XCircle, Loader2 } from "lucide-react";
-import { Dialog, DialogContent } from "@/src/shared/ui/dialog";
-import { Button } from "@/src/shared/ui/button";
-import { Input } from "@/src/shared/ui/input";
-import { Label } from "@/src/shared/ui/label";
+import { Dialog, DialogContent } from "#shared/ui/dialog";
+import { Button } from "#shared/ui/button";
+import { Input } from "#shared/ui/input";
+import { Label } from "#shared/ui/label";
 import { useQRPayment } from "../model";
-import { formatCurrency } from "@/src/shared/lib";
+import { formatCurrency } from "#shared/lib";
 
 interface QRModalProps {
   open: boolean;

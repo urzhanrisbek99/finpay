@@ -19,12 +19,13 @@
       }
     ],
     "paths": {
-      "@/*": ["./*"],
-      "@/src/shared/*": ["./src/shared/*"],
-      "@/src/features/*": ["./src/features/*"],
-      "@/src/entities/*": ["./src/entities/*"],
-      "@/src/widgets/*": ["./src/widgets/*"],
-      "@/src/pages/*": ["./src/pages/*"]
+      "#app": ["./src/_app"],
+      "#app/*": ["./src/_app/*"],
+      "#shared/*": ["./src/shared/*"],
+      "#entities/*": ["./src/entities/*"],
+      "#features/*": ["./src/features/*"],
+      "#widgets/*": ["./src/widgets/*"],
+      "#pages/*": ["./src/_pages/*"]
     }
   },
   "include": [

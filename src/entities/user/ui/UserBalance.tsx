@@ -1,4 +1,4 @@
-import { formatCurrency } from "@/src/shared/lib";
+import { formatCurrency } from "#shared/lib";
 
 interface UserBalanceProps {
   balance: number;

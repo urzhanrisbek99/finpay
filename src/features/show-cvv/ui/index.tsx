@@ -2,8 +2,8 @@
 
 import { useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
-import { Dialog, DialogContent } from "@/src/shared/ui/dialog";
-import { Button } from "@/src/shared/ui/button";
+import { Dialog, DialogContent } from "#shared/ui/dialog";
+import { Button } from "#shared/ui/button";
 
 interface ShowCVVModalProps {
   open: boolean;

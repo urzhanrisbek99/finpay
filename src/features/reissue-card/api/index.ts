@@ -1,4 +1,4 @@
-import { createBrowserClient } from "@/src/shared/api/supabase/client";
+import { createBrowserClient } from "#shared/api/supabase/client";
 
 export const reissueCardApi = {
   request: async (

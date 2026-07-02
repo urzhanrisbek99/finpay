@@ -2,7 +2,7 @@
 
 import * as React from "react";
 
-import { cn } from "@/src/shared/lib";
+import { cn } from "#shared/lib";
 
 function Label({ className, ...props }: React.ComponentProps<"label">) {
   return (

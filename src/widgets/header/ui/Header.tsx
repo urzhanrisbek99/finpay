@@ -1,8 +1,8 @@
 "use client";
 
 import { Bell, Plus } from "lucide-react";
-import { Button } from "@/src/shared/ui/button";
-import { userModel } from "@/src/entities/user";
+import { Button } from "#shared/ui/button";
+import { userModel } from "#entities/user";
 
 interface HeaderProps {
   onNewPayment?: () => void;

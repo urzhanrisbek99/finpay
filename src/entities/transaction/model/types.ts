@@ -2,7 +2,7 @@ import type {
   TransactionStatus,
   TransactionType,
   TransactionCategory,
-} from "@/src/shared/types";
+} from "#shared/types";
 
 export type Transaction = {
   id: string;

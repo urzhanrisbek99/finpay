@@ -9,10 +9,10 @@ import {
   BarChart3,
   Settings,
 } from "lucide-react";
-import { cn } from "@/src/shared/lib";
-import { ROUTES } from "@/src/shared/config";
-import { LogoutButton } from "@/src/features/logout";
-import { ThemeToggle } from "@/src/features/theme-toggle";
+import { cn } from "#shared/lib";
+import { ROUTES } from "#shared/config";
+import { LogoutButton } from "#features/logout";
+import { ThemeToggle } from "#features/theme-toggle";
 
 const navItems = [
   { icon: LayoutDashboard, href: ROUTES.DASHBOARD, label: "Dashboard" },

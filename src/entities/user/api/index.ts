@@ -1,4 +1,4 @@
-import { createBrowserClient } from "@/src/shared/api/supabase/client";
+import { createBrowserClient } from "#shared/api/supabase/client";
 import type { User } from "../model/types";
 
 export const userApi = {

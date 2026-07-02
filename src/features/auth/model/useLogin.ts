@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { authApi } from "../api";
-import { ROUTES } from "@/src/shared/config";
+import { ROUTES } from "#shared/config";
 
 export function useLogin() {
   const [isLoading, setIsLoading] = useState(false);

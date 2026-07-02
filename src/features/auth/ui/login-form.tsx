@@ -2,9 +2,9 @@
 
 import { useState } from "react";
 import { useLogin } from "../model";
-import { Button } from "@/src/shared/ui/button";
-import { Input } from "@/src/shared/ui/input";
-import { Label } from "@/src/shared/ui/label";
+import { Button } from "#shared/ui/button";
+import { Input } from "#shared/ui/input";
+import { Label } from "#shared/ui/label";
 
 export function LoginForm() {
   const [email, setEmail] = useState("");

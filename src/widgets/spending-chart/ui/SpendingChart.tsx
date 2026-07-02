@@ -8,8 +8,8 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
-import { Card, CardContent, CardHeader, CardTitle } from "@/src/shared/ui/card";
-import { formatCurrency } from "@/src/shared/lib";
+import { Card, CardContent, CardHeader, CardTitle } from "#shared/ui/card";
+import { formatCurrency } from "#shared/lib";
 
 const data = [
   { month: "Jan", amount: 320000 },
