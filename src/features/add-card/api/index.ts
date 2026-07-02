@@ -1,0 +1,45 @@
+import { createBrowserClient } from "#shared/api/supabase/client";
+import type { Card } from "#entities/card";
+
+export type AddCardInput = {
+  number: string;
+  holder_name: string;
+  expires_at: string;
+  type: Card["type"];
+};
+
+// лимит трат по умолчанию — поля в форме нет, но колонка обязательна
+const DEFAULT_SPENDING_LIMIT = 500000;
+
+export const addCardApi = {
+  // создать новую карту пользователя
+  create: async (
+    userId: string,
+    input: AddCardInput,
+  ): Promise<{ data: Card | null; error: string | null }> => {
+    const supabase = createBrowserClient();
+
+    // храним только последние 4 цифры — полный номер и CVV не сохраняем
+    const number = input.number.replace(/\D/g, "").slice(-4);
+
+    const { data, error } = await supabase
+      .from("cards")
+      .insert({
+        user_id: userId,
+        number,
+        holder_name: input.holder_name,
+        expires_at: input.expires_at,
+        type: input.type,
+        is_frozen: false,
+        spending_limit: DEFAULT_SPENDING_LIMIT,
+        spent: 0,
+      })
+      .select()
+      .single();
+
+    return {
+      data: data as Card | null,
+      error: error ? error.message : null,
+    };
+  },
+};

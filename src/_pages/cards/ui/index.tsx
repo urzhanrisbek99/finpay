@@ -10,6 +10,7 @@ import { cardModel, cardApi } from "#entities/card";
 import { ShowCVVModal } from "#features/show-cvv";
 import { ReissueCardModal } from "#features/reissue-card";
 import { RemoveCardModal } from "#features/remove-card";
+import { AddCardModal } from "#features/add-card";
 
 export function Cards() {
   const { card, isLoading } = cardModel.useCard();
@@ -17,6 +18,7 @@ export function Cards() {
   const [cvvOpen, setCvvOpen] = useState(false);
   const [reissueOpen, setReissueOpen] = useState(false);
   const [removeOpen, setRemoveOpen] = useState(false);
+  const [addOpen, setAddOpen] = useState(false);
 
   const handleToggleFreeze = async () => {
     if (!card) return;
@@ -42,37 +44,48 @@ export function Cards() {
 
       <div className="grid grid-cols-2 gap-6">
         <div className="flex flex-col gap-4">
-          <div
-            className={`rounded-xl p-5 text-white transition-all ${card?.is_frozen ? "bg-gray-400" : "bg-violet-600"}`}
-          >
-            <div className="mb-6 flex items-start justify-between">
-              <span className="text-xs opacity-75">Halyk Bank</span>
-              {card?.is_frozen && (
-                <span className="rounded-full bg-white/20 px-2 py-1 text-xs">
-                  Frozen
-                </span>
-              )}
-            </div>
-            <div className="mb-6 text-base tracking-widest">
-              •••• •••• •••• {card?.number ?? "0000"}
-            </div>
-            <div className="flex items-end justify-between">
-              <div>
-                <div className="mb-1 text-xs opacity-65">Card holder</div>
-                <div className="text-sm font-medium">{card?.holder_name}</div>
+          {card && (
+            <div
+              className={`rounded-xl p-5 text-white transition-all ${card.is_frozen ? "bg-gray-400" : "bg-violet-600"}`}
+            >
+              <div className="mb-6 flex items-start justify-between">
+                <span className="text-xs opacity-75">Halyk Bank</span>
+                {card.is_frozen && (
+                  <span className="rounded-full bg-white/20 px-2 py-1 text-xs">
+                    Frozen
+                  </span>
+                )}
               </div>
-              <div className="text-right">
-                <div className="mb-1 text-xs opacity-65">Expires</div>
-                <div className="text-sm font-medium">{card?.expires_at}</div>
+              <div className="mb-6 text-base tracking-widest">
+                •••• •••• •••• {card.number}
               </div>
-              <div className="text-xl opacity-85">VISA</div>
+              <div className="flex items-end justify-between">
+                <div>
+                  <div className="mb-1 text-xs opacity-65">Card holder</div>
+                  <div className="text-sm font-medium">{card.holder_name}</div>
+                </div>
+                <div className="text-right">
+                  <div className="mb-1 text-xs opacity-65">Expires</div>
+                  <div className="text-sm font-medium">{card.expires_at}</div>
+                </div>
+                <div className="text-xl opacity-85">
+                  {card.type.toUpperCase()}
+                </div>
+              </div>
             </div>
-          </div>
+          )}
 
-          <div className="hover:bg-muted/50 flex min-h-24 cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed p-5 transition-colors">
-            <CreditCard size={20} className="text-muted-foreground" />
-            <span className="text-muted-foreground text-sm">Add new card</span>
-          </div>
+          {!card && (
+            <button
+              onClick={() => setAddOpen(true)}
+              className="hover:bg-muted/50 flex min-h-24 cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed p-5 transition-colors"
+            >
+              <CreditCard size={20} className="text-muted-foreground" />
+              <span className="text-muted-foreground text-sm">
+                Add new card
+              </span>
+            </button>
+          )}
         </div>
 
         <div className="flex flex-col gap-4">
@@ -197,6 +210,7 @@ export function Cards() {
         onClose={() => setReissueOpen(false)}
       />
       <RemoveCardModal open={removeOpen} onClose={() => setRemoveOpen(false)} />
+      <AddCardModal open={addOpen} onClose={() => setAddOpen(false)} />
     </div>
   );
 }
