@@ -3,7 +3,8 @@
 import { useState, useCallback, useEffect, useRef } from "react";
 import { qrPaymentApi } from "../api";
 import { userModel } from "#entities/user";
-import { transactionModel } from "#entities/transaction";
+import { transactionModel, transactionApi } from "#entities/transaction";
+import { cardApi } from "#entities/card";
 import { createBrowserClient } from "#shared/api/supabase/client";
 import { POLLING_INTERVAL } from "#shared/config";
 
@@ -29,7 +30,7 @@ export function useQRPayment() {
   }, []);
 
   const startPolling = useCallback(
-    (transactionId: string, txData: transactionModel.Transaction) => {
+    (transactionId: string) => {
       const supabase = createBrowserClient();
 
       intervalRef.current = setInterval(async () => {
@@ -57,6 +58,17 @@ export function useQRPayment() {
       setState("pending");
       setError(null);
 
+      // проверяем месячный лимит карты
+      const [{ data: card }, { data: spent }] = await Promise.all([
+        cardApi.getCard(user.id),
+        transactionApi.getMonthlySpent(user.id),
+      ]);
+      if (card && spent + amount > card.spending_limit) {
+        setState("failed");
+        setError("This payment exceeds your monthly card limit");
+        return;
+      }
+
       const { data, error } = await qrPaymentApi.create(
         amount,
         merchant,
@@ -76,7 +88,7 @@ export function useQRPayment() {
       qrPaymentApi.simulateConfirm(data.id);
 
       // polling каждые 2 сек
-      startPolling(data.id, data);
+      startPolling(data.id);
     },
     [user, startPolling],
   );

@@ -68,6 +68,7 @@ export const qrPaymentApi = {
         .from("transactions")
         .update({ status: "completed" })
         .eq("id", transactionId);
+      if (error) console.error("[qr-payment] confirm failed:", error.message);
     }, 3000);
   },
 };

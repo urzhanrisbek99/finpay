@@ -50,6 +50,7 @@ export function AddCardModal({ open, onClose }: AddCardModalProps) {
   const [holderName, setHolderName] = useState("");
   const [expiry, setExpiry] = useState("");
   const [cvv, setCvv] = useState("");
+  const [limit, setLimit] = useState("500000");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [confirmed, setConfirmed] = useState(false);
@@ -62,6 +63,7 @@ export function AddCardModal({ open, onClose }: AddCardModalProps) {
     setHolderName("");
     setExpiry("");
     setCvv("");
+    setLimit("500000");
     setError(null);
     setConfirmed(false);
     setIsLoading(false);
@@ -93,6 +95,10 @@ export function AddCardModal({ open, onClose }: AddCardModalProps) {
 
     if (cvv.length < 3) return { ok: false, error: "Enter a valid CVV" };
 
+    const spendingLimit = Number(limit);
+    if (!spendingLimit || spendingLimit <= 0)
+      return { ok: false, error: "Enter a valid monthly spending limit" };
+
     return {
       ok: true,
       value: {
@@ -100,6 +106,7 @@ export function AddCardModal({ open, onClose }: AddCardModalProps) {
         holder_name: holder,
         expires_at: expiry,
         type: brand,
+        spending_limit: spendingLimit,
       },
     };
   };
@@ -219,6 +226,19 @@ export function AddCardModal({ open, onClose }: AddCardModalProps) {
                   }
                 />
               </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="spending-limit">Monthly spending limit (₸)</Label>
+              <Input
+                id="spending-limit"
+                inputMode="numeric"
+                placeholder="500000"
+                value={limit}
+                onChange={(e) =>
+                  setLimit(e.target.value.replace(/\D/g, "").slice(0, 9))
+                }
+              />
             </div>
 
             {error && <p className="text-xs text-red-500">{error}</p>}

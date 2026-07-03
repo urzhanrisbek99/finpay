@@ -3,7 +3,8 @@
 import { useState, useCallback } from "react";
 import { transferApi } from "../api";
 import { userModel } from "#entities/user";
-import { transactionModel } from "#entities/transaction";
+import { transactionModel, transactionApi } from "#entities/transaction";
+import { cardApi } from "#entities/card";
 
 type TransferState = "idle" | "loading" | "success" | "failed";
 
@@ -30,6 +31,17 @@ export function useTransfer() {
 
       setState("loading");
       setError(null);
+
+      // проверяем месячный лимит карты
+      const [{ data: card }, { data: spent }] = await Promise.all([
+        cardApi.getCard(user.id),
+        transactionApi.getMonthlySpent(user.id),
+      ]);
+      if (card && spent + amount > card.spending_limit) {
+        setState("failed");
+        setError("This transfer exceeds your monthly card limit");
+        return;
+      }
 
       const { data, error } = await transferApi.send(
         user.id,

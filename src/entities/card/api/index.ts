@@ -35,6 +35,21 @@ export const cardApi = {
     return { error: error ? error.message : null };
   },
 
+  // обновить месячный лимит трат
+  updateSpendingLimit: async (
+    cardId: string,
+    spendingLimit: number,
+  ): Promise<{ error: string | null }> => {
+    const supabase = createBrowserClient();
+
+    const { error } = await supabase
+      .from("cards")
+      .update({ spending_limit: spendingLimit })
+      .eq("id", cardId);
+
+    return { error: error ? error.message : null };
+  },
+
   // удалить карту
   deleteCard: async (cardId: string): Promise<{ error: string | null }> => {
     const supabase = createBrowserClient();

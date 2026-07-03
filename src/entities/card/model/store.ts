@@ -7,6 +7,7 @@ type CardStore = {
   setCard: (card: Card | null) => void;
   setLoading: (isLoading: boolean) => void;
   toggleFreeze: () => void;
+  setSpendingLimit: (spendingLimit: number) => void;
 };
 
 export const useCardStore = create<CardStore>((set) => ({
@@ -18,6 +19,12 @@ export const useCardStore = create<CardStore>((set) => ({
     set((state) => ({
       card: state.card
         ? { ...state.card, is_frozen: !state.card.is_frozen }
+        : null,
+    })),
+  setSpendingLimit: (spendingLimit) =>
+    set((state) => ({
+      card: state.card
+        ? { ...state.card, spending_limit: spendingLimit }
         : null,
     })),
 }));

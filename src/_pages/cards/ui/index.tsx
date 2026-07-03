@@ -1,24 +1,33 @@
 "use client";
 
 import { useState } from "react";
-import { CreditCard, Lock, Eye, RefreshCw, Trash2 } from "lucide-react";
+import { CreditCard, Lock, Eye, RefreshCw, Trash2, Pencil } from "lucide-react";
 import { Header } from "#widgets/header";
 import { Card, CardContent, CardHeader, CardTitle } from "#shared/ui/card";
 import { Skeleton } from "#shared/ui/skeleton";
 import { formatCurrency } from "#shared/lib";
 import { cardModel, cardApi } from "#entities/card";
+import { transactionModel } from "#entities/transaction";
 import { ShowCVVModal } from "#features/show-cvv";
 import { ReissueCardModal } from "#features/reissue-card";
 import { RemoveCardModal } from "#features/remove-card";
 import { AddCardModal } from "#features/add-card";
+import { SetSpendingLimitModal } from "#features/set-spending-limit";
 
 export function Cards() {
   const { card, isLoading } = cardModel.useCard();
   const { toggleFreeze } = cardModel.useCardStore();
+  const { spent } = transactionModel.useMonthlySpent();
   const [cvvOpen, setCvvOpen] = useState(false);
   const [reissueOpen, setReissueOpen] = useState(false);
   const [removeOpen, setRemoveOpen] = useState(false);
   const [addOpen, setAddOpen] = useState(false);
+  const [limitOpen, setLimitOpen] = useState(false);
+
+  const limit = card?.spending_limit ?? 0;
+  const usedPercent =
+    limit > 0 ? Math.min(100, Math.round((spent / limit) * 100)) : 0;
+  const isOverLimit = limit > 0 && spent > limit;
 
   const handleToggleFreeze = async () => {
     if (!card) return;
@@ -136,10 +145,19 @@ export function Cards() {
           </Card>
 
           <Card>
-            <CardHeader className="pb-2">
+            <CardHeader className="flex-row items-center justify-between pb-2">
               <CardTitle className="text-sm font-medium">
                 Spending limit
               </CardTitle>
+              {card && (
+                <button
+                  onClick={() => setLimitOpen(true)}
+                  className="flex items-center gap-1 text-xs font-medium text-violet-600 hover:underline"
+                >
+                  <Pencil size={12} />
+                  Edit
+                </button>
+              )}
             </CardHeader>
             <CardContent>
               <div className="mb-2 flex justify-between">
@@ -147,23 +165,21 @@ export function Cards() {
                   Used this month
                 </span>
                 <span className="text-xs font-medium">
-                  {formatCurrency(card?.spent ?? 0)} /{" "}
-                  {formatCurrency(card?.spending_limit ?? 0)}
+                  {formatCurrency(spent)} / {formatCurrency(limit)}
                 </span>
               </div>
               <div className="bg-muted h-1.5 overflow-hidden rounded-full">
                 <div
-                  className="h-full rounded-full bg-violet-600"
-                  style={{
-                    width: `${card ? (card.spent / card.spending_limit) * 100 : 0}%`,
-                  }}
+                  className={`h-full rounded-full ${isOverLimit ? "bg-red-500" : "bg-violet-600"}`}
+                  style={{ width: `${usedPercent}%` }}
                 />
               </div>
-              <p className="text-muted-foreground mt-2 text-xs">
-                {card
-                  ? Math.round((card.spent / card.spending_limit) * 100)
-                  : 0}
-                % of monthly limit used
+              <p
+                className={`mt-2 text-xs ${isOverLimit ? "text-red-500" : "text-muted-foreground"}`}
+              >
+                {isOverLimit
+                  ? "Monthly limit reached"
+                  : `${usedPercent}% of monthly limit used`}
               </p>
             </CardContent>
           </Card>
@@ -211,6 +227,10 @@ export function Cards() {
       />
       <RemoveCardModal open={removeOpen} onClose={() => setRemoveOpen(false)} />
       <AddCardModal open={addOpen} onClose={() => setAddOpen(false)} />
+      <SetSpendingLimitModal
+        open={limitOpen}
+        onClose={() => setLimitOpen(false)}
+      />
     </div>
   );
 }

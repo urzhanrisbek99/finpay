@@ -20,6 +20,29 @@ export const transactionApi = {
     };
   },
 
+  // сумма расходов пользователя за текущий месяц (для лимита карты)
+  getMonthlySpent: async (
+    userId: string,
+  ): Promise<{ data: number; error: string | null }> => {
+    const supabase = createBrowserClient();
+
+    const monthStart = new Date();
+    monthStart.setDate(1);
+    monthStart.setHours(0, 0, 0, 0);
+
+    const { data, error } = await supabase
+      .from("transactions")
+      .select("amount")
+      .eq("user_id", userId)
+      .in("type", ["expense", "transfer"])
+      .neq("status", "failed")
+      .gte("created_at", monthStart.toISOString());
+
+    const spent = (data ?? []).reduce((sum, row) => sum + (row.amount ?? 0), 0);
+
+    return { data: spent, error: error ? error.message : null };
+  },
+
   // добавить транзакцию
   add: async (
     transaction: Omit<Transaction, "id" | "created_at">,

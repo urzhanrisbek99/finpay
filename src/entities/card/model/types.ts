@@ -7,5 +7,4 @@ export type Card = {
   type: "visa" | "mastercard";
   is_frozen: boolean;
   spending_limit: number;
-  spent: number;
 };

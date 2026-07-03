@@ -6,10 +6,8 @@ export type AddCardInput = {
   holder_name: string;
   expires_at: string;
   type: Card["type"];
+  spending_limit: number;
 };
-
-// лимит трат по умолчанию — поля в форме нет, но колонка обязательна
-const DEFAULT_SPENDING_LIMIT = 500000;
 
 export const addCardApi = {
   // создать новую карту пользователя
@@ -31,7 +29,7 @@ export const addCardApi = {
         expires_at: input.expires_at,
         type: input.type,
         is_frozen: false,
-        spending_limit: DEFAULT_SPENDING_LIMIT,
+        spending_limit: input.spending_limit,
         spent: 0,
       })
       .select()
