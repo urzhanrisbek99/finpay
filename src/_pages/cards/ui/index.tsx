@@ -121,7 +121,8 @@ export function Cards() {
                 </button>
                 <button
                   onClick={() => setCvvOpen(true)}
-                  className="hover:bg-muted flex flex-col items-center gap-2 rounded-lg border p-3 transition-colors"
+                  disabled={!card}
+                  className="hover:bg-muted flex flex-col items-center gap-2 rounded-lg border p-3 transition-colors disabled:pointer-events-none disabled:opacity-50"
                 >
                   <Eye size={18} />
                   <span className="text-xs">Show CVV</span>
@@ -220,7 +221,11 @@ export function Cards() {
         </div>
       </div>
 
-      <ShowCVVModal open={cvvOpen} onClose={() => setCvvOpen(false)} />
+      <ShowCVVModal
+        open={cvvOpen}
+        onClose={() => setCvvOpen(false)}
+        cardId={card?.id}
+      />
       <ReissueCardModal
         open={reissueOpen}
         onClose={() => setReissueOpen(false)}

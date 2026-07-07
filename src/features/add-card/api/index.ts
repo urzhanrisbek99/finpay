@@ -3,6 +3,7 @@ import type { Card } from "#entities/card";
 
 export type AddCardInput = {
   number: string;
+  cvv: string;
   holder_name: string;
   expires_at: string;
   type: Card["type"];
@@ -17,7 +18,7 @@ export const addCardApi = {
   ): Promise<{ data: Card | null; error: string | null }> => {
     const supabase = createBrowserClient();
 
-    // храним только последние 4 цифры — полный номер и CVV не сохраняем
+    // храним только последние 4 цифры номера; CVV сохраняем как эмитент карты
     const number = input.number.replace(/\D/g, "").slice(-4);
 
     const { data, error } = await supabase
@@ -25,6 +26,7 @@ export const addCardApi = {
       .insert({
         user_id: userId,
         number,
+        cvv: input.cvv,
         holder_name: input.holder_name,
         expires_at: input.expires_at,
         type: input.type,
@@ -32,7 +34,10 @@ export const addCardApi = {
         spending_limit: input.spending_limit,
         spent: 0,
       })
-      .select()
+      // не возвращаем cvv обратно — колонка недоступна для прямого чтения
+      .select(
+        "id, user_id, number, holder_name, expires_at, type, is_frozen, spending_limit",
+      )
       .single();
 
     return {

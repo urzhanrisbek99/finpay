@@ -93,7 +93,9 @@ export function AddCardModal({ open, onClose }: AddCardModalProps) {
     if (expDate < new Date())
       return { ok: false, error: "The card has expired" };
 
-    if (cvv.length < 3) return { ok: false, error: "Enter a valid CVV" };
+    // Visa/Mastercard: CVV всегда ровно 3 цифры
+    if (cvv.length !== 3)
+      return { ok: false, error: "Enter a valid 3-digit CVV" };
 
     const spendingLimit = Number(limit);
     if (!spendingLimit || spendingLimit <= 0)
@@ -103,6 +105,7 @@ export function AddCardModal({ open, onClose }: AddCardModalProps) {
       ok: true,
       value: {
         number: digits,
+        cvv,
         holder_name: holder,
         expires_at: expiry,
         type: brand,
@@ -222,7 +225,7 @@ export function AddCardModal({ open, onClose }: AddCardModalProps) {
                   placeholder="123"
                   value={cvv}
                   onChange={(e) =>
-                    setCvv(e.target.value.replace(/\D/g, "").slice(0, 4))
+                    setCvv(e.target.value.replace(/\D/g, "").slice(0, 3))
                   }
                 />
               </div>
