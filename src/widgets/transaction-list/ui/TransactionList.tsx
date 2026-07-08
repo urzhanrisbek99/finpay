@@ -1,9 +1,11 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
 import { Building2, QrCode, Send, Clock, ShoppingBag } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "#shared/ui/card";
 
+import { ROUTES } from "#shared/config";
 import { formatCurrency, formatDate } from "#shared/lib";
 import { transactionModel } from "#entities/transaction";
 import { transactionApi } from "#entities/transaction";
@@ -68,10 +70,25 @@ function TransactionRow({
   );
 }
 
+const filters = ["All", "Income", "Expense"] as const;
+type Filter = (typeof filters)[number];
+
 export function TransactionList() {
   const { transactions, isLoading, setTransactions, setLoading } =
     transactionModel.useTransactionStore();
   const user = userModel.useUserStore((state) => state.user);
+  const router = useRouter();
+  const [filter, setFilter] = useState<Filter>("All");
+
+  const visibleTransactions = useMemo(() => {
+    if (filter === "Income")
+      return transactions.filter((tx) => tx.type === "income");
+    if (filter === "Expense")
+      return transactions.filter(
+        (tx) => tx.type === "expense" || tx.type === "transfer",
+      );
+    return transactions;
+  }, [transactions, filter]);
 
   useEffect(() => {
     if (!user) return;
@@ -93,12 +110,17 @@ export function TransactionList() {
           Recent transactions
         </CardTitle>
         <div className="flex gap-1">
-          {["All", "Income", "Expense"].map((filter) => (
+          {filters.map((f) => (
             <button
-              key={filter}
-              className="bg-muted text-muted-foreground rounded-full px-3 py-1 text-xs first:bg-violet-100 first:text-violet-600"
+              key={f}
+              onClick={() => setFilter(f)}
+              className={`rounded-full px-3 py-1 text-xs transition-colors ${
+                filter === f
+                  ? "bg-violet-100 text-violet-600"
+                  : "bg-muted text-muted-foreground hover:text-foreground"
+              }`}
             >
-              {filter}
+              {f}
             </button>
           ))}
         </div>
@@ -116,17 +138,22 @@ export function TransactionList() {
               </div>
             ))}
           </div>
-        ) : transactions.length === 0 ? (
+        ) : visibleTransactions.length === 0 ? (
           <p className="text-muted-foreground py-6 text-center text-sm">
-            No transactions yet
+            {transactions.length === 0
+              ? "No transactions yet"
+              : `No ${filter.toLowerCase()} transactions`}
           </p>
         ) : (
-          transactions.map((tx) => (
+          visibleTransactions.map((tx) => (
             <TransactionRow key={tx.id} transaction={tx} />
           ))
         )}
-        {transactions.length > 0 && (
-          <button className="mt-3 w-full text-center text-xs text-violet-600">
+        {visibleTransactions.length > 0 && (
+          <button
+            onClick={() => router.push(ROUTES.ANALYTICS)}
+            className="mt-3 w-full text-center text-xs text-violet-600 hover:underline"
+          >
             View all transactions →
           </button>
         )}

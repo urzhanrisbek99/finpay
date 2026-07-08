@@ -1,32 +1,34 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Header } from "#widgets/header";
 import { SpendingChart } from "#widgets/spending-chart";
 import { TransactionList } from "#widgets/transaction-list";
 import { UserBalance } from "#entities/user";
 import { QRModal } from "#features/qr-payment";
 import { TransferModal } from "#features/transfer";
+import { AddIncomeModal } from "#features/add-income";
 import { userModel } from "#entities/user";
+import { transactionModel } from "#entities/transaction";
+import { ROUTES } from "#shared/config";
 import { formatCurrency } from "#shared/lib";
-
-const statsCards = [
-  { label: "Monthly income", amount: 520000, trend: "+8%", positive: true },
-  { label: "Monthly expenses", amount: 184300, trend: "−4%", positive: false },
-  { label: "Pending", amount: 42000, trend: "3 txns", positive: null },
-];
 
 export function Dashboard() {
   const { user } = userModel.useUser();
+  const router = useRouter();
+  const statsCards = transactionModel.useDashboardStats();
+  const balanceTrend = transactionModel.useBalanceTrend(user?.balance ?? 0);
   const [qrOpen, setQrOpen] = useState(false);
   const [transferOpen, setTransferOpen] = useState(false);
+  const [incomeOpen, setIncomeOpen] = useState(false);
 
   return (
     <div className="mx-auto max-w-6xl">
       <Header onNewPayment={() => setQrOpen(true)} />
 
       <div className="mb-6 grid grid-cols-4 gap-4">
-        <UserBalance balance={user?.balance ?? 0} />
+        <UserBalance balance={user?.balance ?? 0} trend={balanceTrend} />
 
         {statsCards.map((card) => (
           <div key={card.label} className="bg-background rounded-xl border p-4">
@@ -68,7 +70,16 @@ export function Dashboard() {
             >
               Transfer by phone
             </button>
-            <button className="bg-muted hover:bg-muted/80 flex items-center gap-2 rounded-lg px-3 py-2 text-left text-sm transition-colors">
+            <button
+              onClick={() => setIncomeOpen(true)}
+              className="flex items-center gap-2 rounded-lg bg-green-100 px-3 py-2 text-left text-sm text-green-700 transition-colors hover:bg-green-200"
+            >
+              Add income
+            </button>
+            <button
+              onClick={() => router.push(ROUTES.ANALYTICS)}
+              className="bg-muted hover:bg-muted/80 flex items-center gap-2 rounded-lg px-3 py-2 text-left text-sm transition-colors"
+            >
               Payment history
             </button>
           </div>
@@ -82,6 +93,7 @@ export function Dashboard() {
         open={transferOpen}
         onClose={() => setTransferOpen(false)}
       />
+      <AddIncomeModal open={incomeOpen} onClose={() => setIncomeOpen(false)} />
     </div>
   );
 }

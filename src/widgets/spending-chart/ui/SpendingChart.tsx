@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import {
   AreaChart,
   Area,
@@ -10,28 +11,33 @@ import {
 } from "recharts";
 import { Card, CardContent, CardHeader, CardTitle } from "#shared/ui/card";
 import { formatCurrency } from "#shared/lib";
+import { transactionModel } from "#entities/transaction";
 
-const data = [
-  { month: "Jan", amount: 320000 },
-  { month: "Feb", amount: 480000 },
-  { month: "Mar", amount: 290000 },
-  { month: "Apr", amount: 560000 },
-  { month: "May", amount: 380000 },
-  { month: "Jun", amount: 435000 },
-];
+const periods: transactionModel.ChartPeriod[] = ["Week", "Month", "Year"];
 
 export function SpendingChart() {
+  const [period, setPeriod] = useState<transactionModel.ChartPeriod>("Week");
+  const { data, thisMonth, changePct } =
+    transactionModel.useSpendingChart(period);
+
+  const spentLess = changePct <= 0;
+
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between pb-2">
         <CardTitle className="text-sm font-medium">Spending overview</CardTitle>
         <div className="flex gap-1">
-          {["Week", "Month", "Year"].map((period) => (
+          {periods.map((p) => (
             <button
-              key={period}
-              className="bg-muted text-muted-foreground rounded-full px-3 py-1 text-xs first:bg-violet-100 first:text-violet-600"
+              key={p}
+              onClick={() => setPeriod(p)}
+              className={`rounded-full px-3 py-1 text-xs transition-colors ${
+                period === p
+                  ? "bg-violet-100 text-violet-600"
+                  : "bg-muted text-muted-foreground hover:text-foreground"
+              }`}
             >
-              {period}
+              {p}
             </button>
           ))}
         </div>
@@ -40,14 +46,15 @@ export function SpendingChart() {
         <ResponsiveContainer width="100%" height={180}>
           <AreaChart data={data}>
             <XAxis
-              dataKey="month"
+              dataKey="label"
               tick={{ fontSize: 11 }}
               axisLine={false}
               tickLine={false}
+              interval="preserveStartEnd"
             />
             <YAxis hide />
             <Tooltip
-              formatter={(value) => [formatCurrency(Number(value)), "Amount"]}
+              formatter={(value) => [formatCurrency(Number(value)), "Spent"]}
               contentStyle={{ fontSize: 12 }}
             />
             <Area
@@ -62,12 +69,17 @@ export function SpendingChart() {
         <div className="mt-2 flex justify-between border-t pt-3">
           <div>
             <p className="text-muted-foreground text-xs">Total this month</p>
-            <p className="text-sm font-medium">{formatCurrency(435000)}</p>
+            <p className="text-sm font-medium">{formatCurrency(thisMonth)}</p>
           </div>
           <div className="text-right">
             <p className="text-muted-foreground text-xs">vs last month</p>
-            <p className="text-xs font-medium text-green-600">
-              ↓ −12% less spent
+            <p
+              className={`text-xs font-medium ${
+                spentLess ? "text-green-600" : "text-red-600"
+              }`}
+            >
+              {spentLess ? "↓" : "↑"} {changePct > 0 ? "+" : ""}
+              {changePct}% {spentLess ? "less" : "more"} spent
             </p>
           </div>
         </div>

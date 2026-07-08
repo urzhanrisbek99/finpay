@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useEffect, useRef } from "react";
 import { qrPaymentApi } from "../api";
-import { userModel } from "#entities/user";
+import { userApi, userModel } from "#entities/user";
 import { transactionModel, transactionApi } from "#entities/transaction";
 import { cardApi } from "#entities/card";
 import { createBrowserClient } from "#shared/api/supabase/client";
@@ -16,10 +16,15 @@ export function useQRPayment() {
     useState<transactionModel.Transaction | null>(null);
   const [error, setError] = useState<string | null>(null);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  // чтобы списать баланс ровно один раз, даже если polling заметит completed дважды
+  const settledRef = useRef(false);
 
   const user = userModel.useUserStore((s) => s.user);
   const addTransaction = transactionModel.useTransactionStore(
     (s) => s.addTransaction,
+  );
+  const updateTransactionStatus = transactionModel.useTransactionStore(
+    (s) => s.updateTransactionStatus,
   );
 
   const stopPolling = useCallback(() => {
@@ -29,8 +34,21 @@ export function useQRPayment() {
     }
   }, []);
 
+  // списывает сумму платежа с баланса ровно один раз
+  const settleBalance = useCallback(async (amount: number) => {
+    if (settledRef.current) return;
+    settledRef.current = true;
+
+    const { user: current, setBalance } = userModel.useUserStore.getState();
+    if (!current) return;
+
+    const newBalance = current.balance - amount;
+    await userApi.updateBalance(current.id, newBalance);
+    setBalance(newBalance);
+  }, []);
+
   const startPolling = useCallback(
-    (transactionId: string) => {
+    (transactionId: string, amount: number) => {
       const supabase = createBrowserClient();
 
       intervalRef.current = setInterval(async () => {
@@ -43,18 +61,28 @@ export function useQRPayment() {
         if (data?.status === "completed") {
           setState("completed");
           stopPolling();
+          // синхронизируем строку в сторе и уменьшаем баланс
+          updateTransactionStatus(transactionId, "completed");
+          void settleBalance(amount);
         } else if (data?.status === "failed") {
           setState("failed");
           stopPolling();
+          updateTransactionStatus(transactionId, "failed");
         }
       }, POLLING_INTERVAL);
     },
-    [stopPolling],
+    [stopPolling, settleBalance, updateTransactionStatus],
   );
 
   const createPayment = useCallback(
     async (amount: number, merchant: string) => {
       if (!user) return;
+      if (amount > user.balance) {
+        setState("failed");
+        setError("Insufficient balance");
+        return;
+      }
+      settledRef.current = false;
       setState("pending");
       setError(null);
 
@@ -88,13 +116,14 @@ export function useQRPayment() {
       qrPaymentApi.simulateConfirm(data.id);
 
       // polling каждые 2 сек
-      startPolling(data.id);
+      startPolling(data.id, data.amount);
     },
-    [user, startPolling],
+    [user, addTransaction, startPolling],
   );
 
   const reset = useCallback(() => {
     stopPolling();
+    settledRef.current = false;
     setState("idle");
     setTransaction(null);
     setError(null);

@@ -2,7 +2,7 @@
 
 import { useState, useCallback } from "react";
 import { transferApi } from "../api";
-import { userModel } from "#entities/user";
+import { userApi, userModel } from "#entities/user";
 import { transactionModel, transactionApi } from "#entities/transaction";
 import { cardApi } from "#entities/card";
 
@@ -13,6 +13,7 @@ export function useTransfer() {
   const [error, setError] = useState<string | null>(null);
 
   const user = userModel.useUserStore((s) => s.user);
+  const setBalance = userModel.useUserStore((s) => s.setBalance);
   const addTransaction = transactionModel.useTransactionStore(
     (s) => s.addTransaction,
   );
@@ -57,9 +58,15 @@ export function useTransfer() {
       }
 
       addTransaction(data);
+
+      // перевод уходит с баланса — держим profiles.balance в согласии
+      const newBalance = user.balance - amount;
+      await userApi.updateBalance(user.id, newBalance);
+      setBalance(newBalance);
+
       setState("success");
     },
-    [user],
+    [user, addTransaction, setBalance],
   );
 
   const reset = useCallback(() => {
