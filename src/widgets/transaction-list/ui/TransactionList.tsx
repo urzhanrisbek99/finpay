@@ -51,6 +51,11 @@ function TransactionRow({
       </div>
       <div className="min-w-0 flex-1">
         <p className="truncate text-sm font-medium">{transaction.merchant}</p>
+        {transaction.comment && (
+          <p className="text-muted-foreground truncate text-xs italic">
+            {transaction.comment}
+          </p>
+        )}
         <p className="text-muted-foreground text-xs">
           {formatDate(transaction.created_at)}
         </p>

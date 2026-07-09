@@ -22,6 +22,7 @@ export const transferApi = {
         merchant: `Transfer to ${phone}`,
         category: "transfer",
         status: "completed",
+        comment: comment?.trim() || null,
       })
       .select()
       .single();

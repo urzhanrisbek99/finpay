@@ -12,5 +12,6 @@ export type Transaction = {
   merchant: string;
   category: TransactionCategory;
   status: TransactionStatus;
+  comment: string | null;
   created_at: string;
 };
