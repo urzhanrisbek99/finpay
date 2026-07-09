@@ -7,6 +7,7 @@ import { Button } from "#shared/ui/button";
 import { Input } from "#shared/ui/input";
 import { Label } from "#shared/ui/label";
 import { useTransfer } from "../model";
+import { recipientModel } from "#entities/recipient";
 import { formatCurrency, formatPhone, isValidPhone } from "#shared/lib";
 
 const QUICK_AMOUNTS = [5000, 10000, 30000, 50000];
@@ -14,29 +15,78 @@ const QUICK_AMOUNTS = [5000, 10000, 30000, 50000];
 interface TransferModalProps {
   open: boolean;
   onClose: () => void;
+  // предзаполнить номер (10 цифр) при открытии — напр. из частых переводов
+  initialPhone?: string;
 }
 
-export function TransferModal({ open, onClose }: TransferModalProps) {
+export function TransferModal({
+  open,
+  onClose,
+  initialPhone,
+}: TransferModalProps) {
   const [phone, setPhone] = useState("");
   const [amount, setAmount] = useState("");
   const [comment, setComment] = useState("");
+  const [saveName, setSaveName] = useState("");
+  // имя подставлено автоматически по совпадению номера (а не введено вручную) —
+  // такое имя чистим, когда номер перестаёт совпадать
+  const [nameAutoFilled, setNameAutoFilled] = useState(false);
+  const [prevOpen, setPrevOpen] = useState(open);
   const { state, error, send, reset } = useTransfer();
+  const recipients = recipientModel.useRecipientStore((s) => s.recipients);
+
+  // на переходе закрыто→открыто подставляем номер и имя уже сохранённого
+  // получателя (паттерн «правка состояния во время рендера» вместо эффекта)
+  if (open !== prevOpen) {
+    setPrevOpen(open);
+    if (open) {
+      const initial = initialPhone ?? "";
+      const match = recipients.find((r) => r.phone === initial);
+      setPhone(initial);
+      setSaveName(match?.name ?? "");
+      setNameAutoFilled(!!match);
+    }
+  }
 
   const phoneValid = isValidPhone(phone);
   // показываем ошибку формата только когда что-то введено, но номер ещё неполон
   const phoneError = phone.length > 0 && !phoneValid;
+  // этот номер уже в частых переводах — не предлагаем «сохранить» повторно
+  const alreadySaved = recipients.some((r) => r.phone === phone);
+
+  const handlePhoneChange = (raw: string) => {
+    const digits = raw.replace(/\D/g, "").slice(0, 10);
+    setPhone(digits);
+    const match = recipients.find((r) => r.phone === digits);
+    if (match) {
+      // номер сохранён — подтягиваем его имя (можно изменить)
+      setSaveName(match.name);
+      setNameAutoFilled(true);
+    } else if (nameAutoFilled) {
+      // номер изменили — убираем чужое автоподставленное имя, введённое руками не трогаем
+      setSaveName("");
+      setNameAutoFilled(false);
+    }
+  };
+
+  const handleNameChange = (value: string) => {
+    setSaveName(value);
+    setNameAutoFilled(false); // юзер правит имя сам — больше не автоочищаем
+  };
 
   const handleClose = () => {
     reset();
     setPhone("");
     setAmount("");
     setComment("");
+    setSaveName("");
+    setNameAutoFilled(false);
     onClose();
   };
 
   const handleSend = () => {
     if (!phoneValid || !amount) return;
-    send(Number(amount), `+7${phone}`, comment);
+    send(Number(amount), `+7${phone}`, comment, saveName);
   };
 
   return (
@@ -62,9 +112,7 @@ export function TransferModal({ open, onClose }: TransferModalProps) {
                   inputMode="numeric"
                   placeholder="(702) 000-00-00"
                   value={formatPhone(phone)}
-                  onChange={(e) =>
-                    setPhone(e.target.value.replace(/\D/g, "").slice(0, 10))
-                  }
+                  onChange={(e) => handlePhoneChange(e.target.value)}
                   aria-invalid={phoneError}
                   className="rounded-l-none"
                 />
@@ -105,6 +153,24 @@ export function TransferModal({ open, onClose }: TransferModalProps) {
                 onChange={(e) => setComment(e.target.value)}
               />
             </div>
+
+            {phoneValid && (
+              <div className="space-y-1.5">
+                <Label>
+                  {alreadySaved ? "Recipient name" : "Save as (optional)"}
+                </Label>
+                <Input
+                  placeholder="e.g. Asel"
+                  value={saveName}
+                  onChange={(e) => handleNameChange(e.target.value)}
+                />
+                {!alreadySaved && saveName.trim() && (
+                  <p className="text-muted-foreground text-xs">
+                    Will be added to frequent recipients
+                  </p>
+                )}
+              </div>
+            )}
 
             {error && <p className="text-xs text-red-600">{error}</p>}
 

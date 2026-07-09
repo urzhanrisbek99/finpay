@@ -35,6 +35,16 @@ export function formatCardNumber(number: string): string {
   return `•••• •••• •••• ${last4}`;
 }
 
+// инициалы из имени → "Asel Kim" => "AK", "Damir" => "D"
+export function getInitials(name: string): string {
+  return name
+    .trim()
+    .split(/\s+/)
+    .slice(0, 2)
+    .map((w) => w[0]?.toUpperCase() ?? "")
+    .join("");
+}
+
 // KZ-номер: после +7 ровно 10 цифр
 export function isValidPhone(digits: string): boolean {
   return /^7\d{9}$/.test(digits);

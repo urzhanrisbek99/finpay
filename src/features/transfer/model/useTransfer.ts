@@ -5,6 +5,7 @@ import { transferApi } from "../api";
 import { userApi, userModel } from "#entities/user";
 import { transactionModel, transactionApi } from "#entities/transaction";
 import { cardApi } from "#entities/card";
+import { recipientApi, recipientModel } from "#entities/recipient";
 
 type TransferState = "idle" | "loading" | "success" | "failed";
 
@@ -17,9 +18,17 @@ export function useTransfer() {
   const addTransaction = transactionModel.useTransactionStore(
     (s) => s.addTransaction,
   );
+  const upsertRecipient = recipientModel.useRecipientStore(
+    (s) => s.upsertRecipient,
+  );
 
   const send = useCallback(
-    async (amount: number, phone: string, comment?: string) => {
+    async (
+      amount: number,
+      phone: string,
+      comment?: string,
+      saveName?: string,
+    ) => {
       if (!user) return;
       if (amount < 100) {
         setError("Minimum transfer amount is 100 ₸");
@@ -64,9 +73,22 @@ export function useTransfer() {
       await userApi.updateBalance(user.id, newBalance);
       setBalance(newBalance);
 
+      // сохраняем получателя в «частые переводы», если задано имя
+      const name = saveName?.trim();
+      if (name) {
+        // phone приходит как "+7XXXXXXXXXX" — храним 10 цифр, как в форме
+        const digits = phone.replace(/\D/g, "").slice(-10);
+        const { data: recipient } = await recipientApi.save(
+          user.id,
+          name,
+          digits,
+        );
+        if (recipient) upsertRecipient(recipient);
+      }
+
       setState("success");
     },
-    [user, addTransaction, setBalance],
+    [user, addTransaction, setBalance, upsertRecipient],
   );
 
   const reset = useCallback(() => {

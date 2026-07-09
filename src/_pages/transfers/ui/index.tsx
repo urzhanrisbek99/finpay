@@ -1,29 +1,51 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Header } from "#widgets/header";
 import { TransferModal } from "#features/transfer";
 import { Card, CardContent, CardHeader, CardTitle } from "#shared/ui/card";
-import { formatCurrency, formatDate } from "#shared/lib";
+import { formatCurrency, formatDate, getInitials } from "#shared/lib";
 import { transactionModel } from "#entities/transaction";
+import { recipientApi, recipientModel } from "#entities/recipient";
+import { userModel } from "#entities/user";
 import { Send, ArrowDownLeft } from "lucide-react";
 
-const recentRecipients = [
-  { initials: "AS", name: "Asel", color: "bg-violet-100 text-violet-600" },
-  { initials: "DM", name: "Damir", color: "bg-green-100 text-green-600" },
-  { initials: "NK", name: "Nurgul", color: "bg-blue-100 text-blue-600" },
-  { initials: "ZB", name: "Zarina", color: "bg-pink-100 text-pink-600" },
+// палитра аватарок — цвет стабильно закреплён за получателем по индексу
+const AVATAR_COLORS = [
+  "bg-violet-100 text-violet-600",
+  "bg-green-100 text-green-600",
+  "bg-blue-100 text-blue-600",
+  "bg-pink-100 text-pink-600",
+  "bg-amber-100 text-amber-700",
 ];
 
 export function Transfers() {
   const [transferOpen, setTransferOpen] = useState(false);
+  const [initialPhone, setInitialPhone] = useState<string | undefined>();
+  const user = userModel.useUserStore((s) => s.user);
   const transactions = transactionModel
     .useTransactionStore((s) => s.transactions)
     .filter((tx) => tx.type === "transfer");
+  const recipients = recipientModel.useRecipientStore((s) => s.recipients);
+  const setRecipients = recipientModel.useRecipientStore(
+    (s) => s.setRecipients,
+  );
+
+  useEffect(() => {
+    if (!user) return;
+    recipientApi.getAll(user.id).then(({ data }) => {
+      if (data) setRecipients(data);
+    });
+  }, [user, setRecipients]);
+
+  const openTransfer = (phone?: string) => {
+    setInitialPhone(phone);
+    setTransferOpen(true);
+  };
 
   return (
     <div className="mx-auto max-w-4xl">
-      <Header onNewPayment={() => setTransferOpen(true)} />
+      <Header onNewPayment={() => openTransfer()} />
 
       <div className="grid grid-cols-2 gap-6">
         <Card>
@@ -46,31 +68,36 @@ export function Transfers() {
               ))}
             </div>
 
-            <div>
-              <p className="text-muted-foreground mb-3 text-xs">
-                Recent recipients
-              </p>
-              <div className="flex gap-3">
-                {recentRecipients.map((r) => (
-                  <div
-                    key={r.initials}
-                    className="flex flex-col items-center gap-1"
-                  >
-                    <div
-                      className={`flex h-10 w-10 items-center justify-center rounded-full text-sm font-medium ${r.color}`}
+            {recipients.length > 0 && (
+              <div>
+                <p className="text-muted-foreground mb-3 text-xs">
+                  Frequent recipients
+                </p>
+                <div className="flex flex-wrap gap-3">
+                  {recipients.slice(0, 5).map((r, i) => (
+                    <button
+                      key={r.id}
+                      onClick={() => openTransfer(r.phone)}
+                      className="flex flex-col items-center gap-1"
                     >
-                      {r.initials}
-                    </div>
-                    <span className="text-muted-foreground text-xs">
-                      {r.name}
-                    </span>
-                  </div>
-                ))}
+                      <div
+                        className={`flex h-10 w-10 items-center justify-center rounded-full text-sm font-medium transition-transform hover:scale-105 ${
+                          AVATAR_COLORS[i % AVATAR_COLORS.length]
+                        }`}
+                      >
+                        {getInitials(r.name)}
+                      </div>
+                      <span className="text-muted-foreground max-w-14 truncate text-xs">
+                        {r.name}
+                      </span>
+                    </button>
+                  ))}
+                </div>
               </div>
-            </div>
+            )}
 
             <button
-              onClick={() => setTransferOpen(true)}
+              onClick={() => openTransfer()}
               className="w-full rounded-lg bg-violet-600 py-2.5 text-sm text-white transition-colors hover:bg-violet-700"
             >
               New transfer
@@ -137,6 +164,7 @@ export function Transfers() {
       <TransferModal
         open={transferOpen}
         onClose={() => setTransferOpen(false)}
+        initialPhone={initialPhone}
       />
     </div>
   );
