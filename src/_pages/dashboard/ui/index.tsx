@@ -9,6 +9,7 @@ import { UserBalance } from "#entities/user";
 import { QRModal } from "#features/qr-payment";
 import { TransferModal } from "#features/transfer";
 import { AddIncomeModal } from "#features/add-income";
+import { PaymentMethodModal } from "#features/payment-method";
 import { userModel } from "#entities/user";
 import { transactionModel } from "#entities/transaction";
 import { ROUTES } from "#shared/config";
@@ -19,13 +20,14 @@ export function Dashboard() {
   const router = useRouter();
   const statsCards = transactionModel.useDashboardStats();
   const balanceTrend = transactionModel.useBalanceTrend(user?.balance ?? 0);
+  const [methodOpen, setMethodOpen] = useState(false);
   const [qrOpen, setQrOpen] = useState(false);
   const [transferOpen, setTransferOpen] = useState(false);
   const [incomeOpen, setIncomeOpen] = useState(false);
 
   return (
     <div className="mx-auto max-w-6xl">
-      <Header onNewPayment={() => setQrOpen(true)} />
+      <Header onNewPayment={() => setMethodOpen(true)} />
 
       <div className="mb-6 grid grid-cols-4 gap-4">
         <UserBalance balance={user?.balance ?? 0} trend={balanceTrend} />
@@ -87,6 +89,19 @@ export function Dashboard() {
       </div>
 
       <TransactionList />
+
+      <PaymentMethodModal
+        open={methodOpen}
+        onClose={() => setMethodOpen(false)}
+        onSelectQr={() => {
+          setMethodOpen(false);
+          setQrOpen(true);
+        }}
+        onSelectTransfer={() => {
+          setMethodOpen(false);
+          setTransferOpen(true);
+        }}
+      />
 
       <QRModal open={qrOpen} onClose={() => setQrOpen(false)} />
       <TransferModal
