@@ -7,7 +7,7 @@ import { Button } from "#shared/ui/button";
 import { Input } from "#shared/ui/input";
 import { Label } from "#shared/ui/label";
 import { useTransfer } from "../model";
-import { formatCurrency } from "#shared/lib";
+import { formatCurrency, formatPhone, isValidPhone } from "#shared/lib";
 
 const QUICK_AMOUNTS = [5000, 10000, 30000, 50000];
 
@@ -22,6 +22,10 @@ export function TransferModal({ open, onClose }: TransferModalProps) {
   const [comment, setComment] = useState("");
   const { state, error, send, reset } = useTransfer();
 
+  const phoneValid = isValidPhone(phone);
+  // показываем ошибку формата только когда что-то введено, но номер ещё неполон
+  const phoneError = phone.length > 0 && !phoneValid;
+
   const handleClose = () => {
     reset();
     setPhone("");
@@ -31,7 +35,7 @@ export function TransferModal({ open, onClose }: TransferModalProps) {
   };
 
   const handleSend = () => {
-    if (!phone || !amount) return;
+    if (!phoneValid || !amount) return;
     send(Number(amount), `+7${phone}`, comment);
   };
 
@@ -55,12 +59,21 @@ export function TransferModal({ open, onClose }: TransferModalProps) {
                 </span>
                 <Input
                   type="tel"
+                  inputMode="numeric"
                   placeholder="(702) 000-00-00"
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value.replace(/\D/g, ""))}
+                  value={formatPhone(phone)}
+                  onChange={(e) =>
+                    setPhone(e.target.value.replace(/\D/g, "").slice(0, 10))
+                  }
+                  aria-invalid={phoneError}
                   className="rounded-l-none"
                 />
               </div>
+              {phoneError && (
+                <p className="text-xs text-red-600">
+                  Enter a valid number: +7 7XX XXX XX XX
+                </p>
+              )}
             </div>
 
             <div className="space-y-1.5">
@@ -98,7 +111,7 @@ export function TransferModal({ open, onClose }: TransferModalProps) {
             <Button
               className="w-full bg-violet-600 hover:bg-violet-700"
               onClick={handleSend}
-              disabled={!phone || !amount}
+              disabled={!phoneValid || !amount}
             >
               Send {amount ? formatCurrency(Number(amount)) : ""}
             </Button>
@@ -117,7 +130,7 @@ export function TransferModal({ open, onClose }: TransferModalProps) {
             <CheckCircle size={48} className="text-green-500" />
             <h2 className="text-base font-medium">Transfer successful!</h2>
             <p className="text-muted-foreground text-center text-sm">
-              {formatCurrency(Number(amount))} sent to +7{phone}
+              {formatCurrency(Number(amount))} sent to +7 {formatPhone(phone)}
             </p>
             <Button
               className="mt-2 w-full bg-violet-600 hover:bg-violet-700"

@@ -34,3 +34,20 @@ export function formatCardNumber(number: string): string {
   const last4 = number.slice(-4);
   return `•••• •••• •••• ${last4}`;
 }
+
+// KZ-номер: после +7 ровно 10 цифр
+export function isValidPhone(digits: string): boolean {
+  return /^7\d{9}$/.test(digits);
+}
+
+// форматирование ввода телефона → (702) 123-45-67
+export function formatPhone(digits: string): string {
+  const d = digits.slice(0, 10);
+  const parts = [
+    ["(", d.slice(0, 3)],
+    [d.length > 3 ? ") " : "", d.slice(3, 6)],
+    [d.length > 6 ? "-" : "", d.slice(6, 8)],
+    [d.length > 8 ? "-" : "", d.slice(8, 10)],
+  ];
+  return parts.map(([sep, chunk]) => (chunk ? sep + chunk : "")).join("");
+}
