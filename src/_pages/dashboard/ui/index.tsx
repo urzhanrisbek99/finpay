@@ -66,7 +66,7 @@ export function Dashboard() {
             </button>
             <button
               onClick={() => setTransferOpen(true)}
-              className="bg-muted hover:bg-muted/80 flex items-center gap-2 rounded-lg px-3 py-2 text-left text-sm transition-colors"
+              className="bg-muted hover:bg-muted-foreground/15 flex items-center gap-2 rounded-lg px-3 py-2 text-left text-sm transition-colors"
             >
               Transfer by phone
             </button>
@@ -78,7 +78,7 @@ export function Dashboard() {
             </button>
             <button
               onClick={() => router.push(ROUTES.ANALYTICS)}
-              className="bg-muted hover:bg-muted/80 flex items-center gap-2 rounded-lg px-3 py-2 text-left text-sm transition-colors"
+              className="bg-muted hover:bg-muted-foreground/15 flex items-center gap-2 rounded-lg px-3 py-2 text-left text-sm transition-colors"
             >
               Payment history
             </button>
