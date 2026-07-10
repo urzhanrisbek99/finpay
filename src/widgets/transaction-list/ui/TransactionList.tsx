@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Building2, QrCode, Send, Clock, ShoppingBag } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "#shared/ui/card";
@@ -8,8 +8,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "#shared/ui/card";
 import { ROUTES } from "#shared/config";
 import { formatCurrency, formatDate } from "#shared/lib";
 import { transactionModel } from "#entities/transaction";
-import { transactionApi } from "#entities/transaction";
-import { userModel } from "#entities/user";
 
 const categoryIcons: Record<string, React.ReactNode> = {
   salary: <Building2 size={15} />,
@@ -79,9 +77,7 @@ const filters = ["All", "Income", "Expense"] as const;
 type Filter = (typeof filters)[number];
 
 export function TransactionList() {
-  const { transactions, isLoading, setTransactions, setLoading } =
-    transactionModel.useTransactionStore();
-  const user = userModel.useUserStore((state) => state.user);
+  const { transactions, isLoading } = transactionModel.useTransactionStore();
   const router = useRouter();
   const [filter, setFilter] = useState<Filter>("All");
 
@@ -94,19 +90,6 @@ export function TransactionList() {
       );
     return transactions;
   }, [transactions, filter]);
-
-  useEffect(() => {
-    if (!user) return;
-
-    const load = async () => {
-      setLoading(true);
-      const { data } = await transactionApi.getAll(user.id);
-      if (data) setTransactions(data);
-      setLoading(false);
-    };
-
-    load();
-  }, [user]);
 
   return (
     <Card>

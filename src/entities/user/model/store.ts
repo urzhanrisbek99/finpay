@@ -11,7 +11,7 @@ type UserStore = {
 
 export const useUserStore = create<UserStore>((set) => ({
   user: null,
-  isLoading: false,
+  isLoading: true,
   setUser: (user) => set({ user }),
   setBalance: (balance) =>
     set((state) => (state.user ? { user: { ...state.user, balance } } : state)),

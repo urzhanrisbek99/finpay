@@ -13,7 +13,7 @@ type TransactionStore = {
 
 export const useTransactionStore = create<TransactionStore>((set) => ({
   transactions: [],
-  isLoading: false,
+  isLoading: true,
   setTransactions: (transactions) => set({ transactions }),
   addTransaction: (transaction) =>
     set((state) => ({ transactions: [transaction, ...state.transactions] })),
