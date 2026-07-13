@@ -1,12 +1,10 @@
 "use client";
 
-import { Bell, Plus } from "lucide-react";
+import { Plus } from "lucide-react";
 import { Button } from "#shared/ui/button";
 import { userModel } from "#entities/user";
 import { usePaymentMethodStore } from "#features/payment-method";
 
-// Глобальный хэдер: один экземпляр в оболочке приложения, одинаковый для всех
-// страниц. Кнопка «New payment» открывает общий флоу выбора способа оплаты.
 export function Header() {
   const user = userModel.useUserStore((state) => state.user);
   const openNewPayment = usePaymentMethodStore((state) => state.open);
@@ -28,9 +26,6 @@ export function Header() {
       </div>
 
       <div className="flex items-center gap-2">
-        <button className="bg-muted text-muted-foreground hover:text-foreground flex h-8 w-8 items-center justify-center rounded-full transition-colors">
-          <Bell size={15} />
-        </button>
         <Button
           className="h-8 rounded-full bg-violet-600 px-4 text-xs text-white hover:bg-violet-700"
           onClick={openNewPayment}
