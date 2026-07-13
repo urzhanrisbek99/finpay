@@ -23,6 +23,7 @@ export function Dashboard() {
   const balanceTrend = transactionModel.useBalanceTrend(user?.balance ?? 0);
   const {
     isLoading: txLoading,
+    hasLoaded,
     setTransactions,
     setLoading,
   } = transactionModel.useTransactionStore();
@@ -34,6 +35,8 @@ export function Dashboard() {
   useEffect(() => {
     if (!user) return;
 
+    if (hasLoaded) return;
+
     const load = async () => {
       setLoading(true);
       const { data } = await transactionApi.getAll(user.id);
@@ -42,9 +45,11 @@ export function Dashboard() {
     };
 
     load();
-  }, [user, setTransactions, setLoading]);
+  }, [user, hasLoaded, setTransactions, setLoading]);
 
-  const isLoading = userLoading || txLoading;
+  // скелетон только до первой успешной загрузки; при переходах контент
+  // показываем сразу, без повторного скелетона
+  const isLoading = userLoading || (txLoading && !hasLoaded);
 
   return (
     <div className="mx-auto max-w-6xl">
@@ -53,7 +58,7 @@ export function Dashboard() {
       {isLoading ? (
         <DashboardSkeleton />
       ) : (
-        <>
+        <div className="animate-in fade-in duration-500 ease-out">
           <div className="mb-6 grid grid-cols-4 gap-4">
             <UserBalance balance={user?.balance ?? 0} trend={balanceTrend} />
 
@@ -119,7 +124,7 @@ export function Dashboard() {
           </div>
 
           <TransactionList />
-        </>
+        </div>
       )}
 
       <PaymentMethodModal

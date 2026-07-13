@@ -10,8 +10,8 @@ import { ROUTES } from "#shared/config";
 export function LogoutButton() {
   const router = useRouter();
   const setUser = userModel.useUserStore((s) => s.setUser);
-  const setTransactions = transactionModel.useTransactionStore(
-    (s) => s.setTransactions,
+  const resetTransactions = transactionModel.useTransactionStore(
+    (s) => s.reset,
   );
 
   const handleLogout = async () => {
@@ -20,7 +20,7 @@ export function LogoutButton() {
 
     // очищаем сторы
     setUser(null);
-    setTransactions([]);
+    resetTransactions();
 
     router.push(ROUTES.LOGIN);
   };

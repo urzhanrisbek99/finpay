@@ -63,6 +63,10 @@ export function SpendingChart() {
               stroke="#7c3aed"
               fill="#ede9fe"
               strokeWidth={2}
+              isAnimationActive
+              animationBegin={200}
+              animationDuration={900}
+              animationEasing="ease-out"
             />
           </AreaChart>
         </ResponsiveContainer>
