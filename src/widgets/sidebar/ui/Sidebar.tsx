@@ -11,8 +11,19 @@ import {
 } from "lucide-react";
 import { cn } from "#shared/lib";
 import { ROUTES } from "#shared/config";
+import { userModel } from "#entities/user";
 import { LogoutButton } from "#features/logout";
 import { ThemeToggle } from "#features/theme-toggle";
+
+function getInitials(fullName?: string) {
+  if (!fullName) return "";
+  return fullName
+    .trim()
+    .split(/\s+/)
+    .slice(0, 2)
+    .map((part) => part[0]?.toUpperCase() ?? "")
+    .join("");
+}
 
 const navItems = [
   { icon: LayoutDashboard, href: ROUTES.DASHBOARD, label: "Dashboard" },
@@ -23,11 +34,13 @@ const navItems = [
 
 export function Sidebar() {
   const pathname = usePathname();
+  const user = userModel.useUserStore((state) => state.user);
+  const initials = getInitials(user?.full_name);
 
   return (
     <aside className="bg-background sticky top-0 flex h-screen w-14 flex-col items-center gap-2 border-r px-2 py-4">
       <div className="mb-4 flex h-8 w-8 items-center justify-center rounded-full bg-violet-600 text-xs font-medium text-white">
-        UR
+        {initials}
       </div>
 
       <nav className="flex flex-1 flex-col gap-1">
