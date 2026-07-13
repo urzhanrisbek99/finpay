@@ -22,7 +22,6 @@ function netFlowThisMonth(transactions: Transaction[]): number {
   }, 0);
 }
 
-// изменение баланса за текущий месяц в процентах от баланса на его начало
 export function useBalanceTrend(currentBalance: number): number {
   const transactions = useTransactionStore((state) => state.transactions);
 

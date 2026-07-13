@@ -21,6 +21,7 @@ export const qrPaymentApi = {
         merchant,
         category: "other",
         status: "pending",
+        method: "qr",
       })
       .select()
       .single();
@@ -58,7 +59,6 @@ export const qrPaymentApi = {
     };
   },
 
-  // для демо — симулируем подтверждение через 3 сек
   simulateConfirm: (transactionId: string): void => {
     setTimeout(async () => {
       const supabase = createBrowserClient();

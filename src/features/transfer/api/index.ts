@@ -23,6 +23,7 @@ export const transferApi = {
         category: "transfer",
         status: "completed",
         comment: comment?.trim() || null,
+        method: "phone",
       })
       .select()
       .single();

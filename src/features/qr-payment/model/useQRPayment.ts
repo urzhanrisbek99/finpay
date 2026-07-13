@@ -34,7 +34,6 @@ export function useQRPayment() {
     }
   }, []);
 
-  // списывает сумму платежа с баланса ровно один раз
   const settleBalance = useCallback(async (amount: number) => {
     if (settledRef.current) return;
     settledRef.current = true;

@@ -1,7 +1,6 @@
 import { createBrowserClient } from "#shared/api/supabase/client";
 import type { Card } from "../model/types";
 
-// колонки карты, безопасные для чтения клиентом (без cvv)
 const CARD_COLUMNS =
   "id, user_id, number, holder_name, expires_at, type, is_frozen, spending_limit";
 

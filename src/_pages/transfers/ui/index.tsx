@@ -9,7 +9,14 @@ import { formatCurrency, formatDate, getInitials } from "#shared/lib";
 import { transactionModel } from "#entities/transaction";
 import { recipientApi, recipientModel } from "#entities/recipient";
 import { userModel } from "#entities/user";
-import { Send, ArrowDownLeft } from "lucide-react";
+import {
+  Send,
+  ArrowDownLeft,
+  Smartphone,
+  QrCode,
+  CreditCard,
+  type LucideIcon,
+} from "lucide-react";
 
 const AVATAR_COLORS = [
   "bg-violet-100 text-violet-600",
@@ -39,6 +46,23 @@ const METHOD_CTA: Record<TransferMethod, string> = {
   card: "Transfer by card",
 };
 
+const METHOD_META: Record<
+  TransferMethod,
+  { label: string; icon: LucideIcon; color: string }
+> = {
+  phone: {
+    label: "By phone",
+    icon: Smartphone,
+    color: "bg-violet-100 text-violet-600",
+  },
+  qr: { label: "By QR", icon: QrCode, color: "bg-blue-100 text-blue-600" },
+  card: {
+    label: "By card",
+    icon: CreditCard,
+    color: "bg-green-100 text-green-600",
+  },
+};
+
 export function Transfers() {
   const [method, setMethod] = useState<TransferMethod>("phone");
   const [transferOpen, setTransferOpen] = useState(false);
@@ -46,9 +70,10 @@ export function Transfers() {
   const [cardOpen, setCardOpen] = useState(false);
   const [initialPhone, setInitialPhone] = useState<string | undefined>();
   const user = userModel.useUserStore((s) => s.user);
-  const transactions = transactionModel
-    .useTransactionStore((s) => s.transactions)
-    .filter((tx) => tx.type === "transfer");
+  const allTransactions = transactionModel.useTransactionStore(
+    (s) => s.transactions,
+  );
+  const transactions = allTransactions.filter((tx) => tx.type === "transfer");
   const recipients = recipientModel.useRecipientStore((s) => s.recipients);
   const setRecipients = recipientModel.useRecipientStore(
     (s) => s.setRecipients,
@@ -82,15 +107,28 @@ export function Transfers() {
   );
   const sentThisMonth = monthTransfers.reduce((sum, tx) => sum + tx.amount, 0);
 
+  const methodStats = METHOD_TABS.map(({ key }) => {
+    const txs = allTransactions.filter(
+      (tx) =>
+        tx.method === key &&
+        tx.status !== "failed" &&
+        new Date(tx.created_at) >= monthStart,
+    );
+    return {
+      key,
+      total: txs.reduce((sum, tx) => sum + tx.amount, 0),
+      count: txs.length,
+    };
+  });
+
   const summary = [
     { label: "Sent this month", value: formatCurrency(sentThisMonth) },
     { label: "Transfers", value: String(monthTransfers.length) },
-    { label: "Recipients", value: String(recipients.length) },
   ];
 
   return (
     <>
-      <div className="mb-6 grid grid-cols-3 gap-4">
+      <div className="mb-6 grid grid-cols-2 gap-4">
         {summary.map((item) => (
           <div key={item.label} className="bg-background rounded-xl border p-4">
             <p className="text-muted-foreground mb-1 text-xs">{item.label}</p>
@@ -148,6 +186,36 @@ export function Transfers() {
                 </div>
               </div>
             )}
+
+            <div>
+              <p className="text-muted-foreground mb-3 text-xs">
+                This month&apos;s transfers
+              </p>
+              <div className="space-y-2">
+                {methodStats.map(({ key, total, count }) => {
+                  const meta = METHOD_META[key];
+                  const Icon = meta.icon;
+                  return (
+                    <div key={key} className="flex items-center gap-3">
+                      <div
+                        className={`flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full ${meta.color}`}
+                      >
+                        <Icon size={15} />
+                      </div>
+                      <span className="flex-1 text-sm">{meta.label}</span>
+                      <div className="text-right">
+                        <p className="text-sm font-medium">
+                          {formatCurrency(total)}
+                        </p>
+                        <p className="text-muted-foreground text-xs">
+                          {count} {count === 1 ? "transfer" : "transfers"}
+                        </p>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
 
             <button
               onClick={startTransfer}

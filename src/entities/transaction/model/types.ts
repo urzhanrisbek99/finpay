@@ -2,6 +2,7 @@ import type {
   TransactionStatus,
   TransactionType,
   TransactionCategory,
+  TransactionMethod,
 } from "#shared/types";
 
 export type Transaction = {
@@ -13,5 +14,6 @@ export type Transaction = {
   category: TransactionCategory;
   status: TransactionStatus;
   comment: string | null;
+  method: TransactionMethod | null;
   created_at: string;
 };

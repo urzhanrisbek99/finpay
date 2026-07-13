@@ -5,14 +5,12 @@ export function DashboardSkeleton() {
   return (
     <div className="animate-in fade-in duration-300">
       <div className="mb-6 grid grid-cols-4 gap-4">
-        {/* карточка баланса */}
         <div className="rounded-xl bg-violet-600 p-4">
           <Skeleton className="mb-1 h-4 w-20 bg-white/25" />
           <Skeleton className="mb-2 h-8 w-28 bg-white/30" />
           <Skeleton className="h-6 w-24 rounded-full bg-white/20" />
         </div>
 
-        {/* stat-карточки */}
         {[0, 1, 2].map((i) => (
           <div key={i} className="bg-background rounded-xl border p-4">
             <Skeleton className="mb-1 h-4 w-20" />
@@ -23,7 +21,6 @@ export function DashboardSkeleton() {
       </div>
 
       <div className="mb-6 grid grid-cols-3 gap-4">
-        {/* график */}
         <div className="col-span-2">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
@@ -50,7 +47,6 @@ export function DashboardSkeleton() {
           </Card>
         </div>
 
-        {/* быстрые действия */}
         <div className="bg-background rounded-xl border p-4">
           <Skeleton className="mb-3 h-4 w-24" />
           <div className="flex flex-col gap-2">
@@ -79,7 +75,6 @@ export function DashboardSkeleton() {
         </Card>
       </div>
 
-      {/* список транзакций */}
       <Card>
         <CardHeader className="flex flex-row items-center justify-between pb-2">
           <Skeleton className="h-5 w-40" />

@@ -27,15 +27,13 @@ export function TransferModal({
   const [amount, setAmount] = useState("");
   const [comment, setComment] = useState("");
   const [saveName, setSaveName] = useState("");
-  // имя подставлено автоматически по совпадению номера (а не введено вручную) —
-  // такое имя чистим, когда номер перестаёт совпадать
   const [nameAutoFilled, setNameAutoFilled] = useState(false);
   const [prevOpen, setPrevOpen] = useState(open);
   const { state, error, send, reset } = useTransfer();
   const recipients = recipientModel.useRecipientStore((s) => s.recipients);
 
-  // на переходе закрыто→открыто подставляем номер и имя уже сохранённого
-  // получателя (паттерн «правка состояния во время рендера» вместо эффекта)
+  // правка состояния во время рендера (вместо эффекта): на переходе
+  // закрыто→открыто подставляем номер и имя уже сохранённого получателя
   if (open !== prevOpen) {
     setPrevOpen(open);
     if (open) {
@@ -66,7 +64,7 @@ export function TransferModal({
 
   const handleNameChange = (value: string) => {
     setSaveName(value);
-    setNameAutoFilled(false); // юзер правит имя сам — больше не автоочищаем
+    setNameAutoFilled(false);
   };
 
   const handleClose = () => {

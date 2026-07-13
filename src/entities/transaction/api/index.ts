@@ -19,7 +19,6 @@ export const transactionApi = {
     };
   },
 
-  // сумма расходов пользователя за текущий месяц (для лимита карты)
   getMonthlySpent: async (
     userId: string,
   ): Promise<{ data: number; error: string | null }> => {

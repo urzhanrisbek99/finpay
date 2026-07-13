@@ -16,23 +16,18 @@ import { formatCurrency } from "#shared/lib";
 import { DashboardSkeleton } from "./DashboardSkeleton";
 
 export function Dashboard() {
-  // профиль грузится глобально в оболочке приложения (AppShell) — здесь только
-  // читаем из стора
   const user = userModel.useUserStore((s) => s.user);
   const userLoading = userModel.useUserStore((s) => s.isLoading);
   const router = useRouter();
   const statsCards = transactionModel.useDashboardStats();
   const balanceTrend = transactionModel.useBalanceTrend(user?.balance ?? 0);
-  // транзакции грузятся глобально в оболочке приложения (AppShell) — здесь
-  // только читаем состояние из стора
+
   const txLoading = transactionModel.useTransactionStore((s) => s.isLoading);
   const hasLoaded = transactionModel.useTransactionStore((s) => s.hasLoaded);
   const [qrOpen, setQrOpen] = useState(false);
   const [transferOpen, setTransferOpen] = useState(false);
   const [incomeOpen, setIncomeOpen] = useState(false);
 
-  // скелетон только до первой успешной загрузки; при переходах контент
-  // показываем сразу, без повторного скелетона
   const isLoading = userLoading || (txLoading && !hasLoaded);
 
   return (
@@ -99,7 +94,7 @@ export function Dashboard() {
                   onClick={() => router.push(ROUTES.CARDS)}
                   className="bg-muted hover:bg-muted-foreground/15 flex items-center gap-2 rounded-lg px-3 py-2 text-left text-sm transition-colors"
                 >
-                  My cards
+                  My card
                 </button>
               </div>
             </div>
@@ -113,7 +108,6 @@ export function Dashboard() {
         </div>
       )}
 
-      {/* Quick actions дашборда: открывают модалки напрямую, локальное состояние */}
       <QRModal open={qrOpen} onClose={() => setQrOpen(false)} />
       <TransferModal
         open={transferOpen}

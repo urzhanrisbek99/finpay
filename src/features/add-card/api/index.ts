@@ -17,7 +17,6 @@ export const addCardApi = {
   ): Promise<{ data: Card | null; error: string | null }> => {
     const supabase = createBrowserClient();
 
-    // храним только последние 4 цифры номера; CVV сохраняем как эмитент карты
     const number = input.number.replace(/\D/g, "").slice(-4);
 
     const { data, error } = await supabase

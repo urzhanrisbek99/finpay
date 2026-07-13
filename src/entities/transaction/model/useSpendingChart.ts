@@ -18,7 +18,6 @@ function buildBuckets(period: ChartPeriod): Bucket[] {
   const today = startOfDay(new Date());
 
   if (period === "Week") {
-    // последние 7 дней по дням
     for (let i = 6; i >= 0; i--) {
       const from = new Date(today);
       from.setDate(today.getDate() - i);
@@ -31,7 +30,6 @@ function buildBuckets(period: ChartPeriod): Bucket[] {
       });
     }
   } else if (period === "Month") {
-    // последние 4 недели по неделям
     for (let i = 3; i >= 0; i--) {
       const from = new Date(today);
       from.setDate(today.getDate() - (i + 1) * 7 + 1);
@@ -47,7 +45,6 @@ function buildBuckets(period: ChartPeriod): Bucket[] {
       });
     }
   } else {
-    // последние 12 месяцев
     for (let i = 11; i >= 0; i--) {
       const from = new Date(today.getFullYear(), today.getMonth() - i, 1);
       const to = new Date(from.getFullYear(), from.getMonth() + 1, 1);
@@ -65,7 +62,6 @@ function buildBuckets(period: ChartPeriod): Bucket[] {
 const isSpending = (tx: Transaction) =>
   (tx.type === "expense" || tx.type === "transfer") && tx.status !== "failed";
 
-// сумма расходов за календарный месяц смещённый на offset (0 = текущий)
 function monthlySpending(transactions: Transaction[], offset: number): number {
   const now = new Date();
   const from = new Date(now.getFullYear(), now.getMonth() + offset, 1);

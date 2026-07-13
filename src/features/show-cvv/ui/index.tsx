@@ -35,7 +35,6 @@ export function ShowCVVModal({ open, onClose, cardId }: ShowCVVModalProps) {
       setRevealed(false);
       return;
     }
-    // CVV уже загружали в этой сессии — не дёргаем сервер повторно
     if (cvv !== null) {
       setRevealed(true);
       return;

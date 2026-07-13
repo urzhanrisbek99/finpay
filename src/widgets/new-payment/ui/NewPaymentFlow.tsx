@@ -9,9 +9,6 @@ import { QRModal } from "#features/qr-payment";
 import { TransferModal } from "#features/transfer";
 import { CardTransferModal } from "#features/transfer-by-card";
 
-// Единый флоу «New payment» для всего приложения: смонтирован один раз в
-// оболочке, открывается из глобального хэдера через usePaymentMethodStore.
-// Выбор метода → соответствующая модалка (QR / перевод по телефону / по карте).
 export function NewPaymentFlow() {
   const isOpen = usePaymentMethodStore((s) => s.isOpen);
   const close = usePaymentMethodStore((s) => s.close);

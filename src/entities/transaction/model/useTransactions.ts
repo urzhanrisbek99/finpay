@@ -5,9 +5,6 @@ import { createBrowserClient } from "#shared/api/supabase/client";
 import { transactionApi } from "../api";
 import { useTransactionStore } from "./store";
 
-// единая глобальная загрузка транзакций текущего пользователя: транзакции нужны
-// на нескольких страницах (dashboard, transfers), поэтому грузим их в оболочке
-// приложения один раз, а не в каждой странице отдельно
 export function useTransactions() {
   const { transactions, isLoading, hasLoaded, setTransactions, setLoading } =
     useTransactionStore();

@@ -26,6 +26,7 @@ export const cardTransferApi = {
         category: "transfer",
         status: "completed",
         comment: comment?.trim() || null,
+        method: "card",
       })
       .select()
       .single();

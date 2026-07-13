@@ -4,7 +4,6 @@ import type { Recipient } from "./types";
 type RecipientStore = {
   recipients: Recipient[];
   setRecipients: (recipients: Recipient[]) => void;
-  // добавляет получателя наверх, не создавая дубль по phone
   upsertRecipient: (recipient: Recipient) => void;
 };
 

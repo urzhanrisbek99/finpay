@@ -19,7 +19,6 @@ export const recipientApi = {
     };
   },
 
-  // сохранить получателя; при совпадении user_id+phone обновляем имя
   save: async (
     userId: string,
     name: string,

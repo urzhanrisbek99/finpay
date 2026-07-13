@@ -2,6 +2,8 @@ export type TransactionStatus = "completed" | "pending" | "failed";
 
 export type TransactionType = "income" | "expense" | "transfer";
 
+export type TransactionMethod = "phone" | "qr" | "card";
+
 export type TransactionCategory =
   | "food"
   | "transport"
