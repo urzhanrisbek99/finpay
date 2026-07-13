@@ -1,7 +1,5 @@
 import { create } from "zustand";
 
-// глобальное состояние флоу «New payment»: открывается из хэдера (любой
-// страницы), сам флоу смонтирован один раз в оболочке приложения
 type PaymentMethodStore = {
   isOpen: boolean;
   open: () => void;

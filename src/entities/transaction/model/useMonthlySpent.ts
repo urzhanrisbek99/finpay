@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import { createBrowserClient } from "#shared/api/supabase/client";
 import { transactionApi } from "../api";
 
-// сумма расходов текущего пользователя за текущий месяц
 export function useMonthlySpent() {
   const [spent, setSpent] = useState(0);
 

@@ -29,9 +29,7 @@ export function RemoveCardModal({ open, onClose }: RemoveCardModalProps) {
     } = await supabase.auth.getUser();
     if (!user) return;
 
-    // сохраняем запрос в БД
     await removeCardApi.request(user.id, card.id);
-    // реально удаляем карту
     await cardApi.deleteCard(card.id);
     setCard(null);
     setConfirmed(true);

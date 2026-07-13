@@ -1,6 +1,6 @@
 "use client";
 
-import { QrCode, Smartphone } from "lucide-react";
+import { QrCode, Smartphone, CreditCard } from "lucide-react";
 import { Dialog, DialogContent } from "#shared/ui/dialog";
 
 interface PaymentMethodModalProps {
@@ -8,6 +8,7 @@ interface PaymentMethodModalProps {
   onClose: () => void;
   onSelectQr: () => void;
   onSelectTransfer: () => void;
+  onSelectCard: () => void;
 }
 
 export function PaymentMethodModal({
@@ -15,6 +16,7 @@ export function PaymentMethodModal({
   onClose,
   onSelectQr,
   onSelectTransfer,
+  onSelectCard,
 }: PaymentMethodModalProps) {
   return (
     <Dialog open={open} onOpenChange={onClose}>
@@ -56,6 +58,23 @@ export function PaymentMethodModal({
                 </span>
                 <span className="text-muted-foreground block text-xs">
                   Send money to a contact&apos;s phone number
+                </span>
+              </span>
+            </button>
+
+            <button
+              onClick={onSelectCard}
+              className="hover:bg-muted-foreground/10 flex items-center gap-3 rounded-lg border p-3 text-left transition-colors"
+            >
+              <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-green-100 text-green-600">
+                <CreditCard size={18} />
+              </span>
+              <span>
+                <span className="block text-sm font-medium">
+                  Transfer by card
+                </span>
+                <span className="text-muted-foreground block text-xs">
+                  Send money to any card number
                 </span>
               </span>
             </button>

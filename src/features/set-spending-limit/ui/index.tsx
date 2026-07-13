@@ -23,7 +23,6 @@ export function SetSpendingLimitModal({
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // при открытии подставляем текущий лимит карты
   const [wasOpen, setWasOpen] = useState(false);
   if (open !== wasOpen) {
     setWasOpen(open);

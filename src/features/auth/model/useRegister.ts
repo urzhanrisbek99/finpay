@@ -28,7 +28,6 @@ export function useRegister() {
     }
 
     if (data?.user) {
-      // создаём профиль в таблице profiles
       await userApi.createProfile({
         id: data.user.id,
         email,

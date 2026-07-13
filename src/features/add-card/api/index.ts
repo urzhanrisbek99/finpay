@@ -11,7 +11,6 @@ export type AddCardInput = {
 };
 
 export const addCardApi = {
-  // создать новую карту пользователя
   create: async (
     userId: string,
     input: AddCardInput,

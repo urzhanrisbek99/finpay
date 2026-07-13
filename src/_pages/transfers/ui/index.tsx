@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { TransferModal } from "#features/transfer";
+import { QRModal } from "#features/qr-payment";
+import { CardTransferModal } from "#features/transfer-by-card";
 import { Card, CardContent, CardHeader, CardTitle } from "#shared/ui/card";
 import { formatCurrency, formatDate, getInitials } from "#shared/lib";
 import { transactionModel } from "#entities/transaction";
@@ -9,7 +11,6 @@ import { recipientApi, recipientModel } from "#entities/recipient";
 import { userModel } from "#entities/user";
 import { Send, ArrowDownLeft } from "lucide-react";
 
-// палитра аватарок — цвет стабильно закреплён за получателем по индексу
 const AVATAR_COLORS = [
   "bg-violet-100 text-violet-600",
   "bg-green-100 text-green-600",
@@ -18,8 +19,31 @@ const AVATAR_COLORS = [
   "bg-amber-100 text-amber-700",
 ];
 
+const STATUS_COLORS: Record<string, string> = {
+  completed: "bg-green-100 text-green-700",
+  pending: "bg-amber-100 text-amber-700",
+  failed: "bg-red-100 text-red-700",
+};
+
+type TransferMethod = "phone" | "qr" | "card";
+
+const METHOD_TABS: { key: TransferMethod; label: string }[] = [
+  { key: "phone", label: "By phone" },
+  { key: "qr", label: "By QR" },
+  { key: "card", label: "By card" },
+];
+
+const METHOD_CTA: Record<TransferMethod, string> = {
+  phone: "New transfer",
+  qr: "Generate QR",
+  card: "Transfer by card",
+};
+
 export function Transfers() {
+  const [method, setMethod] = useState<TransferMethod>("phone");
   const [transferOpen, setTransferOpen] = useState(false);
+  const [qrOpen, setQrOpen] = useState(false);
+  const [cardOpen, setCardOpen] = useState(false);
   const [initialPhone, setInitialPhone] = useState<string | undefined>();
   const user = userModel.useUserStore((s) => s.user);
   const transactions = transactionModel
@@ -42,6 +66,12 @@ export function Transfers() {
     setTransferOpen(true);
   };
 
+  const startTransfer = () => {
+    if (method === "phone") openTransfer();
+    else if (method === "qr") setQrOpen(true);
+    else setCardOpen(true);
+  };
+
   return (
     <>
       <div className="grid grid-cols-2 gap-6">
@@ -51,21 +81,22 @@ export function Transfers() {
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex gap-2">
-              {["By phone", "By QR", "By card"].map((tab, i) => (
+              {METHOD_TABS.map((tab) => (
                 <button
-                  key={tab}
+                  key={tab.key}
+                  onClick={() => setMethod(tab.key)}
                   className={`flex-1 rounded-lg py-2 text-xs transition-colors ${
-                    i === 0
+                    method === tab.key
                       ? "bg-violet-100 text-violet-600"
-                      : "bg-muted text-muted-foreground"
+                      : "bg-muted text-muted-foreground hover:text-foreground"
                   }`}
                 >
-                  {tab}
+                  {tab.label}
                 </button>
               ))}
             </div>
 
-            {recipients.length > 0 && (
+            {method === "phone" && recipients.length > 0 && (
               <div>
                 <p className="text-muted-foreground mb-3 text-xs">
                   Frequent recipients
@@ -94,10 +125,10 @@ export function Transfers() {
             )}
 
             <button
-              onClick={() => openTransfer()}
+              onClick={startTransfer}
               className="w-full rounded-lg bg-violet-600 py-2.5 text-sm text-white transition-colors hover:bg-violet-700"
             >
-              New transfer
+              {METHOD_CTA[method]}
             </button>
           </CardContent>
         </Card>
@@ -146,7 +177,12 @@ export function Transfers() {
                         {tx.type === "income" ? "+" : "−"}
                         {formatCurrency(tx.amount)}
                       </p>
-                      <span className="rounded-full bg-green-100 px-2 py-0.5 text-xs text-green-700">
+                      <span
+                        className={`rounded-full px-2 py-0.5 text-xs ${
+                          STATUS_COLORS[tx.status] ??
+                          "bg-muted text-muted-foreground"
+                        }`}
+                      >
                         {tx.status}
                       </span>
                     </div>
@@ -163,6 +199,8 @@ export function Transfers() {
         onClose={() => setTransferOpen(false)}
         initialPhone={initialPhone}
       />
+      <QRModal open={qrOpen} onClose={() => setQrOpen(false)} />
+      <CardTransferModal open={cardOpen} onClose={() => setCardOpen(false)} />
     </>
   );
 }

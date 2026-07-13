@@ -2,7 +2,6 @@ import { createBrowserClient } from "#shared/api/supabase/client";
 import type { Recipient } from "../model/types";
 
 export const recipientApi = {
-  // получить сохранённых получателей пользователя (свежие сверху)
   getAll: async (
     userId: string,
   ): Promise<{ data: Recipient[] | null; error: string | null }> => {

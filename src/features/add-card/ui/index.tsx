@@ -15,14 +15,12 @@ interface AddCardModalProps {
   onClose: () => void;
 }
 
-// определяем платёжную систему по номеру
 function detectBrand(digits: string): Card["type"] | null {
   if (digits.startsWith("4")) return "visa";
   if (/^(5[1-5]|2(2[2-9]|[3-6]\d|7[01]|720))/.test(digits)) return "mastercard";
   return null;
 }
 
-// 1234 5678 9012 3456
 function formatNumber(value: string): string {
   return value
     .replace(/\D/g, "")
@@ -31,13 +29,11 @@ function formatNumber(value: string): string {
     .trim();
 }
 
-// MM/YY
 function formatExpiry(value: string): string {
   const d = value.replace(/\D/g, "").slice(0, 4);
   return d.length <= 2 ? d : `${d.slice(0, 2)}/${d.slice(2)}`;
 }
 
-// приводим ошибку Supabase к понятному пользователю тексту
 function toFriendlyError(message: string): string {
   if (/duplicate|unique/i.test(message)) return "You already have a card";
   return "Could not add card. Please try again";
@@ -69,7 +65,6 @@ export function AddCardModal({ open, onClose }: AddCardModalProps) {
     setIsLoading(false);
   };
 
-  // валидируем и сразу возвращаем готовый payload — без non-null костылей
   const validate = ():
     | { ok: true; value: AddCardInput }
     | { ok: false; error: string } => {
@@ -93,7 +88,6 @@ export function AddCardModal({ open, onClose }: AddCardModalProps) {
     if (expDate < new Date())
       return { ok: false, error: "The card has expired" };
 
-    // Visa/Mastercard: CVV всегда ровно 3 цифры
     if (cvv.length !== 3)
       return { ok: false, error: "Enter a valid 3-digit CVV" };
 

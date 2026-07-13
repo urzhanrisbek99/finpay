@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { SpendingChart } from "#widgets/spending-chart";
 import { TransactionList } from "#widgets/transaction-list";
@@ -9,7 +9,7 @@ import { QRModal } from "#features/qr-payment";
 import { TransferModal } from "#features/transfer";
 import { AddIncomeModal } from "#features/add-income";
 import { userModel } from "#entities/user";
-import { transactionModel, transactionApi } from "#entities/transaction";
+import { transactionModel } from "#entities/transaction";
 import { ROUTES } from "#shared/config";
 import { formatCurrency } from "#shared/lib";
 import { DashboardSkeleton } from "./DashboardSkeleton";
@@ -22,30 +22,13 @@ export function Dashboard() {
   const router = useRouter();
   const statsCards = transactionModel.useDashboardStats();
   const balanceTrend = transactionModel.useBalanceTrend(user?.balance ?? 0);
-  const {
-    isLoading: txLoading,
-    hasLoaded,
-    setTransactions,
-    setLoading,
-  } = transactionModel.useTransactionStore();
+  // транзакции грузятся глобально в оболочке приложения (AppShell) — здесь
+  // только читаем состояние из стора
+  const txLoading = transactionModel.useTransactionStore((s) => s.isLoading);
+  const hasLoaded = transactionModel.useTransactionStore((s) => s.hasLoaded);
   const [qrOpen, setQrOpen] = useState(false);
   const [transferOpen, setTransferOpen] = useState(false);
   const [incomeOpen, setIncomeOpen] = useState(false);
-
-  useEffect(() => {
-    if (!user) return;
-
-    if (hasLoaded) return;
-
-    const load = async () => {
-      setLoading(true);
-      const { data } = await transactionApi.getAll(user.id);
-      if (data) setTransactions(data);
-      setLoading(false);
-    };
-
-    load();
-  }, [user, hasLoaded, setTransactions, setLoading]);
 
   // скелетон только до первой успешной загрузки; при переходах контент
   // показываем сразу, без повторного скелетона

@@ -2,7 +2,6 @@ import { createBrowserClient } from "#shared/api/supabase/client";
 import type { User } from "../model/types";
 
 export const userApi = {
-  // получить профиль пользователя
   getProfile: async (
     userId: string,
   ): Promise<{ data: User | null; error: string | null }> => {
@@ -20,7 +19,6 @@ export const userApi = {
     };
   },
 
-  // обновить баланс
   updateBalance: async (
     userId: string,
     balance: number,

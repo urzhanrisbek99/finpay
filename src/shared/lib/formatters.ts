@@ -1,4 +1,3 @@
-// форматирование суммы → ₸1,240,500
 export function formatCurrency(amount: number): string {
   return (
     new Intl.NumberFormat("ru-KZ", {
@@ -8,7 +7,6 @@ export function formatCurrency(amount: number): string {
   );
 }
 
-// форматирование даты → Today, 09:00
 export function formatDate(date: string | Date): string {
   const d = new Date(date);
   const now = new Date();
@@ -29,13 +27,11 @@ export function formatDate(date: string | Date): string {
   return d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
 }
 
-// форматирование номера карты → •••• •••• •••• 4821
 export function formatCardNumber(number: string): string {
   const last4 = number.slice(-4);
   return `•••• •••• •••• ${last4}`;
 }
 
-// инициалы из имени → "Asel Kim" => "AK", "Damir" => "D"
 export function getInitials(name: string): string {
   return name
     .trim()
@@ -45,12 +41,25 @@ export function getInitials(name: string): string {
     .join("");
 }
 
-// KZ-номер: после +7 ровно 10 цифр
 export function isValidPhone(digits: string): boolean {
   return /^7\d{9}$/.test(digits);
 }
 
-// форматирование ввода телефона → (702) 123-45-67
+export function formatCardInput(digits: string): string {
+  return (
+    digits
+      .replace(/\D/g, "")
+      .slice(0, 16)
+      .match(/.{1,4}/g)
+      ?.join(" ") ?? ""
+  );
+}
+
+// валидный номер карты: ровно 16 цифр (формат, без проверки Луна — как isValidPhone)
+export function isValidCardNumber(digits: string): boolean {
+  return /^\d{16}$/.test(digits.replace(/\D/g, ""));
+}
+
 export function formatPhone(digits: string): string {
   const d = digits.slice(0, 10);
   const parts = [

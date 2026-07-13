@@ -4,7 +4,6 @@ import { transactionModel } from "#entities/transaction";
 import type { TransactionCategory } from "#shared/types";
 
 export const addIncomeApi = {
-  // добавляет доход: транзакция type=income + увеличение баланса профиля
   add: async (
     userId: string,
     amount: number,
@@ -39,7 +38,6 @@ export const addIncomeApi = {
       };
     }
 
-    // доход увеличивает баланс — держим profiles.balance в согласии с транзакциями
     const newBalance = currentBalance + amount;
     const { error: balanceError } = await userApi.updateBalance(
       userId,

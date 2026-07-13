@@ -2,6 +2,7 @@
 
 import { useSelectedLayoutSegment } from "next/navigation";
 import { userModel } from "#entities/user";
+import { transactionModel } from "#entities/transaction";
 import { Header } from "#widgets/header";
 import { NewPaymentFlow } from "#widgets/new-payment";
 
@@ -19,6 +20,10 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   // единая глобальная загрузка профиля — хэдер доступен на любой странице,
   // поэтому имя пользователя не должно зависеть от конкретной страницы
   userModel.useUser();
+  // и транзакций — история/статистика нужны на нескольких страницах, поэтому
+  // грузим один раз в оболочке, а не в каждой странице (иначе при прямой
+  // перезагрузке /transfers история пустая)
+  transactionModel.useTransactions();
 
   return (
     <>

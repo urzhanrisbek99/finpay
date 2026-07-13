@@ -1,16 +1,15 @@
 "use client";
 
 import { useState, useCallback } from "react";
-import { transferApi } from "../api";
+import { cardTransferApi } from "../api";
 import { userApi, userModel } from "#entities/user";
 import { transactionModel, transactionApi } from "#entities/transaction";
 import { cardApi } from "#entities/card";
-import { recipientApi, recipientModel } from "#entities/recipient";
 
-type TransferState = "idle" | "loading" | "success" | "failed";
+type CardTransferState = "idle" | "loading" | "success" | "failed";
 
-export function useTransfer() {
-  const [state, setState] = useState<TransferState>("idle");
+export function useCardTransfer() {
+  const [state, setState] = useState<CardTransferState>("idle");
   const [error, setError] = useState<string | null>(null);
 
   const user = userModel.useUserStore((s) => s.user);
@@ -18,17 +17,9 @@ export function useTransfer() {
   const addTransaction = transactionModel.useTransactionStore(
     (s) => s.addTransaction,
   );
-  const upsertRecipient = recipientModel.useRecipientStore(
-    (s) => s.upsertRecipient,
-  );
 
   const send = useCallback(
-    async (
-      amount: number,
-      phone: string,
-      comment?: string,
-      saveName?: string,
-    ) => {
+    async (amount: number, cardNumber: string, comment?: string) => {
       if (!user) return;
       if (amount < 100) {
         setError("Minimum transfer amount is 100 ₸");
@@ -52,10 +43,10 @@ export function useTransfer() {
         return;
       }
 
-      const { data, error } = await transferApi.send(
+      const { data, error } = await cardTransferApi.send(
         user.id,
         amount,
-        phone,
+        cardNumber,
         comment,
       );
 
@@ -71,21 +62,9 @@ export function useTransfer() {
       await userApi.updateBalance(user.id, newBalance);
       setBalance(newBalance);
 
-      const name = saveName?.trim();
-      if (name) {
-        // phone приходит как "+7XXXXXXXXXX" — храним 10 цифр, как в форме
-        const digits = phone.replace(/\D/g, "").slice(-10);
-        const { data: recipient } = await recipientApi.save(
-          user.id,
-          name,
-          digits,
-        );
-        if (recipient) upsertRecipient(recipient);
-      }
-
       setState("success");
     },
-    [user, addTransaction, setBalance, upsertRecipient],
+    [user, addTransaction, setBalance],
   );
 
   const reset = useCallback(() => {

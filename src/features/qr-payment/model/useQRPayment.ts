@@ -61,7 +61,6 @@ export function useQRPayment() {
         if (data?.status === "completed") {
           setState("completed");
           stopPolling();
-          // синхронизируем строку в сторе и уменьшаем баланс
           updateTransactionStatus(transactionId, "completed");
           void settleBalance(amount);
         } else if (data?.status === "failed") {
@@ -86,7 +85,6 @@ export function useQRPayment() {
       setState("pending");
       setError(null);
 
-      // проверяем месячный лимит карты
       const [{ data: card }, { data: spent }] = await Promise.all([
         cardApi.getCard(user.id),
         transactionApi.getMonthlySpent(user.id),
@@ -112,10 +110,7 @@ export function useQRPayment() {
       setTransaction(data);
       addTransaction(data);
 
-      // симулируем подтверждение через 3 сек
       qrPaymentApi.simulateConfirm(data.id);
-
-      // polling каждые 2 сек
       startPolling(data.id, data.amount);
     },
     [user, addTransaction, startPolling],
@@ -129,7 +124,6 @@ export function useQRPayment() {
     setError(null);
   }, [stopPolling]);
 
-  // очищаем при размонтировании
   useEffect(() => {
     return () => stopPolling();
   }, [stopPolling]);

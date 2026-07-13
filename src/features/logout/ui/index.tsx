@@ -18,7 +18,6 @@ export function LogoutButton() {
     const supabase = createBrowserClient();
     await supabase.auth.signOut();
 
-    // очищаем сторы
     setUser(null);
     resetTransactions();
 

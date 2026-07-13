@@ -8,7 +8,6 @@ const isIncome = (tx: Transaction) => tx.type === "income";
 const isExpense = (tx: Transaction) =>
   tx.type === "expense" || tx.type === "transfer";
 
-// чистый денежный поток за текущий месяц (доходы − расходы)
 function netFlowThisMonth(transactions: Transaction[]): number {
   const now = new Date();
   const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);

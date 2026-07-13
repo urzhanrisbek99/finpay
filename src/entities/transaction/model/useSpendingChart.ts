@@ -13,7 +13,6 @@ type Bucket = { label: string; from: Date; to: Date };
 const startOfDay = (d: Date) =>
   new Date(d.getFullYear(), d.getMonth(), d.getDate());
 
-// набор интервалов-корзин для выбранного периода
 function buildBuckets(period: ChartPeriod): Bucket[] {
   const buckets: Bucket[] = [];
   const today = startOfDay(new Date());
@@ -79,7 +78,6 @@ function monthlySpending(transactions: Transaction[], offset: number): number {
   }, 0);
 }
 
-// данные графика расходов + итоги за текущий месяц
 export function useSpendingChart(period: ChartPeriod) {
   const transactions = useTransactionStore((state) => state.transactions);
 

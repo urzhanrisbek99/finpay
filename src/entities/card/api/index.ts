@@ -6,7 +6,6 @@ const CARD_COLUMNS =
   "id, user_id, number, holder_name, expires_at, type, is_frozen, spending_limit";
 
 export const cardApi = {
-  // получить карту пользователя
   getCard: async (
     userId: string,
   ): Promise<{ data: Card | null; error: string | null }> => {
@@ -40,7 +39,6 @@ export const cardApi = {
     };
   },
 
-  // заморозить/разморозить карту
   toggleFreeze: async (
     cardId: string,
     isFrozen: boolean,
@@ -55,7 +53,6 @@ export const cardApi = {
     return { error: error ? error.message : null };
   },
 
-  // обновить месячный лимит трат
   updateSpendingLimit: async (
     cardId: string,
     spendingLimit: number,
@@ -70,7 +67,6 @@ export const cardApi = {
     return { error: error ? error.message : null };
   },
 
-  // удалить карту
   deleteCard: async (cardId: string): Promise<{ error: string | null }> => {
     const supabase = createBrowserClient();
 

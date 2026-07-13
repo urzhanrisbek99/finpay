@@ -2,7 +2,6 @@ import { createBrowserClient } from "#shared/api/supabase/client";
 import type { Transaction } from "../model/types";
 
 export const transactionApi = {
-  // получить все транзакции пользователя
   getAll: async (
     userId: string,
   ): Promise<{ data: Transaction[] | null; error: string | null }> => {
@@ -43,7 +42,6 @@ export const transactionApi = {
     return { data: spent, error: error ? error.message : null };
   },
 
-  // добавить транзакцию
   add: async (
     transaction: Omit<Transaction, "id" | "created_at">,
   ): Promise<{ data: Transaction | null; error: string | null }> => {

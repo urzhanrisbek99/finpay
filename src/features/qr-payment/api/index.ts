@@ -31,7 +31,6 @@ export const qrPaymentApi = {
     };
   },
 
-  // подписка на изменение статуса транзакции через Realtime
   subscribeToStatus: (
     transactionId: string,
     onStatusChange: (status: string) => void,
@@ -54,7 +53,6 @@ export const qrPaymentApi = {
       )
       .subscribe();
 
-    // возвращаем функцию отписки
     return () => {
       supabase.removeChannel(channel);
     };

@@ -15,7 +15,6 @@ const QUICK_AMOUNTS = [5000, 10000, 30000, 50000];
 interface TransferModalProps {
   open: boolean;
   onClose: () => void;
-  // предзаполнить номер (10 цифр) при открытии — напр. из частых переводов
   initialPhone?: string;
 }
 
@@ -49,9 +48,7 @@ export function TransferModal({
   }
 
   const phoneValid = isValidPhone(phone);
-  // показываем ошибку формата только когда что-то введено, но номер ещё неполон
   const phoneError = phone.length > 0 && !phoneValid;
-  // этот номер уже в частых переводах — не предлагаем «сохранить» повторно
   const alreadySaved = recipients.some((r) => r.phone === phone);
 
   const handlePhoneChange = (raw: string) => {
@@ -59,11 +56,9 @@ export function TransferModal({
     setPhone(digits);
     const match = recipients.find((r) => r.phone === digits);
     if (match) {
-      // номер сохранён — подтягиваем его имя (можно изменить)
       setSaveName(match.name);
       setNameAutoFilled(true);
     } else if (nameAutoFilled) {
-      // номер изменили — убираем чужое автоподставленное имя, введённое руками не трогаем
       setSaveName("");
       setNameAutoFilled(false);
     }

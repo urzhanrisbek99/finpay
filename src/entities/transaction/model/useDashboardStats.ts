@@ -11,7 +11,6 @@ export type DashboardStat = {
   positive: boolean | null;
 };
 
-// границы текущего и предыдущего месяца
 function getMonthRanges() {
   const now = new Date();
 
@@ -21,7 +20,6 @@ function getMonthRanges() {
   return { monthStart, prevMonthStart };
 }
 
-// сумма транзакций за период по предикату
 function sumBetween(
   transactions: Transaction[],
   from: Date,
@@ -36,7 +34,6 @@ function sumBetween(
   }, 0);
 }
 
-// тренд «текущий vs прошлый месяц» → строка вида "+8%"
 function formatTrend(current: number, previous: number): string {
   if (previous === 0) return current > 0 ? "+100%" : "0%";
   const change = Math.round(((current - previous) / previous) * 100);
@@ -47,7 +44,6 @@ const isIncome = (tx: Transaction) => tx.type === "income";
 const isExpense = (tx: Transaction) =>
   tx.type === "expense" || tx.type === "transfer";
 
-// stat-карточки дашборда на основе реальных транзакций из стора
 export function useDashboardStats(): DashboardStat[] {
   const transactions = useTransactionStore((state) => state.transactions);
 
