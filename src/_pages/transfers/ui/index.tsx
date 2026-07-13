@@ -72,8 +72,33 @@ export function Transfers() {
     else setCardOpen(true);
   };
 
+  const monthStart = new Date(
+    new Date().getFullYear(),
+    new Date().getMonth(),
+    1,
+  );
+  const monthTransfers = transactions.filter(
+    (tx) => tx.status !== "failed" && new Date(tx.created_at) >= monthStart,
+  );
+  const sentThisMonth = monthTransfers.reduce((sum, tx) => sum + tx.amount, 0);
+
+  const summary = [
+    { label: "Sent this month", value: formatCurrency(sentThisMonth) },
+    { label: "Transfers", value: String(monthTransfers.length) },
+    { label: "Recipients", value: String(recipients.length) },
+  ];
+
   return (
     <>
+      <div className="mb-6 grid grid-cols-3 gap-4">
+        {summary.map((item) => (
+          <div key={item.label} className="bg-background rounded-xl border p-4">
+            <p className="text-muted-foreground mb-1 text-xs">{item.label}</p>
+            <p className="text-lg font-medium">{item.value}</p>
+          </div>
+        ))}
+      </div>
+
       <div className="grid grid-cols-2 gap-6">
         <Card>
           <CardHeader className="pb-2">
@@ -145,7 +170,7 @@ export function Transfers() {
                 No transfers yet
               </p>
             ) : (
-              <div>
+              <div className="max-h-80 overflow-y-auto">
                 {transactions.map((tx) => (
                   <div
                     key={tx.id}

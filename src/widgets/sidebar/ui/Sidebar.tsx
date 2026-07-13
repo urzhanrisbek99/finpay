@@ -6,7 +6,6 @@ import {
   LayoutDashboard,
   CreditCard,
   ArrowLeftRight,
-  BarChart3,
   Settings,
 } from "lucide-react";
 import { cn } from "#shared/lib";
@@ -29,7 +28,6 @@ const navItems = [
   { icon: LayoutDashboard, href: ROUTES.DASHBOARD, label: "Dashboard" },
   { icon: CreditCard, href: ROUTES.CARDS, label: "Cards" },
   { icon: ArrowLeftRight, href: ROUTES.TRANSFERS, label: "Transfers" },
-  { icon: BarChart3, href: ROUTES.ANALYTICS, label: "Analytics" },
 ];
 
 export function Sidebar() {

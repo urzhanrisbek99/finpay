@@ -1,11 +1,8 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { useRouter } from "next/navigation";
 import { Building2, QrCode, Send, Clock, ShoppingBag } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "#shared/ui/card";
-
-import { ROUTES } from "#shared/config";
 import { formatCurrency, formatDate } from "#shared/lib";
 import { transactionModel } from "#entities/transaction";
 
@@ -78,7 +75,6 @@ type Filter = (typeof filters)[number];
 
 export function TransactionList() {
   const { transactions, isLoading } = transactionModel.useTransactionStore();
-  const router = useRouter();
   const [filter, setFilter] = useState<Filter>("All");
 
   const visibleTransactions = useMemo(() => {
@@ -136,14 +132,6 @@ export function TransactionList() {
           visibleTransactions.map((tx) => (
             <TransactionRow key={tx.id} transaction={tx} />
           ))
-        )}
-        {visibleTransactions.length > 0 && (
-          <button
-            onClick={() => router.push(ROUTES.ANALYTICS)}
-            className="mt-3 w-full text-center text-xs text-violet-600 hover:underline"
-          >
-            View all transactions →
-          </button>
         )}
       </CardContent>
     </Card>

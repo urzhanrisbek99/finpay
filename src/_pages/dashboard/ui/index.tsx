@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { SpendingChart } from "#widgets/spending-chart";
+import { BudgetStatus } from "#widgets/budget-status";
 import { TransactionList } from "#widgets/transaction-list";
 import { UserBalance } from "#entities/user";
 import { QRModal } from "#features/qr-payment";
@@ -95,13 +96,17 @@ export function Dashboard() {
                   Add income
                 </button>
                 <button
-                  onClick={() => router.push(ROUTES.ANALYTICS)}
+                  onClick={() => router.push(ROUTES.CARDS)}
                   className="bg-muted hover:bg-muted-foreground/15 flex items-center gap-2 rounded-lg px-3 py-2 text-left text-sm transition-colors"
                 >
-                  Payment history
+                  My cards
                 </button>
               </div>
             </div>
+          </div>
+
+          <div className="mb-6">
+            <BudgetStatus />
           </div>
 
           <TransactionList />

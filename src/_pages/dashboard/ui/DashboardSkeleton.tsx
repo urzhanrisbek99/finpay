@@ -61,6 +61,24 @@ export function DashboardSkeleton() {
         </div>
       </div>
 
+      <div className="mb-6">
+        <Card>
+          <CardHeader className="pb-2">
+            <Skeleton className="h-5 w-32" />
+          </CardHeader>
+          <CardContent>
+            <Skeleton className="mb-4 h-8 w-32" />
+            <Skeleton className="h-2 w-full rounded-full" />
+            <Skeleton className="mt-3 h-4 w-28" />
+            <div className="mt-4 grid grid-cols-3 gap-3 border-t pt-3">
+              <Skeleton className="h-8 w-20" />
+              <Skeleton className="h-8 w-20" />
+              <Skeleton className="ml-auto h-8 w-20" />
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
       {/* список транзакций */}
       <Card>
         <CardHeader className="flex flex-row items-center justify-between pb-2">
