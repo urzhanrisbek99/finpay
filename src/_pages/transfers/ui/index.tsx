@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Header } from "#widgets/header";
 import { TransferModal } from "#features/transfer";
 import { Card, CardContent, CardHeader, CardTitle } from "#shared/ui/card";
 import { formatCurrency, formatDate, getInitials } from "#shared/lib";
@@ -44,9 +43,7 @@ export function Transfers() {
   };
 
   return (
-    <div className="mx-auto max-w-4xl">
-      <Header onNewPayment={() => openTransfer()} />
-
+    <>
       <div className="grid grid-cols-2 gap-6">
         <Card>
           <CardHeader className="pb-2">
@@ -166,6 +163,6 @@ export function Transfers() {
         onClose={() => setTransferOpen(false)}
         initialPhone={initialPhone}
       />
-    </div>
+    </>
   );
 }

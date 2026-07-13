@@ -2,14 +2,12 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Header } from "#widgets/header";
 import { SpendingChart } from "#widgets/spending-chart";
 import { TransactionList } from "#widgets/transaction-list";
 import { UserBalance } from "#entities/user";
 import { QRModal } from "#features/qr-payment";
 import { TransferModal } from "#features/transfer";
 import { AddIncomeModal } from "#features/add-income";
-import { PaymentMethodModal } from "#features/payment-method";
 import { userModel } from "#entities/user";
 import { transactionModel, transactionApi } from "#entities/transaction";
 import { ROUTES } from "#shared/config";
@@ -17,7 +15,10 @@ import { formatCurrency } from "#shared/lib";
 import { DashboardSkeleton } from "./DashboardSkeleton";
 
 export function Dashboard() {
-  const { user, isLoading: userLoading } = userModel.useUser();
+  // профиль грузится глобально в оболочке приложения (AppShell) — здесь только
+  // читаем из стора
+  const user = userModel.useUserStore((s) => s.user);
+  const userLoading = userModel.useUserStore((s) => s.isLoading);
   const router = useRouter();
   const statsCards = transactionModel.useDashboardStats();
   const balanceTrend = transactionModel.useBalanceTrend(user?.balance ?? 0);
@@ -27,7 +28,6 @@ export function Dashboard() {
     setTransactions,
     setLoading,
   } = transactionModel.useTransactionStore();
-  const [methodOpen, setMethodOpen] = useState(false);
   const [qrOpen, setQrOpen] = useState(false);
   const [transferOpen, setTransferOpen] = useState(false);
   const [incomeOpen, setIncomeOpen] = useState(false);
@@ -52,9 +52,7 @@ export function Dashboard() {
   const isLoading = userLoading || (txLoading && !hasLoaded);
 
   return (
-    <div className="mx-auto max-w-6xl">
-      <Header onNewPayment={() => setMethodOpen(true)} />
-
+    <>
       {isLoading ? (
         <DashboardSkeleton />
       ) : (
@@ -127,25 +125,13 @@ export function Dashboard() {
         </div>
       )}
 
-      <PaymentMethodModal
-        open={methodOpen}
-        onClose={() => setMethodOpen(false)}
-        onSelectQr={() => {
-          setMethodOpen(false);
-          setQrOpen(true);
-        }}
-        onSelectTransfer={() => {
-          setMethodOpen(false);
-          setTransferOpen(true);
-        }}
-      />
-
+      {/* Quick actions дашборда: открывают модалки напрямую, локальное состояние */}
       <QRModal open={qrOpen} onClose={() => setQrOpen(false)} />
       <TransferModal
         open={transferOpen}
         onClose={() => setTransferOpen(false)}
       />
       <AddIncomeModal open={incomeOpen} onClose={() => setIncomeOpen(false)} />
-    </div>
+    </>
   );
 }

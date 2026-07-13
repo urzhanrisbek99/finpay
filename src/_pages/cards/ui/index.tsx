@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { CreditCard, Lock, Eye, RefreshCw, Trash2, Pencil } from "lucide-react";
-import { Header } from "#widgets/header";
 import { Card, CardContent, CardHeader, CardTitle } from "#shared/ui/card";
 import { Skeleton } from "#shared/ui/skeleton";
 import { formatCurrency } from "#shared/lib";
@@ -37,20 +36,15 @@ export function Cards() {
 
   if (isLoading) {
     return (
-      <div className="mx-auto max-w-4xl">
-        <Header />
-        <div className="grid grid-cols-2 gap-6">
-          <Skeleton className="h-48 rounded-xl" />
-          <Skeleton className="h-48 rounded-xl" />
-        </div>
+      <div className="grid grid-cols-2 gap-6">
+        <Skeleton className="h-48 rounded-xl" />
+        <Skeleton className="h-48 rounded-xl" />
       </div>
     );
   }
 
   return (
-    <div className="mx-auto max-w-4xl">
-      <Header />
-
+    <>
       <div className="grid grid-cols-2 gap-6">
         <div className="flex flex-col gap-4">
           {card && (
@@ -236,6 +230,6 @@ export function Cards() {
         open={limitOpen}
         onClose={() => setLimitOpen(false)}
       />
-    </div>
+    </>
   );
 }

@@ -3,13 +3,13 @@
 import { Bell, Plus } from "lucide-react";
 import { Button } from "#shared/ui/button";
 import { userModel } from "#entities/user";
+import { usePaymentMethodStore } from "#features/payment-method";
 
-interface HeaderProps {
-  onNewPayment?: () => void;
-}
-
-export function Header({ onNewPayment }: HeaderProps) {
+// Глобальный хэдер: один экземпляр в оболочке приложения, одинаковый для всех
+// страниц. Кнопка «New payment» открывает общий флоу выбора способа оплаты.
+export function Header() {
   const user = userModel.useUserStore((state) => state.user);
+  const openNewPayment = usePaymentMethodStore((state) => state.open);
 
   const getGreeting = () => {
     const hour = new Date().getHours();
@@ -33,7 +33,7 @@ export function Header({ onNewPayment }: HeaderProps) {
         </button>
         <Button
           className="h-8 rounded-full bg-violet-600 px-4 text-xs text-white hover:bg-violet-700"
-          onClick={onNewPayment}
+          onClick={openNewPayment}
         >
           <Plus size={13} />
           New payment

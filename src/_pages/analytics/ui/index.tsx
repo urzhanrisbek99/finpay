@@ -1,6 +1,5 @@
 "use client";
 
-import { Header } from "#widgets/header";
 import { Card, CardContent, CardHeader, CardTitle } from "#shared/ui/card";
 import { formatCurrency } from "#shared/lib";
 import {
@@ -47,9 +46,7 @@ const statsCards = [
 
 export function Analytics() {
   return (
-    <div className="mx-auto max-w-4xl">
-      <Header />
-
+    <>
       <div className="mb-6 grid grid-cols-3 gap-4">
         {statsCards.map((card) => (
           <div key={card.label} className="bg-background rounded-xl border p-4">
@@ -140,6 +137,6 @@ export function Analytics() {
           </CardContent>
         </Card>
       </div>
-    </div>
+    </>
   );
 }
