@@ -1,13 +1,13 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { TransferModal } from "#features/transfer";
 import { QRModal } from "#features/qr-payment";
 import { CardTransferModal } from "#features/transfer-by-card";
 import { Card, CardContent, CardHeader, CardTitle } from "#shared/ui/card";
 import { formatCurrency, formatDate, getInitials } from "#shared/lib";
 import { transactionModel } from "#entities/transaction";
-import { recipientApi, recipientModel } from "#entities/recipient";
+import { recipientModel } from "#entities/recipient";
 import { userModel } from "#entities/user";
 import { Skeleton } from "./Skeleton";
 import {
@@ -70,8 +70,6 @@ export function Transfers() {
   const [qrOpen, setQrOpen] = useState(false);
   const [cardOpen, setCardOpen] = useState(false);
   const [initialPhone, setInitialPhone] = useState<string | undefined>();
-  const [recipientsLoading, setRecipientsLoading] = useState(true);
-  const user = userModel.useUserStore((s) => s.user);
   const userLoading = userModel.useUserStore((s) => s.isLoading);
   const txLoading = transactionModel.useTransactionStore((s) => s.isLoading);
   const hasLoaded = transactionModel.useTransactionStore((s) => s.hasLoaded);
@@ -80,17 +78,8 @@ export function Transfers() {
   );
   const transactions = allTransactions.filter((tx) => tx.type === "transfer");
   const recipients = recipientModel.useRecipientStore((s) => s.recipients);
-  const setRecipients = recipientModel.useRecipientStore(
-    (s) => s.setRecipients,
-  );
-
-  useEffect(() => {
-    if (!user) return;
-    recipientApi.getAll(user.id).then(({ data }) => {
-      if (data) setRecipients(data);
-      setRecipientsLoading(false);
-    });
-  }, [user, setRecipients]);
+  // Получателей грузит AppShell (useRecipients) — здесь только читаем статус.
+  const recipientsLoaded = recipientModel.useRecipientStore((s) => s.hasLoaded);
 
   const openTransfer = (phone?: string) => {
     setInitialPhone(phone);
@@ -133,7 +122,7 @@ export function Transfers() {
   ];
 
   const isLoading =
-    userLoading || (txLoading && !hasLoaded) || recipientsLoading;
+    userLoading || (txLoading && !hasLoaded) || !recipientsLoaded;
 
   if (isLoading) return <Skeleton />;
 

@@ -19,19 +19,9 @@ export const userApi = {
     };
   },
 
-  updateBalance: async (
-    userId: string,
-    balance: number,
-  ): Promise<{ error: string | null }> => {
-    const supabase = createBrowserClient();
-
-    const { error } = await supabase
-      .from("profiles")
-      .update({ balance })
-      .eq("id", userId);
-
-    return { error: error ? error.message : null };
-  },
+  // Баланс меняется только серверными RPC (transfer_money / add_income /
+  // confirm_qr_payment). Прямого updateBalance у клиента больше нет —
+  // право на UPDATE profiles отозвано в миграции 0006.
   createProfile: async (profile: {
     id: string;
     email: string;
@@ -39,10 +29,8 @@ export const userApi = {
   }): Promise<{ error: string | null }> => {
     const supabase = createBrowserClient();
 
-    const { error } = await supabase.from("profiles").insert({
-      ...profile,
-      balance: 1_240_500,
-    });
+    // balance не передаём — стартовое значение задаёт DEFAULT в БД.
+    const { error } = await supabase.from("profiles").insert(profile);
 
     return { error: error ? error.message : null };
   },

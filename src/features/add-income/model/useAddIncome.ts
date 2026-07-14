@@ -30,11 +30,9 @@ export function useAddIncome() {
       setError(null);
 
       const { data, balance, error } = await addIncomeApi.add(
-        user.id,
         amount,
         source.trim() || "Income",
         category,
-        user.balance,
       );
 
       if (error || !data || balance === null) {

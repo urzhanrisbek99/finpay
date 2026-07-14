@@ -1,14 +1,19 @@
 import { createBrowserClient } from "#shared/api/supabase/client";
 import { transactionModel } from "#entities/transaction";
 
+type TransferResult = {
+  transaction: transactionModel.Transaction;
+  balance: number;
+};
+
 export const cardTransferApi = {
   send: async (
-    userId: string,
     amount: number,
     cardNumber: string,
     comment?: string,
   ): Promise<{
     data: transactionModel.Transaction | null;
+    balance: number | null;
     error: string | null;
   }> => {
     const supabase = createBrowserClient();
@@ -16,24 +21,22 @@ export const cardTransferApi = {
     // храним только последние 4 цифры получателя — полный номер не сохраняем
     const last4 = cardNumber.replace(/\D/g, "").slice(-4);
 
-    const { data, error } = await supabase
-      .from("transactions")
-      .insert({
-        user_id: userId,
-        type: "transfer",
-        amount,
-        merchant: `Transfer to card •••• ${last4}`,
-        category: "transfer",
-        status: "completed",
-        comment: comment?.trim() || null,
-        method: "card",
-      })
-      .select()
-      .single();
+    const { data, error } = await supabase.rpc("transfer_money", {
+      p_amount: amount,
+      p_merchant: `Transfer to card •••• ${last4}`,
+      p_method: "card",
+      p_comment: comment?.trim() || null,
+    });
 
-    return {
-      data: data as transactionModel.Transaction | null,
-      error: error ? error.message : null,
-    };
+    if (error || !data) {
+      return {
+        data: null,
+        balance: null,
+        error: error?.message ?? "Transfer failed",
+      };
+    }
+
+    const result = data as TransferResult;
+    return { data: result.transaction, balance: result.balance, error: null };
   },
 };

@@ -1,15 +1,18 @@
 import { createBrowserClient } from "#shared/api/supabase/client";
-import { userApi } from "#entities/user";
 import { transactionModel } from "#entities/transaction";
 import type { TransactionCategory } from "#shared/types";
 
+type IncomeResult = {
+  transaction: transactionModel.Transaction;
+  balance: number;
+};
+
 export const addIncomeApi = {
+  // Вставка транзакции и зачисление на баланс — атомарно в RPC add_income.
   add: async (
-    userId: string,
     amount: number,
     source: string,
     category: TransactionCategory,
-    currentBalance: number,
   ): Promise<{
     data: transactionModel.Transaction | null;
     balance: number | null;
@@ -17,18 +20,11 @@ export const addIncomeApi = {
   }> => {
     const supabase = createBrowserClient();
 
-    const { data, error } = await supabase
-      .from("transactions")
-      .insert({
-        user_id: userId,
-        type: "income",
-        amount,
-        merchant: source,
-        category,
-        status: "completed",
-      })
-      .select()
-      .single();
+    const { data, error } = await supabase.rpc("add_income", {
+      p_amount: amount,
+      p_source: source,
+      p_category: category,
+    });
 
     if (error || !data) {
       return {
@@ -38,19 +34,7 @@ export const addIncomeApi = {
       };
     }
 
-    const newBalance = currentBalance + amount;
-    const { error: balanceError } = await userApi.updateBalance(
-      userId,
-      newBalance,
-    );
-    if (balanceError) {
-      return { data: null, balance: null, error: balanceError };
-    }
-
-    return {
-      data: data as transactionModel.Transaction,
-      balance: newBalance,
-      error: null,
-    };
+    const result = data as IncomeResult;
+    return { data: result.transaction, balance: result.balance, error: null };
   },
 };

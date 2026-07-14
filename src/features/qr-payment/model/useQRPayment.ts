@@ -3,8 +3,7 @@
 import { useState, useCallback, useEffect, useRef } from "react";
 import { qrPaymentApi } from "../api";
 import { userApi, userModel } from "#entities/user";
-import { transactionModel, transactionApi } from "#entities/transaction";
-import { cardApi } from "#entities/card";
+import { transactionModel } from "#entities/transaction";
 import { createBrowserClient } from "#shared/api/supabase/client";
 import { POLLING_INTERVAL } from "#shared/config";
 
@@ -16,8 +15,6 @@ export function useQRPayment() {
     useState<transactionModel.Transaction | null>(null);
   const [error, setError] = useState<string | null>(null);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  // чтобы списать баланс ровно один раз, даже если polling заметит completed дважды
-  const settledRef = useRef(false);
 
   const user = userModel.useUserStore((s) => s.user);
   const addTransaction = transactionModel.useTransactionStore(
@@ -34,20 +31,17 @@ export function useQRPayment() {
     }
   }, []);
 
-  const settleBalance = useCallback(async (amount: number) => {
-    if (settledRef.current) return;
-    settledRef.current = true;
-
+  // Баланс списывает сервер (confirm_qr_payment). После подтверждения просто
+  // подтягиваем авторитетное значение из БД — клиент ничего не считает сам.
+  const syncBalance = useCallback(async () => {
     const { user: current, setBalance } = userModel.useUserStore.getState();
     if (!current) return;
-
-    const newBalance = current.balance - amount;
-    await userApi.updateBalance(current.id, newBalance);
-    setBalance(newBalance);
+    const { data } = await userApi.getProfile(current.id);
+    if (data) setBalance(data.balance);
   }, []);
 
   const startPolling = useCallback(
-    (transactionId: string, amount: number) => {
+    (transactionId: string) => {
       const supabase = createBrowserClient();
 
       intervalRef.current = setInterval(async () => {
@@ -61,7 +55,7 @@ export function useQRPayment() {
           setState("completed");
           stopPolling();
           updateTransactionStatus(transactionId, "completed");
-          void settleBalance(amount);
+          void syncBalance();
         } else if (data?.status === "failed") {
           setState("failed");
           stopPolling();
@@ -69,36 +63,22 @@ export function useQRPayment() {
         }
       }, POLLING_INTERVAL);
     },
-    [stopPolling, settleBalance, updateTransactionStatus],
+    [stopPolling, syncBalance, updateTransactionStatus],
   );
 
   const createPayment = useCallback(
     async (amount: number, merchant: string) => {
       if (!user) return;
+      // Мгновенный фидбэк; баланс и лимит окончательно проверяет сервер.
       if (amount > user.balance) {
         setState("failed");
         setError("Insufficient balance");
         return;
       }
-      settledRef.current = false;
       setState("pending");
       setError(null);
 
-      const [{ data: card }, { data: spent }] = await Promise.all([
-        cardApi.getCard(user.id),
-        transactionApi.getMonthlySpent(user.id),
-      ]);
-      if (card && spent + amount > card.spending_limit) {
-        setState("failed");
-        setError("This payment exceeds your monthly card limit");
-        return;
-      }
-
-      const { data, error } = await qrPaymentApi.create(
-        amount,
-        merchant,
-        user.id,
-      );
+      const { data, error } = await qrPaymentApi.create(amount, merchant);
 
       if (error || !data) {
         setState("failed");
@@ -110,14 +90,13 @@ export function useQRPayment() {
       addTransaction(data);
 
       qrPaymentApi.simulateConfirm(data.id);
-      startPolling(data.id, data.amount);
+      startPolling(data.id);
     },
     [user, addTransaction, startPolling],
   );
 
   const reset = useCallback(() => {
     stopPolling();
-    settledRef.current = false;
     setState("idle");
     setTransaction(null);
     setError(null);

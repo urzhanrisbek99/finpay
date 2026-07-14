@@ -3,6 +3,7 @@
 import { useSelectedLayoutSegment } from "next/navigation";
 import { userModel } from "#entities/user";
 import { transactionModel } from "#entities/transaction";
+import { recipientModel } from "#entities/recipient";
 import { Header } from "#widgets/header";
 import { NewPaymentFlow } from "#widgets/new-payment";
 
@@ -19,6 +20,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   // страницах), иначе при прямой перезагрузке страницы данные будут пустыми
   userModel.useUser();
   transactionModel.useTransactions();
+  recipientModel.useRecipients();
 
   return (
     <>

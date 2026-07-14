@@ -2,9 +2,8 @@
 
 import { useState, useCallback } from "react";
 import { transferApi } from "../api";
-import { userApi, userModel } from "#entities/user";
-import { transactionModel, transactionApi } from "#entities/transaction";
-import { cardApi } from "#entities/card";
+import { userModel } from "#entities/user";
+import { transactionModel } from "#entities/transaction";
 import { recipientApi, recipientModel } from "#entities/recipient";
 
 type TransferState = "idle" | "loading" | "success" | "failed";
@@ -30,6 +29,8 @@ export function useTransfer() {
       saveName?: string,
     ) => {
       if (!user) return;
+      // Клиентские проверки — только для мгновенного фидбэка; настоящую
+      // валидацию (баланс, лимит) выполняет сервер в transfer_money.
       if (amount < 100) {
         setError("Minimum transfer amount is 100 ₸");
         return;
@@ -42,34 +43,20 @@ export function useTransfer() {
       setState("loading");
       setError(null);
 
-      const [{ data: card }, { data: spent }] = await Promise.all([
-        cardApi.getCard(user.id),
-        transactionApi.getMonthlySpent(user.id),
-      ]);
-      if (card && spent + amount > card.spending_limit) {
-        setState("failed");
-        setError("This transfer exceeds your monthly card limit");
-        return;
-      }
-
-      const { data, error } = await transferApi.send(
-        user.id,
+      const { data, balance, error } = await transferApi.send(
         amount,
         phone,
         comment,
       );
 
-      if (error || !data) {
+      if (error || !data || balance === null) {
         setState("failed");
         setError(error);
         return;
       }
 
       addTransaction(data);
-
-      const newBalance = user.balance - amount;
-      await userApi.updateBalance(user.id, newBalance);
-      setBalance(newBalance);
+      setBalance(balance);
 
       const name = saveName?.trim();
       if (name) {
