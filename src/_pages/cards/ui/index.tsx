@@ -11,11 +11,10 @@ import { ReissueCardModal } from "#features/reissue-card";
 import { RemoveCardModal } from "#features/remove-card";
 import { AddCardModal } from "#features/add-card";
 import { SetSpendingLimitModal } from "#features/set-spending-limit";
-import { Skeleton } from "./Skeleton";
 
 export function Cards() {
-  const { card, isLoading } = cardModel.useCard();
-  const { toggleFreeze } = cardModel.useCardStore();
+  const card = cardModel.useCardStore((s) => s.card);
+  const toggleFreeze = cardModel.useCardStore((s) => s.toggleFreeze);
   const { spent } = transactionModel.useMonthlySpent();
   const [cvvOpen, setCvvOpen] = useState(false);
   const [reissueOpen, setReissueOpen] = useState(false);
@@ -33,8 +32,6 @@ export function Cards() {
     toggleFreeze();
     await cardApi.toggleFreeze(card.id, !card.is_frozen);
   };
-
-  if (isLoading) return <Skeleton />;
 
   return (
     <>

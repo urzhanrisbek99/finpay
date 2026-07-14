@@ -1,7 +1,6 @@
 "use client";
 
 import { Card, CardContent, CardHeader, CardTitle } from "#shared/ui/card";
-import { Skeleton } from "#shared/ui/skeleton";
 import { formatCurrency } from "#shared/lib";
 import { transactionModel } from "#entities/transaction";
 import { cardModel } from "#entities/card";
@@ -60,7 +59,7 @@ function getBudget(spent: number, limit: number) {
 }
 
 export function BudgetStatus() {
-  const { card, isLoading: cardLoading } = cardModel.useCard();
+  const card = cardModel.useCardStore((s) => s.card);
   const { spent } = transactionModel.useMonthlySpent();
 
   const limit = card?.spending_limit ?? 0;
@@ -78,79 +77,67 @@ export function BudgetStatus() {
         <CardTitle className="text-sm font-medium">Monthly budget</CardTitle>
       </CardHeader>
       <CardContent>
-        {cardLoading ? (
-          <div className="space-y-4">
-            <Skeleton className="h-8 w-32" />
-            <Skeleton className="h-2 w-full rounded-full" />
-            <Skeleton className="h-4 w-40" />
+        <div className="mb-4 flex items-end justify-between">
+          <div>
+            <p className="text-2xl font-semibold">{formatCurrency(spent)}</p>
+            <p className="text-muted-foreground text-xs">
+              {limit > 0
+                ? `of ${formatCurrency(limit)} limit`
+                : "No spending limit set"}
+            </p>
           </div>
-        ) : (
-          <>
-            <div className="mb-4 flex items-end justify-between">
-              <div>
-                <p className="text-2xl font-semibold">
-                  {formatCurrency(spent)}
-                </p>
-                <p className="text-muted-foreground text-xs">
-                  {limit > 0
-                    ? `of ${formatCurrency(limit)} limit`
-                    : "No spending limit set"}
-                </p>
-              </div>
-              {limit > 0 && (
-                <p className={`text-sm font-medium ${meta.text}`}>
-                  {isOver
-                    ? `${formatCurrency(spent - limit)} over`
-                    : `${formatCurrency(remaining)} left`}
-                </p>
-              )}
-            </div>
+          {limit > 0 && (
+            <p className={`text-sm font-medium ${meta.text}`}>
+              {isOver
+                ? `${formatCurrency(spent - limit)} over`
+                : `${formatCurrency(remaining)} left`}
+            </p>
+          )}
+        </div>
 
-            <div className="bg-muted relative h-2 rounded-full">
-              <div
-                className={`${meta.bar} h-full rounded-full transition-all`}
-                style={{ width: `${usedPercent}%` }}
-              />
-              {limit > 0 && (
-                <div
-                  className="bg-foreground/40 absolute top-1/2 h-3.5 w-0.5 -translate-x-1/2 -translate-y-1/2 rounded"
-                  style={{ left: `${pacePercent}%` }}
-                  title="Expected pace for today"
-                />
-              )}
-            </div>
+        <div className="bg-muted relative h-2 rounded-full">
+          <div
+            className={`${meta.bar} h-full rounded-full transition-all`}
+            style={{ width: `${usedPercent}%` }}
+          />
+          {limit > 0 && (
+            <div
+              className="bg-foreground/40 absolute top-1/2 h-3.5 w-0.5 -translate-x-1/2 -translate-y-1/2 rounded"
+              style={{ left: `${pacePercent}%` }}
+              title="Expected pace for today"
+            />
+          )}
+        </div>
 
-            <div className="mt-3 flex items-center gap-2">
-              <span className={`h-2 w-2 rounded-full ${meta.bar}`} />
-              <span className={`text-sm font-medium ${meta.text}`}>
-                {meta.label}
-              </span>
-            </div>
+        <div className="mt-3 flex items-center gap-2">
+          <span className={`h-2 w-2 rounded-full ${meta.bar}`} />
+          <span className={`text-sm font-medium ${meta.text}`}>
+            {meta.label}
+          </span>
+        </div>
 
-            <div className="mt-4 grid grid-cols-3 gap-3 border-t pt-3 text-xs">
-              <div>
-                <p className="text-muted-foreground">Projected</p>
-                <p className="font-medium">
-                  {limit > 0 ? formatCurrency(projected) : "—"}
-                </p>
-              </div>
-              <div>
-                <p className="text-muted-foreground">Daily avg</p>
-                <p className="font-medium">{formatCurrency(dailyAvg)}</p>
-              </div>
-              <div className="text-right">
-                <p className="text-muted-foreground">
-                  {isOver ? "Over by" : "Remaining"}
-                </p>
-                <p className={`font-medium ${isOver ? meta.text : ""}`}>
-                  {limit > 0
-                    ? formatCurrency(isOver ? spent - limit : remaining)
-                    : "—"}
-                </p>
-              </div>
-            </div>
-          </>
-        )}
+        <div className="mt-4 grid grid-cols-3 gap-3 border-t pt-3 text-xs">
+          <div>
+            <p className="text-muted-foreground">Projected</p>
+            <p className="font-medium">
+              {limit > 0 ? formatCurrency(projected) : "—"}
+            </p>
+          </div>
+          <div>
+            <p className="text-muted-foreground">Daily avg</p>
+            <p className="font-medium">{formatCurrency(dailyAvg)}</p>
+          </div>
+          <div className="text-right">
+            <p className="text-muted-foreground">
+              {isOver ? "Over by" : "Remaining"}
+            </p>
+            <p className={`font-medium ${isOver ? meta.text : ""}`}>
+              {limit > 0
+                ? formatCurrency(isOver ? spent - limit : remaining)
+                : "—"}
+            </p>
+          </div>
+        </div>
       </CardContent>
     </Card>
   );

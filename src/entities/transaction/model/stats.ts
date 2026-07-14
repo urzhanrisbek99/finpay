@@ -138,6 +138,15 @@ export function buildBuckets(period: ChartPeriod, now: Date): Bucket[] {
   return buckets;
 }
 
+// Потрачено в текущем месяце (расходы + переводы, кроме failed).
+// Совпадает с серверным current_month_spent.
+export function computeMonthlySpent(
+  transactions: Transaction[],
+  now: Date,
+): number {
+  return monthlySpending(transactions, 0, now);
+}
+
 function monthlySpending(
   transactions: Transaction[],
   offset: number,

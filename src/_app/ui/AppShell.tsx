@@ -1,9 +1,6 @@
 "use client";
 
 import { useSelectedLayoutSegment } from "next/navigation";
-import { userModel } from "#entities/user";
-import { transactionModel } from "#entities/transaction";
-import { recipientModel } from "#entities/recipient";
 import { Header } from "#widgets/header";
 import { NewPaymentFlow } from "#widgets/new-payment";
 
@@ -16,12 +13,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const segment = useSelectedLayoutSegment();
   const maxWidth = MAX_WIDTH_BY_SEGMENT[segment ?? ""] ?? DEFAULT_MAX_WIDTH;
 
-  // профиль и транзакции грузим один раз в оболочке (нужны на нескольких
-  // страницах), иначе при прямой перезагрузке страницы данные будут пустыми
-  userModel.useUser();
-  transactionModel.useTransactions();
-  recipientModel.useRecipients();
-
+  // Профиль, транзакции и получатели уже загружены на сервере в layout и
+  // прокинуты в сторы через StoreProvider — здесь ничего грузить не нужно.
   return (
     <>
       <div className={`mx-auto ${maxWidth}`}>

@@ -8,8 +8,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "#shared/ui/card";
 import { formatCurrency, formatDate, getInitials } from "#shared/lib";
 import { transactionModel } from "#entities/transaction";
 import { recipientModel } from "#entities/recipient";
-import { userModel } from "#entities/user";
-import { Skeleton } from "./Skeleton";
 import {
   Send,
   ArrowDownLeft,
@@ -70,16 +68,12 @@ export function Transfers() {
   const [qrOpen, setQrOpen] = useState(false);
   const [cardOpen, setCardOpen] = useState(false);
   const [initialPhone, setInitialPhone] = useState<string | undefined>();
-  const userLoading = userModel.useUserStore((s) => s.isLoading);
-  const txLoading = transactionModel.useTransactionStore((s) => s.isLoading);
-  const hasLoaded = transactionModel.useTransactionStore((s) => s.hasLoaded);
   const allTransactions = transactionModel.useTransactionStore(
     (s) => s.transactions,
   );
   const transactions = allTransactions.filter((tx) => tx.type === "transfer");
+  // Данные (транзакции, получатели) гидрируются из SSR — грузить нечего.
   const recipients = recipientModel.useRecipientStore((s) => s.recipients);
-  // Получателей грузит AppShell (useRecipients) — здесь только читаем статус.
-  const recipientsLoaded = recipientModel.useRecipientStore((s) => s.hasLoaded);
 
   const openTransfer = (phone?: string) => {
     setInitialPhone(phone);
@@ -120,11 +114,6 @@ export function Transfers() {
     { label: "Sent this month", value: formatCurrency(sentThisMonth) },
     { label: "Transfers", value: String(monthTransfers.length) },
   ];
-
-  const isLoading =
-    userLoading || (txLoading && !hasLoaded) || !recipientsLoaded;
-
-  if (isLoading) return <Skeleton />;
 
   return (
     <>

@@ -74,7 +74,10 @@ const filters = ["All", "Income", "Expense"] as const;
 type Filter = (typeof filters)[number];
 
 export function TransactionList() {
-  const { transactions, isLoading } = transactionModel.useTransactionStore();
+  const transactions = transactionModel.useTransactionStore(
+    (s) => s.transactions,
+  );
+  const isLoading = transactionModel.useTransactionStore((s) => s.isLoading);
   const [filter, setFilter] = useState<Filter>("All");
 
   const visibleTransactions = useMemo(() => {

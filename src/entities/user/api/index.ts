@@ -1,11 +1,15 @@
+import type { SupabaseClient } from "@supabase/supabase-js";
 import { createBrowserClient } from "#shared/api/supabase/client";
 import type { User } from "../model/types";
 
 export const userApi = {
+  // Читаем и с клиента (браузерный клиент по умолчанию), и из SSR
+  // (передаётся серверный клиент из layout).
   getProfile: async (
     userId: string,
+    client?: SupabaseClient,
   ): Promise<{ data: User | null; error: string | null }> => {
-    const supabase = createBrowserClient();
+    const supabase = client ?? createBrowserClient();
 
     const { data, error } = await supabase
       .from("profiles")

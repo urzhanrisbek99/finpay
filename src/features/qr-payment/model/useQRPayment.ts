@@ -17,6 +17,7 @@ export function useQRPayment() {
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const user = userModel.useUserStore((s) => s.user);
+  const userStore = userModel.useUserStoreApi();
   const addTransaction = transactionModel.useTransactionStore(
     (s) => s.addTransaction,
   );
@@ -34,11 +35,11 @@ export function useQRPayment() {
   // Баланс списывает сервер (confirm_qr_payment). После подтверждения просто
   // подтягиваем авторитетное значение из БД — клиент ничего не считает сам.
   const syncBalance = useCallback(async () => {
-    const { user: current, setBalance } = userModel.useUserStore.getState();
+    const { user: current, setBalance } = userStore.getState();
     if (!current) return;
     const { data } = await userApi.getProfile(current.id);
     if (data) setBalance(data.balance);
-  }, []);
+  }, [userStore]);
 
   const startPolling = useCallback(
     (transactionId: string) => {

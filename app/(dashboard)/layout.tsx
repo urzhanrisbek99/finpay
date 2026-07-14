@@ -1,13 +1,15 @@
+import { Suspense } from "react";
 import { redirect } from "next/navigation";
 import { createServerClient } from "#shared/api/supabase/server";
-import { AppShell } from "#app";
-import { Sidebar } from "#widgets/sidebar";
+import { AppSkeleton } from "#app";
+import { DashboardShell } from "./DashboardShell";
 
 export default async function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  // Быстрый auth-гейт вне Suspense: редирект отрабатывает до показа скелетона.
   const supabase = await createServerClient();
   const {
     data: { user },
@@ -17,12 +19,10 @@ export default async function DashboardLayout({
     redirect("/login");
   }
 
+  // Данные грузятся внутри Suspense — пока идут запросы, стримится AppSkeleton.
   return (
-    <div className="bg-muted/30 flex min-h-screen">
-      <Sidebar />
-      <main className="flex-1 overflow-auto p-6">
-        <AppShell>{children}</AppShell>
-      </main>
-    </div>
+    <Suspense fallback={<AppSkeleton />}>
+      <DashboardShell userId={user.id}>{children}</DashboardShell>
+    </Suspense>
   );
 }

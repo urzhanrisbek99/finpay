@@ -1,14 +1,18 @@
+import type { SupabaseClient } from "@supabase/supabase-js";
 import { createBrowserClient } from "#shared/api/supabase/client";
 import type { Card } from "../model/types";
 
+// cards закрыт табличным SELECT — читаем только разрешённые колонки (без cvv).
 const CARD_COLUMNS =
   "id, user_id, number, holder_name, expires_at, type, is_frozen, spending_limit";
 
 export const cardApi = {
+  // Читаем и с клиента, и из SSR (передаётся серверный клиент из layout).
   getCard: async (
     userId: string,
+    client?: SupabaseClient,
   ): Promise<{ data: Card | null; error: string | null }> => {
-    const supabase = createBrowserClient();
+    const supabase = client ?? createBrowserClient();
 
     const { data, error } = await supabase
       .from("cards")

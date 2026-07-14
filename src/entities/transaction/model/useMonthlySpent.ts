@@ -1,26 +1,15 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { createBrowserClient } from "#shared/api/supabase/client";
-import { transactionApi } from "../api";
+import { useMemo } from "react";
+import { useTransactionStore } from "./store";
+import { computeMonthlySpent } from "./stats";
 
+// Выводим из уже гидрированных транзакций — отдельный запрос в БД больше не нужен.
 export function useMonthlySpent() {
-  const [spent, setSpent] = useState(0);
-
-  useEffect(() => {
-    const load = async () => {
-      const supabase = createBrowserClient();
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-      if (!user) return;
-
-      const { data } = await transactionApi.getMonthlySpent(user.id);
-      setSpent(data);
-    };
-
-    load();
-  }, []);
-
+  const transactions = useTransactionStore((s) => s.transactions);
+  const spent = useMemo(
+    () => computeMonthlySpent(transactions, new Date()),
+    [transactions],
+  );
   return { spent };
 }
