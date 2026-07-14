@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { CreditCard, Lock, Eye, RefreshCw, Trash2, Pencil } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "#shared/ui/card";
-import { Skeleton } from "#shared/ui/skeleton";
 import { formatCurrency } from "#shared/lib";
 import { cardModel, cardApi } from "#entities/card";
 import { transactionModel } from "#entities/transaction";
@@ -12,6 +11,7 @@ import { ReissueCardModal } from "#features/reissue-card";
 import { RemoveCardModal } from "#features/remove-card";
 import { AddCardModal } from "#features/add-card";
 import { SetSpendingLimitModal } from "#features/set-spending-limit";
+import { Skeleton } from "./Skeleton";
 
 export function Cards() {
   const { card, isLoading } = cardModel.useCard();
@@ -34,14 +34,7 @@ export function Cards() {
     await cardApi.toggleFreeze(card.id, !card.is_frozen);
   };
 
-  if (isLoading) {
-    return (
-      <div className="grid grid-cols-2 gap-6">
-        <Skeleton className="h-48 rounded-xl" />
-        <Skeleton className="h-48 rounded-xl" />
-      </div>
-    );
-  }
+  if (isLoading) return <Skeleton />;
 
   return (
     <>

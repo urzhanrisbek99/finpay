@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { SpendingChart } from "#widgets/spending-chart";
 import { BudgetStatus } from "#widgets/budget-status";
@@ -10,10 +10,10 @@ import { QRModal } from "#features/qr-payment";
 import { TransferModal } from "#features/transfer";
 import { AddIncomeModal } from "#features/add-income";
 import { userModel } from "#entities/user";
-import { transactionModel } from "#entities/transaction";
+import { transactionModel, transactionApi } from "#entities/transaction";
 import { ROUTES } from "#shared/config";
 import { formatCurrency } from "#shared/lib";
-import { DashboardSkeleton } from "./DashboardSkeleton";
+import { Skeleton } from "./Skeleton";
 
 export function Dashboard() {
   const user = userModel.useUserStore((s) => s.user);
@@ -24,16 +24,28 @@ export function Dashboard() {
 
   const txLoading = transactionModel.useTransactionStore((s) => s.isLoading);
   const hasLoaded = transactionModel.useTransactionStore((s) => s.hasLoaded);
+  const setTransactions = transactionModel.useTransactionStore(
+    (s) => s.setTransactions,
+  );
+  const [refreshing, setRefreshing] = useState(true);
   const [qrOpen, setQrOpen] = useState(false);
   const [transferOpen, setTransferOpen] = useState(false);
   const [incomeOpen, setIncomeOpen] = useState(false);
 
-  const isLoading = userLoading || (txLoading && !hasLoaded);
+  useEffect(() => {
+    if (!user) return;
+    transactionApi.getAll(user.id).then(({ data }) => {
+      if (data) setTransactions(data);
+      setRefreshing(false);
+    });
+  }, [user, setTransactions]);
+
+  const isLoading = userLoading || (txLoading && !hasLoaded) || refreshing;
 
   return (
     <>
       {isLoading ? (
-        <DashboardSkeleton />
+        <Skeleton />
       ) : (
         <div className="animate-in fade-in duration-500 ease-out">
           <div className="mb-6 grid grid-cols-4 gap-4">

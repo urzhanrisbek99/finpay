@@ -9,6 +9,7 @@ import { formatCurrency, formatDate, getInitials } from "#shared/lib";
 import { transactionModel } from "#entities/transaction";
 import { recipientApi, recipientModel } from "#entities/recipient";
 import { userModel } from "#entities/user";
+import { Skeleton } from "./Skeleton";
 import {
   Send,
   ArrowDownLeft,
@@ -69,7 +70,11 @@ export function Transfers() {
   const [qrOpen, setQrOpen] = useState(false);
   const [cardOpen, setCardOpen] = useState(false);
   const [initialPhone, setInitialPhone] = useState<string | undefined>();
+  const [recipientsLoading, setRecipientsLoading] = useState(true);
   const user = userModel.useUserStore((s) => s.user);
+  const userLoading = userModel.useUserStore((s) => s.isLoading);
+  const txLoading = transactionModel.useTransactionStore((s) => s.isLoading);
+  const hasLoaded = transactionModel.useTransactionStore((s) => s.hasLoaded);
   const allTransactions = transactionModel.useTransactionStore(
     (s) => s.transactions,
   );
@@ -83,6 +88,7 @@ export function Transfers() {
     if (!user) return;
     recipientApi.getAll(user.id).then(({ data }) => {
       if (data) setRecipients(data);
+      setRecipientsLoading(false);
     });
   }, [user, setRecipients]);
 
@@ -125,6 +131,11 @@ export function Transfers() {
     { label: "Sent this month", value: formatCurrency(sentThisMonth) },
     { label: "Transfers", value: String(monthTransfers.length) },
   ];
+
+  const isLoading =
+    userLoading || (txLoading && !hasLoaded) || recipientsLoading;
+
+  if (isLoading) return <Skeleton />;
 
   return (
     <>
