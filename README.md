@@ -141,6 +141,26 @@ Open [http://localhost:3000](http://localhost:3000), then register an account �
 
 Apply the migrations **in order, each exactly once**. They're written as a history: `0000_init.sql` creates the schema with baseline grants, and later files deliberately tighten it (`0001` closes direct reads of `cards.cvv`, `0006` revokes `UPDATE` on `profiles`, `0010` makes `transactions` read-only to the client). Re-running an early file against an already-migrated database would hand back a privilege a later one took away — `0000` in particular is for empty databases only.
 
+## Deployment
+
+The app is a standard Next.js Node.js server — any host that runs Node 20+ will serve it, and Vercel needs no configuration file.
+
+**1. Vercel** — import the repository, then set two environment variables:
+
+```
+NEXT_PUBLIC_SUPABASE_URL=your-project-url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
+```
+
+Both are `NEXT_PUBLIC_` because the browser genuinely needs them, and the anon key is designed to be public. It is not what keeps data safe: RLS scopes every row to `auth.uid()`, the money functions derive the user from the session rather than from arguments, and the client's privilege to write a balance or the ledger is revoked outright. Handing someone the anon key gets them exactly what any visitor already has.
+
+**2. Supabase → Authentication → URL Configuration** — this step is easy to skip and breaks password reset in a way nothing else catches:
+
+- **Site URL**: `https://<your-app>.vercel.app`
+- **Redirect URLs**: add `https://<your-app>.vercel.app/**`, keeping `http://localhost:3000/**` for local work.
+
+`resetPasswordForEmail` asks Supabase to send the user back to `<origin>/auth/confirm`. Supabase honours that only if it matches the allowlist — otherwise it quietly falls back to the Site URL, so an unconfigured production sends real users to whatever is in that field (`localhost:3000`, out of the box). Nothing errors; the link just goes to the wrong machine.
+
 ## Conventions
 
 - **Commits** — [Conventional Commits](https://www.conventionalcommits.org/), enforced by commitlint + husky; lint-staged runs ESLint + Prettier on staged files.
