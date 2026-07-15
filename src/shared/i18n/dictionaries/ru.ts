@@ -284,6 +284,7 @@ export const ru: Messages = {
     signInSubtitle: "Войдите в свой аккаунт FinPay",
     email: "Эл. почта",
     password: "Пароль",
+    showPassword: "Показать пароль",
     forgotPassword: "Забыли пароль?",
     signingIn: "Вход...",
     signIn: "Войти",

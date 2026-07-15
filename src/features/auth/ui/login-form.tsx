@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useLogin } from "../model";
 import { Button } from "#shared/ui/button";
 import { Input } from "#shared/ui/input";
+import { PasswordInput } from "#shared/ui/password-input";
 import { Label } from "#shared/ui/label";
 import { useT } from "#shared/i18n";
 
@@ -44,8 +45,8 @@ export function LoginForm() {
                 {t.auth.forgotPassword}
               </span>
             </div>
-            <Input
-              type="password"
+            <PasswordInput
+              autoComplete="current-password"
               placeholder="••••••••"
               value={password}
               onChange={(e) => setPassword(e.target.value)}

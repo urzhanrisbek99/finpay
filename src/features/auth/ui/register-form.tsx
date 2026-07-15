@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRegister } from "../model";
 import { Button } from "#shared/ui/button";
 import { Input } from "#shared/ui/input";
+import { PasswordInput } from "#shared/ui/password-input";
 import { Label } from "#shared/ui/label";
 import { useT } from "#shared/i18n";
 
@@ -60,8 +61,8 @@ export function RegisterForm() {
 
           <div className="space-y-1.5">
             <Label>{t.auth.password}</Label>
-            <Input
-              type="password"
+            <PasswordInput
+              autoComplete="new-password"
               placeholder="••••••••"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
@@ -70,8 +71,8 @@ export function RegisterForm() {
 
           <div className="space-y-1.5">
             <Label>{t.auth.confirmPassword}</Label>
-            <Input
-              type="password"
+            <PasswordInput
+              autoComplete="new-password"
               placeholder="••••••••"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}

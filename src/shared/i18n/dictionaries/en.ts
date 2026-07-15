@@ -271,6 +271,7 @@ export const en = {
     signInSubtitle: "Sign in to your FinPay account",
     email: "Email",
     password: "Password",
+    showPassword: "Show password",
     forgotPassword: "Forgot password?",
     signingIn: "Signing in...",
     signIn: "Sign in",
