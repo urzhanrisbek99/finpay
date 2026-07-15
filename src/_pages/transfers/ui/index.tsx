@@ -5,7 +5,8 @@ import { TransferModal } from "#features/transfer";
 import { QRModal } from "#features/qr-payment";
 import { CardTransferModal } from "#features/transfer-by-card";
 import { Card, CardContent, CardHeader, CardTitle } from "#shared/ui/card";
-import { formatCurrency, formatDate, getInitials } from "#shared/lib";
+import { formatCurrency, getInitials } from "#shared/lib";
+import { useT, useFormatDate } from "#shared/i18n";
 import { transactionModel } from "#entities/transaction";
 import { recipientModel } from "#entities/recipient";
 import {
@@ -33,34 +34,15 @@ const STATUS_COLORS: Record<string, string> = {
 
 type TransferMethod = "phone" | "qr" | "card";
 
-const METHOD_TABS: { key: TransferMethod; label: string }[] = [
-  { key: "phone", label: "By phone" },
-  { key: "qr", label: "By QR" },
-  { key: "card", label: "By card" },
-];
+const METHOD_KEYS: TransferMethod[] = ["phone", "qr", "card"];
 
-const METHOD_CTA: Record<TransferMethod, string> = {
-  phone: "New transfer",
-  qr: "Generate QR",
-  card: "Transfer by card",
-};
-
-const METHOD_META: Record<
-  TransferMethod,
-  { label: string; icon: LucideIcon; color: string }
-> = {
-  phone: {
-    label: "By phone",
-    icon: Smartphone,
-    color: "bg-violet-100 text-violet-600",
-  },
-  qr: { label: "By QR", icon: QrCode, color: "bg-blue-100 text-blue-600" },
-  card: {
-    label: "By card",
-    icon: CreditCard,
-    color: "bg-green-100 text-green-600",
-  },
-};
+// Иконка и цвет метода — язык-нейтральны; подпись берётся из словаря по ключу.
+const METHOD_META: Record<TransferMethod, { icon: LucideIcon; color: string }> =
+  {
+    phone: { icon: Smartphone, color: "bg-violet-100 text-violet-600" },
+    qr: { icon: QrCode, color: "bg-blue-100 text-blue-600" },
+    card: { icon: CreditCard, color: "bg-green-100 text-green-600" },
+  };
 
 export function Transfers() {
   const [method, setMethod] = useState<TransferMethod>("phone");
@@ -74,6 +56,8 @@ export function Transfers() {
   const transactions = allTransactions.filter((tx) => tx.type === "transfer");
   // Данные (транзакции, получатели) гидрируются из SSR — грузить нечего.
   const recipients = recipientModel.useRecipientStore((s) => s.recipients);
+  const t = useT();
+  const formatDate = useFormatDate();
 
   const openTransfer = (phone?: string) => {
     setInitialPhone(phone);
@@ -96,7 +80,7 @@ export function Transfers() {
   );
   const sentThisMonth = monthTransfers.reduce((sum, tx) => sum + tx.amount, 0);
 
-  const methodStats = METHOD_TABS.map(({ key }) => {
+  const methodStats = METHOD_KEYS.map((key) => {
     const txs = allTransactions.filter(
       (tx) =>
         tx.method === key &&
@@ -111,8 +95,8 @@ export function Transfers() {
   });
 
   const summary = [
-    { label: "Sent this month", value: formatCurrency(sentThisMonth) },
-    { label: "Transfers", value: String(monthTransfers.length) },
+    { label: t.transfers.sentThisMonth, value: formatCurrency(sentThisMonth) },
+    { label: t.transfers.transfersCount, value: String(monthTransfers.length) },
   ];
 
   return (
@@ -129,21 +113,23 @@ export function Transfers() {
       <div className="grid grid-cols-2 gap-6">
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">New transfer</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              {t.transfers.newTransfer}
+            </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex gap-2">
-              {METHOD_TABS.map((tab) => (
+              {METHOD_KEYS.map((key) => (
                 <button
-                  key={tab.key}
-                  onClick={() => setMethod(tab.key)}
+                  key={key}
+                  onClick={() => setMethod(key)}
                   className={`flex-1 rounded-lg py-2 text-xs transition-colors ${
-                    method === tab.key
+                    method === key
                       ? "bg-violet-100 text-violet-600"
                       : "bg-muted text-muted-foreground hover:text-foreground"
                   }`}
                 >
-                  {tab.label}
+                  {t.transfers.methods[key]}
                 </button>
               ))}
             </div>
@@ -151,7 +137,7 @@ export function Transfers() {
             {method === "phone" && recipients.length > 0 && (
               <div>
                 <p className="text-muted-foreground mb-3 text-xs">
-                  Frequent recipients
+                  {t.transfers.frequentRecipients}
                 </p>
                 <div className="flex flex-wrap gap-3">
                   {recipients.slice(0, 5).map((r, i) => (
@@ -178,7 +164,7 @@ export function Transfers() {
 
             <div>
               <p className="text-muted-foreground mb-3 text-xs">
-                This month&apos;s transfers
+                {t.transfers.thisMonthsTransfers}
               </p>
               <div className="space-y-2">
                 {methodStats.map(({ key, total, count }) => {
@@ -191,13 +177,15 @@ export function Transfers() {
                       >
                         <Icon size={15} />
                       </div>
-                      <span className="flex-1 text-sm">{meta.label}</span>
+                      <span className="flex-1 text-sm">
+                        {t.transfers.methods[key]}
+                      </span>
                       <div className="text-right">
                         <p className="text-sm font-medium">
                           {formatCurrency(total)}
                         </p>
                         <p className="text-muted-foreground text-xs">
-                          {count} {count === 1 ? "transfer" : "transfers"}
+                          {count} {t.transfers.transferWord(count)}
                         </p>
                       </div>
                     </div>
@@ -210,7 +198,7 @@ export function Transfers() {
               onClick={startTransfer}
               className="w-full rounded-lg bg-violet-600 py-2.5 text-sm text-white transition-colors hover:bg-violet-700"
             >
-              {METHOD_CTA[method]}
+              {t.transfers.cta[method]}
             </button>
           </CardContent>
         </Card>
@@ -218,13 +206,13 @@ export function Transfers() {
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium">
-              Transfer history
+              {t.transfers.history}
             </CardTitle>
           </CardHeader>
           <CardContent>
             {transactions.length === 0 ? (
               <p className="text-muted-foreground py-6 text-center text-sm">
-                No transfers yet
+                {t.transfers.noTransfers}
               </p>
             ) : (
               <div className="max-h-80 overflow-y-auto">
@@ -248,7 +236,7 @@ export function Transfers() {
                     </div>
                     <div className="min-w-0 flex-1">
                       <p className="truncate text-sm font-medium">
-                        {tx.merchant}
+                        {transactionModel.localizeMerchant(tx, t)}
                       </p>
                       <p className="text-muted-foreground text-xs">
                         {formatDate(tx.created_at)}
@@ -265,7 +253,9 @@ export function Transfers() {
                           "bg-muted text-muted-foreground"
                         }`}
                       >
-                        {tx.status}
+                        {t.transactions.status[
+                          tx.status as keyof typeof t.transactions.status
+                        ] ?? tx.status}
                       </span>
                     </div>
                   </div>

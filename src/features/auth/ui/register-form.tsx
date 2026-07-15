@@ -5,6 +5,7 @@ import { useRegister } from "../model";
 import { Button } from "#shared/ui/button";
 import { Input } from "#shared/ui/input";
 import { Label } from "#shared/ui/label";
+import { useT } from "#shared/i18n";
 
 export function RegisterForm() {
   const [fullName, setFullName] = useState("");
@@ -13,10 +14,11 @@ export function RegisterForm() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [validationError, setValidationError] = useState<string | null>(null);
   const { register, isLoading, error } = useRegister();
+  const t = useT();
 
   const handleRegister = () => {
     if (password !== confirmPassword) {
-      setValidationError("Passwords do not match");
+      setValidationError(t.auth.passwordsMismatch);
       return;
     }
     setValidationError(null);
@@ -30,15 +32,15 @@ export function RegisterForm() {
           <div className="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-violet-600 text-lg font-medium text-white">
             ₸
           </div>
-          <h1 className="text-lg font-medium">Create account</h1>
+          <h1 className="text-lg font-medium">{t.auth.createAccount}</h1>
           <p className="text-muted-foreground mt-1 text-sm">
-            Start managing your finances
+            {t.auth.createSubtitle}
           </p>
         </div>
 
         <div className="space-y-4">
           <div className="space-y-1.5">
-            <Label>Full name</Label>
+            <Label>{t.auth.fullName}</Label>
             <Input
               placeholder="Urzhan Rysbek"
               value={fullName}
@@ -47,7 +49,7 @@ export function RegisterForm() {
           </div>
 
           <div className="space-y-1.5">
-            <Label>Email</Label>
+            <Label>{t.auth.email}</Label>
             <Input
               type="email"
               placeholder="you@email.com"
@@ -57,7 +59,7 @@ export function RegisterForm() {
           </div>
 
           <div className="space-y-1.5">
-            <Label>Password</Label>
+            <Label>{t.auth.password}</Label>
             <Input
               type="password"
               placeholder="••••••••"
@@ -67,7 +69,7 @@ export function RegisterForm() {
           </div>
 
           <div className="space-y-1.5">
-            <Label>Confirm password</Label>
+            <Label>{t.auth.confirmPassword}</Label>
             <Input
               type="password"
               placeholder="••••••••"
@@ -85,14 +87,14 @@ export function RegisterForm() {
             onClick={handleRegister}
             disabled={isLoading}
           >
-            {isLoading ? "Creating account..." : "Create account"}
+            {isLoading ? t.auth.creatingAccount : t.auth.createAccount}
           </Button>
         </div>
 
         <p className="text-muted-foreground mt-4 text-center text-xs">
-          Already have an account?{" "}
+          {t.auth.haveAccount}{" "}
           <a href="/login" className="font-medium text-violet-600">
-            Sign in
+            {t.auth.signIn}
           </a>
         </p>
       </div>

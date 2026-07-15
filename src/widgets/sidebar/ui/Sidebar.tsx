@@ -2,17 +2,14 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import {
-  LayoutDashboard,
-  CreditCard,
-  ArrowLeftRight,
-  Settings,
-} from "lucide-react";
+import { LayoutDashboard, CreditCard, ArrowLeftRight } from "lucide-react";
 import { cn } from "#shared/lib";
 import { ROUTES } from "#shared/config";
+import { useT } from "#shared/i18n";
 import { userModel } from "#entities/user";
 import { LogoutButton } from "#features/logout";
 import { ThemeToggle } from "#features/theme-toggle";
+import { SettingsMenu } from "#features/settings";
 
 function getInitials(fullName?: string) {
   if (!fullName) return "";
@@ -25,13 +22,14 @@ function getInitials(fullName?: string) {
 }
 
 const navItems = [
-  { icon: LayoutDashboard, href: ROUTES.DASHBOARD, label: "Dashboard" },
-  { icon: CreditCard, href: ROUTES.CARDS, label: "Cards" },
-  { icon: ArrowLeftRight, href: ROUTES.TRANSFERS, label: "Transfers" },
-];
+  { icon: LayoutDashboard, href: ROUTES.DASHBOARD, key: "dashboard" },
+  { icon: CreditCard, href: ROUTES.CARDS, key: "cards" },
+  { icon: ArrowLeftRight, href: ROUTES.TRANSFERS, key: "transfers" },
+] as const;
 
 export function Sidebar() {
   const pathname = usePathname();
+  const t = useT();
   const user = userModel.useUserStore((state) => state.user);
   const initials = getInitials(user?.full_name);
 
@@ -42,11 +40,11 @@ export function Sidebar() {
       </div>
 
       <nav className="flex flex-1 flex-col gap-1">
-        {navItems.map(({ icon: Icon, href, label }) => (
+        {navItems.map(({ icon: Icon, href, key }) => (
           <Link
             key={href}
             href={href}
-            title={label}
+            title={t.sidebar[key]}
             className={cn(
               "text-muted-foreground hover:text-foreground hover:bg-muted flex h-9 w-9 items-center justify-center rounded-lg transition-colors",
               pathname === href && "bg-violet-100 text-violet-600",
@@ -58,12 +56,7 @@ export function Sidebar() {
       </nav>
 
       <div className="flex flex-col gap-1">
-        <button
-          title="Settings"
-          className="text-muted-foreground hover:text-foreground hover:bg-muted flex h-9 w-9 items-center justify-center rounded-lg transition-colors"
-        >
-          <Settings size={18} />
-        </button>
+        <SettingsMenu />
         <ThemeToggle />
         <LogoutButton />
       </div>

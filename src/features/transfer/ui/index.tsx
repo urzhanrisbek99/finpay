@@ -9,6 +9,7 @@ import { Label } from "#shared/ui/label";
 import { useTransfer } from "../model";
 import { recipientModel } from "#entities/recipient";
 import { formatCurrency, formatPhone, isValidPhone } from "#shared/lib";
+import { useT } from "#shared/i18n";
 
 const QUICK_AMOUNTS = [5000, 10000, 30000, 50000];
 
@@ -31,6 +32,7 @@ export function TransferModal({
   const [prevOpen, setPrevOpen] = useState(open);
   const { state, error, send, reset } = useTransfer();
   const recipients = recipientModel.useRecipientStore((s) => s.recipients);
+  const t = useT();
 
   // правка состояния во время рендера (вместо эффекта): на переходе
   // закрыто→открыто подставляем номер и имя уже сохранённого получателя
@@ -88,14 +90,14 @@ export function TransferModal({
         {(state === "idle" || state === "failed") && (
           <div className="space-y-4">
             <div>
-              <h2 className="text-base font-medium">Transfer by phone</h2>
+              <h2 className="text-base font-medium">{t.transfer.title}</h2>
               <p className="text-muted-foreground mt-1 text-xs">
-                Send money instantly to any number
+                {t.transfer.subtitle}
               </p>
             </div>
 
             <div className="space-y-1.5">
-              <Label>Phone number</Label>
+              <Label>{t.transfer.phone}</Label>
               <div className="flex">
                 <span className="bg-muted text-muted-foreground flex items-center rounded-l-lg border border-r-0 px-3 text-sm">
                   +7
@@ -111,14 +113,12 @@ export function TransferModal({
                 />
               </div>
               {phoneError && (
-                <p className="text-xs text-red-600">
-                  Enter a valid number: +7 7XX XXX XX XX
-                </p>
+                <p className="text-xs text-red-600">{t.transfer.phoneError}</p>
               )}
             </div>
 
             <div className="space-y-1.5">
-              <Label>Amount (₸)</Label>
+              <Label>{t.transfer.amount}</Label>
               <Input
                 type="number"
                 placeholder="10000"
@@ -139,9 +139,9 @@ export function TransferModal({
             </div>
 
             <div className="space-y-1.5">
-              <Label>Comment (optional)</Label>
+              <Label>{t.transfer.comment}</Label>
               <Input
-                placeholder="For dinner"
+                placeholder={t.transfer.commentPlaceholder}
                 value={comment}
                 onChange={(e) => setComment(e.target.value)}
               />
@@ -150,16 +150,16 @@ export function TransferModal({
             {phoneValid && (
               <div className="space-y-1.5">
                 <Label>
-                  {alreadySaved ? "Recipient name" : "Save as (optional)"}
+                  {alreadySaved ? t.transfer.recipientName : t.transfer.saveAs}
                 </Label>
                 <Input
-                  placeholder="e.g. Asel"
+                  placeholder={t.transfer.namePlaceholder}
                   value={saveName}
                   onChange={(e) => handleNameChange(e.target.value)}
                 />
                 {!alreadySaved && saveName.trim() && (
                   <p className="text-muted-foreground text-xs">
-                    Will be added to frequent recipients
+                    {t.transfer.willAddRecipient}
                   </p>
                 )}
               </div>
@@ -172,7 +172,7 @@ export function TransferModal({
               onClick={handleSend}
               disabled={!phoneValid || !amount}
             >
-              Send {amount ? formatCurrency(Number(amount)) : ""}
+              {t.transfer.send} {amount ? formatCurrency(Number(amount)) : ""}
             </Button>
           </div>
         )}
@@ -180,22 +180,27 @@ export function TransferModal({
         {state === "loading" && (
           <div className="flex flex-col items-center gap-3 py-6">
             <Loader2 size={32} className="animate-spin text-violet-600" />
-            <p className="text-muted-foreground text-sm">Sending transfer...</p>
+            <p className="text-muted-foreground text-sm">
+              {t.transfer.sending}
+            </p>
           </div>
         )}
 
         {state === "success" && (
           <div className="flex flex-col items-center gap-3 py-4">
             <CheckCircle size={48} className="text-green-500" />
-            <h2 className="text-base font-medium">Transfer successful!</h2>
+            <h2 className="text-base font-medium">{t.transfer.success}</h2>
             <p className="text-muted-foreground text-center text-sm">
-              {formatCurrency(Number(amount))} sent to +7 {formatPhone(phone)}
+              {t.transfer.sentTo(
+                formatCurrency(Number(amount)),
+                formatPhone(phone),
+              )}
             </p>
             <Button
               className="mt-2 w-full bg-violet-600 hover:bg-violet-700"
               onClick={handleClose}
             >
-              Done
+              {t.common.done}
             </Button>
           </div>
         )}

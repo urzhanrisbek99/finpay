@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
 import { Dialog, DialogContent } from "#shared/ui/dialog";
 import { Button } from "#shared/ui/button";
+import { useT } from "#shared/i18n";
 import { cardApi } from "#entities/card";
 
 interface ShowCVVModalProps {
@@ -17,6 +18,7 @@ export function ShowCVVModal({ open, onClose, cardId }: ShowCVVModalProps) {
   const [cvv, setCvv] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const t = useT();
 
   const reset = () => {
     setRevealed(false);
@@ -47,7 +49,7 @@ export function ShowCVVModal({ open, onClose, cardId }: ShowCVVModalProps) {
     setLoading(false);
 
     if (apiError || !data) {
-      setError("Could not load CVV. Please try again");
+      setError(t.cvv.error);
       return;
     }
 
@@ -60,14 +62,14 @@ export function ShowCVVModal({ open, onClose, cardId }: ShowCVVModalProps) {
       <DialogContent className="max-w-sm">
         <div className="space-y-4">
           <div>
-            <h2 className="text-base font-medium">Card CVV</h2>
+            <h2 className="text-base font-medium">{t.cvv.title}</h2>
             <p className="text-muted-foreground mt-1 text-xs">
-              Never share your CVV with anyone
+              {t.cvv.subtitle}
             </p>
           </div>
 
           <div className="bg-muted flex flex-col items-center gap-3 rounded-xl p-6">
-            <p className="text-muted-foreground text-xs">CVV code</p>
+            <p className="text-muted-foreground text-xs">{t.cvv.code}</p>
             <div className="font-mono text-3xl font-bold tracking-widest">
               {revealed && cvv ? cvv : "•••"}
             </div>
@@ -77,7 +79,7 @@ export function ShowCVVModal({ open, onClose, cardId }: ShowCVVModalProps) {
               className="flex items-center gap-1.5 text-xs text-violet-600 disabled:opacity-50"
             >
               {revealed ? <EyeOff size={13} /> : <Eye size={13} />}
-              {loading ? "Loading..." : revealed ? "Hide" : "Reveal CVV"}
+              {loading ? t.cvv.loading : revealed ? t.cvv.hide : t.cvv.reveal}
             </button>
             {error && <p className="text-xs text-red-500">{error}</p>}
           </div>
@@ -86,7 +88,7 @@ export function ShowCVVModal({ open, onClose, cardId }: ShowCVVModalProps) {
             className="w-full bg-violet-600 hover:bg-violet-700"
             onClick={handleClose}
           >
-            Done
+            {t.common.done}
           </Button>
         </div>
       </DialogContent>

@@ -4,6 +4,7 @@ import { useState } from "react";
 import { CreditCard, Lock, Eye, RefreshCw, Trash2, Pencil } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "#shared/ui/card";
 import { formatCurrency } from "#shared/lib";
+import { useT } from "#shared/i18n";
 import { cardModel, cardApi } from "#entities/card";
 import { transactionModel } from "#entities/transaction";
 import { ShowCVVModal } from "#features/show-cvv";
@@ -13,6 +14,7 @@ import { AddCardModal } from "#features/add-card";
 import { SetSpendingLimitModal } from "#features/set-spending-limit";
 
 export function Cards() {
+  const t = useT();
   const card = cardModel.useCardStore((s) => s.card);
   const toggleFreeze = cardModel.useCardStore((s) => s.toggleFreeze);
   const { spent } = transactionModel.useMonthlySpent();
@@ -42,10 +44,10 @@ export function Cards() {
               className={`rounded-xl p-5 text-white transition-all ${card.is_frozen ? "bg-gray-400" : "bg-violet-600"}`}
             >
               <div className="mb-6 flex items-start justify-between">
-                <span className="text-xs opacity-75">Halyk Bank</span>
+                <span className="text-xs opacity-75">{t.cards.bankName}</span>
                 {card.is_frozen && (
                   <span className="rounded-full bg-white/20 px-2 py-1 text-xs">
-                    Frozen
+                    {t.cards.frozen}
                   </span>
                 )}
               </div>
@@ -54,11 +56,15 @@ export function Cards() {
               </div>
               <div className="flex items-end justify-between">
                 <div>
-                  <div className="mb-1 text-xs opacity-65">Card holder</div>
+                  <div className="mb-1 text-xs opacity-65">
+                    {t.cards.cardHolder}
+                  </div>
                   <div className="text-sm font-medium">{card.holder_name}</div>
                 </div>
                 <div className="text-right">
-                  <div className="mb-1 text-xs opacity-65">Expires</div>
+                  <div className="mb-1 text-xs opacity-65">
+                    {t.cards.expires}
+                  </div>
                   <div className="text-sm font-medium">{card.expires_at}</div>
                 </div>
                 <div className="text-xl opacity-85">
@@ -75,7 +81,7 @@ export function Cards() {
             >
               <CreditCard size={20} className="text-muted-foreground" />
               <span className="text-muted-foreground text-sm">
-                Add new card
+                {t.cards.addNewCard}
               </span>
             </button>
           )}
@@ -85,7 +91,7 @@ export function Cards() {
           <Card>
             <CardHeader className="pb-2">
               <CardTitle className="text-sm font-medium">
-                Card actions
+                {t.cards.actions}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -100,7 +106,7 @@ export function Cards() {
                 >
                   <Lock size={18} />
                   <span className="text-xs">
-                    {card?.is_frozen ? "Unfreeze" : "Freeze"}
+                    {card?.is_frozen ? t.cards.unfreeze : t.cards.freeze}
                   </span>
                 </button>
                 <button
@@ -109,21 +115,21 @@ export function Cards() {
                   className="hover:bg-muted flex flex-col items-center gap-2 rounded-lg border p-3 transition-colors disabled:pointer-events-none disabled:opacity-50"
                 >
                   <Eye size={18} />
-                  <span className="text-xs">Show CVV</span>
+                  <span className="text-xs">{t.cards.showCvv}</span>
                 </button>
                 <button
                   onClick={() => setReissueOpen(true)}
                   className="hover:bg-muted flex flex-col items-center gap-2 rounded-lg border p-3 transition-colors"
                 >
                   <RefreshCw size={18} />
-                  <span className="text-xs">Reissue</span>
+                  <span className="text-xs">{t.cards.reissue}</span>
                 </button>
                 <button
                   onClick={() => setRemoveOpen(true)}
                   className="flex flex-col items-center gap-2 rounded-lg border border-red-100 p-3 text-red-500 transition-colors hover:bg-red-50"
                 >
                   <Trash2 size={18} />
-                  <span className="text-xs">Remove</span>
+                  <span className="text-xs">{t.cards.remove}</span>
                 </button>
               </div>
             </CardContent>
@@ -132,7 +138,7 @@ export function Cards() {
           <Card>
             <CardHeader className="flex-row items-center justify-between pb-2">
               <CardTitle className="text-sm font-medium">
-                Spending limit
+                {t.cards.spendingLimit}
               </CardTitle>
               {card && (
                 <button
@@ -140,14 +146,14 @@ export function Cards() {
                   className="flex items-center gap-1 text-xs font-medium text-violet-600 hover:underline"
                 >
                   <Pencil size={12} />
-                  Edit
+                  {t.cards.edit}
                 </button>
               )}
             </CardHeader>
             <CardContent>
               <div className="mb-2 flex justify-between">
                 <span className="text-muted-foreground text-xs">
-                  Used this month
+                  {t.cards.usedThisMonth}
                 </span>
                 <span className="text-xs font-medium">
                   {formatCurrency(spent)} / {formatCurrency(limit)}
@@ -163,8 +169,8 @@ export function Cards() {
                 className={`mt-2 text-xs ${isOverLimit ? "text-red-500" : "text-muted-foreground"}`}
               >
                 {isOverLimit
-                  ? "Monthly limit reached"
-                  : `${usedPercent}% of monthly limit used`}
+                  ? t.cards.limitReached
+                  : t.cards.percentUsed(usedPercent)}
               </p>
             </CardContent>
           </Card>
@@ -172,24 +178,28 @@ export function Cards() {
           <Card>
             <CardHeader className="pb-2">
               <CardTitle className="text-sm font-medium">
-                Card details
+                {t.cards.details}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
               <div className="flex justify-between">
                 <span className="text-muted-foreground text-xs">
-                  Card number
+                  {t.cards.cardNumber}
                 </span>
                 <span className="text-xs">•••• {card?.number}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-muted-foreground text-xs">Type</span>
+                <span className="text-muted-foreground text-xs">
+                  {t.cards.type}
+                </span>
                 <span className="rounded-full bg-violet-100 px-2 py-0.5 text-xs text-violet-600">
-                  Debit · {card?.type?.toUpperCase()}
+                  {t.cards.debit} · {card?.type?.toUpperCase()}
                 </span>
               </div>
               <div className="flex justify-between">
-                <span className="text-muted-foreground text-xs">Status</span>
+                <span className="text-muted-foreground text-xs">
+                  {t.cards.status}
+                </span>
                 <span
                   className={`rounded-full px-2 py-0.5 text-xs ${
                     card?.is_frozen
@@ -197,7 +207,7 @@ export function Cards() {
                       : "bg-green-100 text-green-700"
                   }`}
                 >
-                  {card?.is_frozen ? "Frozen" : "Active"}
+                  {card?.is_frozen ? t.cards.frozen : t.cards.active}
                 </span>
               </div>
             </CardContent>

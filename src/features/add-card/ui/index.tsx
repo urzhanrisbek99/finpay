@@ -7,6 +7,7 @@ import { Button } from "#shared/ui/button";
 import { Input } from "#shared/ui/input";
 import { Label } from "#shared/ui/label";
 import { createBrowserClient } from "#shared/api/supabase/client";
+import { useT, type Messages } from "#shared/i18n";
 import { cardModel, type Card } from "#entities/card";
 import { addCardApi, type AddCardInput } from "../api";
 
@@ -34,13 +35,14 @@ function formatExpiry(value: string): string {
   return d.length <= 2 ? d : `${d.slice(0, 2)}/${d.slice(2)}`;
 }
 
-function toFriendlyError(message: string): string {
-  if (/duplicate|unique/i.test(message)) return "You already have a card";
-  return "Could not add card. Please try again";
+function toFriendlyError(message: string, t: Messages): string {
+  if (/duplicate|unique/i.test(message)) return t.addCard.errors.duplicate;
+  return t.addCard.errors.generic;
 }
 
 export function AddCardModal({ open, onClose }: AddCardModalProps) {
   const setCard = cardModel.useCardStore((s) => s.setCard);
+  const t = useT();
 
   const [number, setNumber] = useState("");
   const [holderName, setHolderName] = useState("");
@@ -69,31 +71,27 @@ export function AddCardModal({ open, onClose }: AddCardModalProps) {
     | { ok: true; value: AddCardInput }
     | { ok: false; error: string } => {
     if (digits.length !== 16)
-      return { ok: false, error: "Enter a valid 16-digit card number" };
-    if (!brand)
-      return {
-        ok: false,
-        error: "Unsupported card. Only Visa and Mastercard are allowed",
-      };
+      return { ok: false, error: t.addCard.errors.invalidNumber };
+    if (!brand) return { ok: false, error: t.addCard.errors.unsupported };
 
     const holder = holderName.trim();
-    if (!holder) return { ok: false, error: "Enter the card holder name" };
+    if (!holder) return { ok: false, error: t.addCard.errors.noHolder };
 
     const [mm, yy] = expiry.split("/");
     const month = Number(mm);
     if (expiry.replace(/\D/g, "").length !== 4 || month < 1 || month > 12)
-      return { ok: false, error: "Enter a valid expiry date (MM/YY)" };
+      return { ok: false, error: t.addCard.errors.invalidExpiry };
     // конец указанного месяца: new Date(y, month, 0) = последний день месяца
     const expDate = new Date(2000 + Number(yy), month, 0, 23, 59, 59);
     if (expDate < new Date())
-      return { ok: false, error: "The card has expired" };
+      return { ok: false, error: t.addCard.errors.expired };
 
     if (cvv.length !== 3)
-      return { ok: false, error: "Enter a valid 3-digit CVV" };
+      return { ok: false, error: t.addCard.errors.invalidCvv };
 
     const spendingLimit = Number(limit);
     if (!spendingLimit || spendingLimit <= 0)
-      return { ok: false, error: "Enter a valid monthly spending limit" };
+      return { ok: false, error: t.addCard.errors.invalidLimit };
 
     return {
       ok: true,
@@ -123,7 +121,7 @@ export function AddCardModal({ open, onClose }: AddCardModalProps) {
       data: { user },
     } = await supabase.auth.getUser();
     if (!user) {
-      setError("You must be signed in");
+      setError(t.addCard.errors.notSignedIn);
       setIsLoading(false);
       return;
     }
@@ -135,7 +133,9 @@ export function AddCardModal({ open, onClose }: AddCardModalProps) {
 
     if (apiError || !data) {
       if (apiError) console.error("[add-card] create failed:", apiError);
-      setError(apiError ? toFriendlyError(apiError) : "Could not add card");
+      setError(
+        apiError ? toFriendlyError(apiError, t) : t.addCard.errors.generic,
+      );
       setIsLoading(false);
       return;
     }
@@ -162,14 +162,14 @@ export function AddCardModal({ open, onClose }: AddCardModalProps) {
             className="space-y-4"
           >
             <div>
-              <h2 className="text-base font-medium">Add new card</h2>
+              <h2 className="text-base font-medium">{t.addCard.title}</h2>
               <p className="text-muted-foreground mt-1 text-xs">
-                Enter your card details
+                {t.addCard.subtitle}
               </p>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="card-number">Card number</Label>
+              <Label htmlFor="card-number">{t.addCard.cardNumber}</Label>
               <div className="relative">
                 <Input
                   id="card-number"
@@ -188,7 +188,7 @@ export function AddCardModal({ open, onClose }: AddCardModalProps) {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="holder-name">Card holder</Label>
+              <Label htmlFor="holder-name">{t.addCard.cardHolder}</Label>
               <Input
                 id="holder-name"
                 autoComplete="cc-name"
@@ -200,7 +200,7 @@ export function AddCardModal({ open, onClose }: AddCardModalProps) {
 
             <div className="flex gap-2">
               <div className="flex-1 space-y-2">
-                <Label htmlFor="expiry">Expiry date</Label>
+                <Label htmlFor="expiry">{t.addCard.expiry}</Label>
                 <Input
                   id="expiry"
                   inputMode="numeric"
@@ -211,7 +211,7 @@ export function AddCardModal({ open, onClose }: AddCardModalProps) {
                 />
               </div>
               <div className="flex-1 space-y-2">
-                <Label htmlFor="cvv">CVV</Label>
+                <Label htmlFor="cvv">{t.addCard.cvv}</Label>
                 <Input
                   id="cvv"
                   inputMode="numeric"
@@ -226,7 +226,7 @@ export function AddCardModal({ open, onClose }: AddCardModalProps) {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="spending-limit">Monthly spending limit (₸)</Label>
+              <Label htmlFor="spending-limit">{t.addCard.spendingLimit}</Label>
               <Input
                 id="spending-limit"
                 inputMode="numeric"
@@ -247,29 +247,29 @@ export function AddCardModal({ open, onClose }: AddCardModalProps) {
                 className="flex-1"
                 onClick={handleClose}
               >
-                Cancel
+                {t.common.cancel}
               </Button>
               <Button
                 type="submit"
                 className="flex-1 bg-violet-600 hover:bg-violet-700"
                 disabled={isLoading}
               >
-                {isLoading ? "Adding..." : "Add card"}
+                {isLoading ? t.addCard.adding : t.addCard.add}
               </Button>
             </div>
           </form>
         ) : (
           <div className="flex flex-col items-center gap-3 py-4">
             <CheckCircle size={48} className="text-green-500" />
-            <h2 className="text-base font-medium">Card added!</h2>
+            <h2 className="text-base font-medium">{t.addCard.successTitle}</h2>
             <p className="text-muted-foreground text-center text-sm">
-              Your card is ready to use
+              {t.addCard.successBody}
             </p>
             <Button
               className="mt-2 w-full bg-violet-600 hover:bg-violet-700"
               onClick={handleClose}
             >
-              Done
+              {t.common.done}
             </Button>
           </div>
         )}

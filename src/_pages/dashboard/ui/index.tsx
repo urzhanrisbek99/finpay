@@ -13,8 +13,10 @@ import { userModel } from "#entities/user";
 import { transactionModel } from "#entities/transaction";
 import { ROUTES } from "#shared/config";
 import { formatCurrency } from "#shared/lib";
+import { useT } from "#shared/i18n";
 
 export function Dashboard() {
+  const t = useT();
   const user = userModel.useUserStore((s) => s.user);
   const router = useRouter();
   const statsCards = transactionModel.useDashboardStats();
@@ -31,11 +33,10 @@ export function Dashboard() {
           <UserBalance balance={user?.balance ?? 0} trend={balanceTrend} />
 
           {statsCards.map((card) => (
-            <div
-              key={card.label}
-              className="bg-background rounded-xl border p-4"
-            >
-              <p className="text-muted-foreground mb-1 text-xs">{card.label}</p>
+            <div key={card.key} className="bg-background rounded-xl border p-4">
+              <p className="text-muted-foreground mb-1 text-xs">
+                {t.dashboard.stats[card.key]}
+              </p>
               <p className="mb-2 text-lg font-medium">
                 {formatCurrency(card.amount)}
               </p>
@@ -48,7 +49,9 @@ export function Dashboard() {
                       : "bg-amber-100 text-amber-700"
                 }`}
               >
-                {card.trend}
+                {card.key === "pending"
+                  ? t.dashboard.pendingCount(card.count ?? 0)
+                  : card.trend}
               </span>
             </div>
           ))}
@@ -59,31 +62,33 @@ export function Dashboard() {
             <SpendingChart />
           </div>
           <div className="bg-background rounded-xl border p-4">
-            <p className="mb-3 text-sm font-medium">Quick actions</p>
+            <p className="mb-3 text-sm font-medium">
+              {t.dashboard.quickActions}
+            </p>
             <div className="flex flex-col gap-2">
               <button
                 onClick={() => setQrOpen(true)}
                 className="flex items-center gap-2 rounded-lg bg-violet-100 px-3 py-2 text-left text-sm text-violet-600 transition-colors hover:bg-violet-200"
               >
-                QR payment
+                {t.dashboard.qrPayment}
               </button>
               <button
                 onClick={() => setTransferOpen(true)}
                 className="bg-muted hover:bg-muted-foreground/15 flex items-center gap-2 rounded-lg px-3 py-2 text-left text-sm transition-colors"
               >
-                Transfer by phone
+                {t.dashboard.transferByPhone}
               </button>
               <button
                 onClick={() => setIncomeOpen(true)}
                 className="flex items-center gap-2 rounded-lg bg-green-100 px-3 py-2 text-left text-sm text-green-700 transition-colors hover:bg-green-200"
               >
-                Add income
+                {t.dashboard.addIncome}
               </button>
               <button
                 onClick={() => router.push(ROUTES.CARDS)}
                 className="bg-muted hover:bg-muted-foreground/15 flex items-center gap-2 rounded-lg px-3 py-2 text-left text-sm transition-colors"
               >
-                My card
+                {t.dashboard.myCard}
               </button>
             </div>
           </div>

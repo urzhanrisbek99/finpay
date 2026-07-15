@@ -1,11 +1,20 @@
+import type { Locale } from "#shared/i18n";
 import type { Transaction } from "./types";
 
+export type DashboardStatKey = "income" | "expenses" | "pending";
+
 export type DashboardStat = {
-  label: string;
+  // Стабильный ключ вместо готовой подписи — перевод подставляется в UI-слое.
+  key: DashboardStatKey;
   amount: number;
-  trend: string;
   positive: boolean | null;
+  // Процентный тренд для income/expenses (нейтрален к языку).
+  trend?: string;
+  // Число операций в обработке — для pending (склонение делается в UI).
+  count?: number;
 };
+
+const intl = (locale: Locale) => (locale === "ru" ? "ru-RU" : "en-US");
 
 export type ChartPeriod = "Week" | "Month" | "Year";
 
@@ -72,29 +81,34 @@ export function computeDashboardStats(
 
   return [
     {
-      label: "Monthly income",
+      key: "income",
       amount: income,
       trend: formatTrend(income, prevIncome),
       positive: income >= prevIncome,
     },
     {
-      label: "Monthly expenses",
+      key: "expenses",
       amount: expenses,
       trend: formatTrend(expenses, prevExpenses),
       positive: expenses <= prevExpenses,
     },
     {
-      label: "Pending",
+      key: "pending",
       amount: pendingAmount,
-      trend: `${pending.length} txn${pending.length === 1 ? "" : "s"}`,
+      count: pending.length,
       positive: null,
     },
   ];
 }
 
-export function buildBuckets(period: ChartPeriod, now: Date): Bucket[] {
+export function buildBuckets(
+  period: ChartPeriod,
+  now: Date,
+  locale: Locale = "en",
+): Bucket[] {
   const buckets: Bucket[] = [];
   const today = startOfDay(now);
+  const loc = intl(locale);
 
   if (period === "Week") {
     for (let i = 6; i >= 0; i--) {
@@ -103,7 +117,7 @@ export function buildBuckets(period: ChartPeriod, now: Date): Bucket[] {
       const to = new Date(from);
       to.setDate(from.getDate() + 1);
       buckets.push({
-        label: from.toLocaleDateString("en-US", { weekday: "short" }),
+        label: from.toLocaleDateString(loc, { weekday: "short" }),
         from,
         to,
       });
@@ -115,7 +129,7 @@ export function buildBuckets(period: ChartPeriod, now: Date): Bucket[] {
       const to = new Date(from);
       to.setDate(from.getDate() + 7);
       buckets.push({
-        label: from.toLocaleDateString("en-US", {
+        label: from.toLocaleDateString(loc, {
           month: "short",
           day: "numeric",
         }),
@@ -128,7 +142,7 @@ export function buildBuckets(period: ChartPeriod, now: Date): Bucket[] {
       const from = new Date(today.getFullYear(), today.getMonth() - i, 1);
       const to = new Date(from.getFullYear(), from.getMonth() + 1, 1);
       buckets.push({
-        label: from.toLocaleDateString("en-US", { month: "short" }),
+        label: from.toLocaleDateString(loc, { month: "short" }),
         from,
         to,
       });
@@ -166,8 +180,9 @@ export function computeSpendingChart(
   transactions: Transaction[],
   period: ChartPeriod,
   now: Date,
+  locale: Locale = "en",
 ): { data: ChartPoint[]; thisMonth: number; changePct: number } {
-  const buckets = buildBuckets(period, now);
+  const buckets = buildBuckets(period, now, locale);
 
   const data: ChartPoint[] = buckets.map((bucket) => {
     const amount = transactions.reduce((sum, tx) => {

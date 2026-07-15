@@ -2,35 +2,18 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "#shared/ui/card";
 import { formatCurrency } from "#shared/lib";
+import { useT } from "#shared/i18n";
 import { transactionModel } from "#entities/transaction";
 import { cardModel } from "#entities/card";
 
 type BudgetLevel = "on-track" | "trending-over" | "over-budget" | "no-budget";
 
-const BUDGET_META: Record<
-  BudgetLevel,
-  { label: string; text: string; bar: string }
-> = {
-  "on-track": {
-    label: "On track",
-    text: "text-green-600",
-    bar: "bg-green-500",
-  },
-  "trending-over": {
-    label: "Trending over",
-    text: "text-amber-600",
-    bar: "bg-amber-500",
-  },
-  "over-budget": {
-    label: "Over budget",
-    text: "text-red-600",
-    bar: "bg-red-500",
-  },
-  "no-budget": {
-    label: "No budget set",
-    text: "text-muted-foreground",
-    bar: "bg-muted-foreground/40",
-  },
+// Цвета уровня бюджета; подпись уровня берётся из словаря по ключу level.
+const BUDGET_META: Record<BudgetLevel, { text: string; bar: string }> = {
+  "on-track": { text: "text-green-600", bar: "bg-green-500" },
+  "trending-over": { text: "text-amber-600", bar: "bg-amber-500" },
+  "over-budget": { text: "text-red-600", bar: "bg-red-500" },
+  "no-budget": { text: "text-muted-foreground", bar: "bg-muted-foreground/40" },
 };
 
 function getBudget(spent: number, limit: number) {
@@ -59,6 +42,7 @@ function getBudget(spent: number, limit: number) {
 }
 
 export function BudgetStatus() {
+  const t = useT();
   const card = cardModel.useCardStore((s) => s.card);
   const { spent } = transactionModel.useMonthlySpent();
 
@@ -74,7 +58,9 @@ export function BudgetStatus() {
   return (
     <Card>
       <CardHeader className="pb-2">
-        <CardTitle className="text-sm font-medium">Monthly budget</CardTitle>
+        <CardTitle className="text-sm font-medium">
+          {t.budget.monthly}
+        </CardTitle>
       </CardHeader>
       <CardContent>
         <div className="mb-4 flex items-end justify-between">
@@ -82,15 +68,15 @@ export function BudgetStatus() {
             <p className="text-2xl font-semibold">{formatCurrency(spent)}</p>
             <p className="text-muted-foreground text-xs">
               {limit > 0
-                ? `of ${formatCurrency(limit)} limit`
-                : "No spending limit set"}
+                ? t.budget.ofLimit(formatCurrency(limit))
+                : t.budget.noLimit}
             </p>
           </div>
           {limit > 0 && (
             <p className={`text-sm font-medium ${meta.text}`}>
               {isOver
-                ? `${formatCurrency(spent - limit)} over`
-                : `${formatCurrency(remaining)} left`}
+                ? t.budget.over(formatCurrency(spent - limit))
+                : t.budget.left(formatCurrency(remaining))}
             </p>
           )}
         </div>
@@ -104,7 +90,7 @@ export function BudgetStatus() {
             <div
               className="bg-foreground/40 absolute top-1/2 h-3.5 w-0.5 -translate-x-1/2 -translate-y-1/2 rounded"
               style={{ left: `${pacePercent}%` }}
-              title="Expected pace for today"
+              title={t.budget.expectedPace}
             />
           )}
         </div>
@@ -112,24 +98,24 @@ export function BudgetStatus() {
         <div className="mt-3 flex items-center gap-2">
           <span className={`h-2 w-2 rounded-full ${meta.bar}`} />
           <span className={`text-sm font-medium ${meta.text}`}>
-            {meta.label}
+            {t.budget.levels[level]}
           </span>
         </div>
 
         <div className="mt-4 grid grid-cols-3 gap-3 border-t pt-3 text-xs">
           <div>
-            <p className="text-muted-foreground">Projected</p>
+            <p className="text-muted-foreground">{t.budget.projected}</p>
             <p className="font-medium">
               {limit > 0 ? formatCurrency(projected) : "—"}
             </p>
           </div>
           <div>
-            <p className="text-muted-foreground">Daily avg</p>
+            <p className="text-muted-foreground">{t.budget.dailyAvg}</p>
             <p className="font-medium">{formatCurrency(dailyAvg)}</p>
           </div>
           <div className="text-right">
             <p className="text-muted-foreground">
-              {isOver ? "Over by" : "Remaining"}
+              {isOver ? t.budget.overBy : t.budget.remaining}
             </p>
             <p className={`font-medium ${isOver ? meta.text : ""}`}>
               {limit > 0

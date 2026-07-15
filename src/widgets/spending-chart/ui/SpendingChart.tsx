@@ -11,11 +11,13 @@ import {
 } from "recharts";
 import { Card, CardContent, CardHeader, CardTitle } from "#shared/ui/card";
 import { formatCurrency } from "#shared/lib";
+import { useT } from "#shared/i18n";
 import { transactionModel } from "#entities/transaction";
 
 const periods: transactionModel.ChartPeriod[] = ["Week", "Month", "Year"];
 
 export function SpendingChart() {
+  const t = useT();
   const [period, setPeriod] = useState<transactionModel.ChartPeriod>("Week");
   const { data, thisMonth, changePct } =
     transactionModel.useSpendingChart(period);
@@ -25,7 +27,9 @@ export function SpendingChart() {
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between pb-2">
-        <CardTitle className="text-sm font-medium">Spending overview</CardTitle>
+        <CardTitle className="text-sm font-medium">
+          {t.spending.overview}
+        </CardTitle>
         <div className="flex gap-1">
           {periods.map((p) => (
             <button
@@ -37,7 +41,7 @@ export function SpendingChart() {
                   : "bg-muted text-muted-foreground hover:text-foreground"
               }`}
             >
-              {p}
+              {t.spending.periods[p]}
             </button>
           ))}
         </div>
@@ -54,7 +58,10 @@ export function SpendingChart() {
             />
             <YAxis hide />
             <Tooltip
-              formatter={(value) => [formatCurrency(Number(value)), "Spent"]}
+              formatter={(value) => [
+                formatCurrency(Number(value)),
+                t.spending.tooltip,
+              ]}
               contentStyle={{ fontSize: 12 }}
             />
             <Area
@@ -72,18 +79,21 @@ export function SpendingChart() {
         </ResponsiveContainer>
         <div className="mt-2 flex justify-between border-t pt-3">
           <div>
-            <p className="text-muted-foreground text-xs">Total this month</p>
+            <p className="text-muted-foreground text-xs">
+              {t.spending.totalThisMonth}
+            </p>
             <p className="text-sm font-medium">{formatCurrency(thisMonth)}</p>
           </div>
           <div className="text-right">
-            <p className="text-muted-foreground text-xs">vs last month</p>
+            <p className="text-muted-foreground text-xs">
+              {t.spending.vsLastMonth}
+            </p>
             <p
               className={`text-xs font-medium ${
                 spentLess ? "text-green-600" : "text-red-600"
               }`}
             >
-              {spentLess ? "↓" : "↑"} {changePct > 0 ? "+" : ""}
-              {changePct}% {spentLess ? "less" : "more"} spent
+              {t.spending.changeLine(spentLess, changePct)}
             </p>
           </div>
         </div>

@@ -1,8 +1,15 @@
 "use client";
 
 import { ThemeProvider } from "next-themes";
+import { I18nProvider, type Locale } from "#shared/i18n";
 
-export function Providers({ children }: { children: React.ReactNode }) {
+export function Providers({
+  locale,
+  children,
+}: {
+  locale: Locale;
+  children: React.ReactNode;
+}) {
   return (
     <ThemeProvider
       attribute="class"
@@ -10,7 +17,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
       enableSystem
       disableTransitionOnChange
     >
-      {children}
+      <I18nProvider initialLocale={locale}>{children}</I18nProvider>
     </ThemeProvider>
   );
 }

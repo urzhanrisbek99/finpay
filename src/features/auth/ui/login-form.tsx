@@ -5,11 +5,13 @@ import { useLogin } from "../model";
 import { Button } from "#shared/ui/button";
 import { Input } from "#shared/ui/input";
 import { Label } from "#shared/ui/label";
+import { useT } from "#shared/i18n";
 
 export function LoginForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const { login, isLoading, error } = useLogin();
+  const t = useT();
 
   return (
     <div className="bg-muted flex min-h-screen items-center justify-center p-4">
@@ -18,15 +20,15 @@ export function LoginForm() {
           <div className="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-violet-600 text-lg font-medium text-white">
             ₸
           </div>
-          <h1 className="text-lg font-medium">Welcome back</h1>
+          <h1 className="text-lg font-medium">{t.auth.welcomeBack}</h1>
           <p className="text-muted-foreground mt-1 text-sm">
-            Sign in to your FinPay account
+            {t.auth.signInSubtitle}
           </p>
         </div>
 
         <div className="space-y-4">
           <div className="space-y-1.5">
-            <Label>Email</Label>
+            <Label>{t.auth.email}</Label>
             <Input
               type="email"
               placeholder="you@email.com"
@@ -37,9 +39,9 @@ export function LoginForm() {
 
           <div className="space-y-1.5">
             <div className="flex items-center justify-between">
-              <Label>Password</Label>
+              <Label>{t.auth.password}</Label>
               <span className="cursor-pointer text-xs text-violet-600">
-                Forgot password?
+                {t.auth.forgotPassword}
               </span>
             </div>
             <Input
@@ -57,14 +59,14 @@ export function LoginForm() {
             onClick={() => login(email, password)}
             disabled={isLoading}
           >
-            {isLoading ? "Signing in..." : "Sign in"}
+            {isLoading ? t.auth.signingIn : t.auth.signIn}
           </Button>
         </div>
 
         <p className="text-muted-foreground mt-4 text-center text-xs">
-          Don&apos;t have an account?
+          {t.auth.noAccount}{" "}
           <a href="/register" className="font-medium text-violet-600">
-            Sign up
+            {t.auth.signUp}
           </a>
         </p>
       </div>

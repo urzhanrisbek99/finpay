@@ -9,6 +9,7 @@ import { Input } from "#shared/ui/input";
 import { Label } from "#shared/ui/label";
 import { useQRPayment } from "../model";
 import { formatCurrency } from "#shared/lib";
+import { useT } from "#shared/i18n";
 
 interface QRModalProps {
   open: boolean;
@@ -19,6 +20,7 @@ export function QRModal({ open, onClose }: QRModalProps) {
   const [amount, setAmount] = useState("");
   const [merchant, setMerchant] = useState("");
   const { state, transaction, error, createPayment, reset } = useQRPayment();
+  const t = useT();
 
   const handleClose = () => {
     reset();
@@ -38,14 +40,14 @@ export function QRModal({ open, onClose }: QRModalProps) {
         {state === "idle" && (
           <div className="space-y-4">
             <div>
-              <h2 className="text-base font-medium">QR Payment</h2>
+              <h2 className="text-base font-medium">{t.qr.title}</h2>
               <p className="text-muted-foreground mt-1 text-xs">
-                Enter amount and merchant to generate QR
+                {t.qr.subtitle}
               </p>
             </div>
 
             <div className="space-y-1.5">
-              <Label>Amount (₸)</Label>
+              <Label>{t.qr.amount}</Label>
               <Input
                 type="number"
                 placeholder="10000"
@@ -55,9 +57,9 @@ export function QRModal({ open, onClose }: QRModalProps) {
             </div>
 
             <div className="space-y-1.5">
-              <Label>Merchant</Label>
+              <Label>{t.qr.merchant}</Label>
               <Input
-                placeholder="Halyk Market"
+                placeholder={t.qr.merchantPlaceholder}
                 value={merchant}
                 onChange={(e) => setMerchant(e.target.value)}
               />
@@ -68,7 +70,7 @@ export function QRModal({ open, onClose }: QRModalProps) {
               onClick={handleCreate}
               disabled={!amount || !merchant}
             >
-              Generate QR
+              {t.qr.generate}
             </Button>
           </div>
         )}
@@ -76,9 +78,14 @@ export function QRModal({ open, onClose }: QRModalProps) {
         {state === "pending" && transaction && (
           <div className="flex flex-col items-center gap-4 py-2">
             <div>
-              <h2 className="text-center text-base font-medium">Scan to pay</h2>
+              <h2 className="text-center text-base font-medium">
+                {t.qr.scanTitle}
+              </h2>
               <p className="text-muted-foreground mt-1 text-center text-xs">
-                {formatCurrency(transaction.amount)} → {transaction.merchant}
+                {t.qr.scanSubtitle(
+                  formatCurrency(transaction.amount),
+                  transaction.merchant,
+                )}
               </p>
             </div>
 
@@ -92,11 +99,11 @@ export function QRModal({ open, onClose }: QRModalProps) {
 
             <div className="text-muted-foreground flex items-center gap-2 text-sm">
               <Loader2 size={14} className="animate-spin" />
-              Waiting for payment...
+              {t.qr.waiting}
             </div>
 
             <p className="text-muted-foreground text-center text-xs">
-              Payment will be confirmed automatically in 3 seconds
+              {t.qr.autoConfirm}
             </p>
           </div>
         )}
@@ -104,16 +111,18 @@ export function QRModal({ open, onClose }: QRModalProps) {
         {state === "completed" && transaction && (
           <div className="flex flex-col items-center gap-3 py-4">
             <CheckCircle size={48} className="text-green-500" />
-            <h2 className="text-base font-medium">Payment successful!</h2>
+            <h2 className="text-base font-medium">{t.qr.successTitle}</h2>
             <p className="text-muted-foreground text-sm">
-              {formatCurrency(transaction.amount)} paid to{" "}
-              {transaction.merchant}
+              {t.qr.paidTo(
+                formatCurrency(transaction.amount),
+                transaction.merchant,
+              )}
             </p>
             <Button
               className="mt-2 w-full bg-violet-600 hover:bg-violet-700"
               onClick={handleClose}
             >
-              Done
+              {t.common.done}
             </Button>
           </div>
         )}
@@ -121,10 +130,10 @@ export function QRModal({ open, onClose }: QRModalProps) {
         {state === "failed" && (
           <div className="flex flex-col items-center gap-3 py-4">
             <XCircle size={48} className="text-red-500" />
-            <h2 className="text-base font-medium">Payment failed</h2>
+            <h2 className="text-base font-medium">{t.qr.failedTitle}</h2>
             <p className="text-muted-foreground text-xs">{error}</p>
             <Button variant="outline" className="mt-2 w-full" onClick={reset}>
-              Try again
+              {t.common.tryAgain}
             </Button>
           </div>
         )}

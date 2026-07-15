@@ -12,6 +12,7 @@ import {
   formatCardInput,
   isValidCardNumber,
 } from "#shared/lib";
+import { useT } from "#shared/i18n";
 
 const QUICK_AMOUNTS = [5000, 10000, 30000, 50000];
 
@@ -25,6 +26,7 @@ export function CardTransferModal({ open, onClose }: CardTransferModalProps) {
   const [amount, setAmount] = useState("");
   const [comment, setComment] = useState("");
   const { state, error, send, reset } = useCardTransfer();
+  const t = useT();
 
   const cardValid = isValidCardNumber(cardDigits);
 
@@ -53,14 +55,14 @@ export function CardTransferModal({ open, onClose }: CardTransferModalProps) {
         {(state === "idle" || state === "failed") && (
           <div className="space-y-4">
             <div>
-              <h2 className="text-base font-medium">Transfer by card</h2>
+              <h2 className="text-base font-medium">{t.cardTransfer.title}</h2>
               <p className="text-muted-foreground mt-1 text-xs">
-                Send money to any card number
+                {t.cardTransfer.subtitle}
               </p>
             </div>
 
             <div className="space-y-1.5">
-              <Label>Card number</Label>
+              <Label>{t.cardTransfer.cardNumber}</Label>
               <Input
                 type="text"
                 inputMode="numeric"
@@ -71,7 +73,7 @@ export function CardTransferModal({ open, onClose }: CardTransferModalProps) {
             </div>
 
             <div className="space-y-1.5">
-              <Label>Amount (₸)</Label>
+              <Label>{t.cardTransfer.amount}</Label>
               <Input
                 type="number"
                 placeholder="10000"
@@ -92,9 +94,9 @@ export function CardTransferModal({ open, onClose }: CardTransferModalProps) {
             </div>
 
             <div className="space-y-1.5">
-              <Label>Comment (optional)</Label>
+              <Label>{t.cardTransfer.comment}</Label>
               <Input
-                placeholder="For dinner"
+                placeholder={t.cardTransfer.commentPlaceholder}
                 value={comment}
                 onChange={(e) => setComment(e.target.value)}
               />
@@ -107,7 +109,8 @@ export function CardTransferModal({ open, onClose }: CardTransferModalProps) {
               onClick={handleSend}
               disabled={!cardValid || !amount}
             >
-              Send {amount ? formatCurrency(Number(amount)) : ""}
+              {t.cardTransfer.send}{" "}
+              {amount ? formatCurrency(Number(amount)) : ""}
             </Button>
           </div>
         )}
@@ -115,22 +118,24 @@ export function CardTransferModal({ open, onClose }: CardTransferModalProps) {
         {state === "loading" && (
           <div className="flex flex-col items-center gap-3 py-6">
             <Loader2 size={32} className="animate-spin text-violet-600" />
-            <p className="text-muted-foreground text-sm">Sending transfer...</p>
+            <p className="text-muted-foreground text-sm">
+              {t.cardTransfer.sending}
+            </p>
           </div>
         )}
 
         {state === "success" && (
           <div className="flex flex-col items-center gap-3 py-4">
             <CheckCircle size={48} className="text-green-500" />
-            <h2 className="text-base font-medium">Transfer successful!</h2>
+            <h2 className="text-base font-medium">{t.cardTransfer.success}</h2>
             <p className="text-muted-foreground text-center text-sm">
-              {formatCurrency(Number(amount))} sent to card •••• {last4}
+              {t.cardTransfer.sentTo(formatCurrency(Number(amount)), last4)}
             </p>
             <Button
               className="mt-2 w-full bg-violet-600 hover:bg-violet-700"
               onClick={handleClose}
             >
-              Done
+              {t.common.done}
             </Button>
           </div>
         )}

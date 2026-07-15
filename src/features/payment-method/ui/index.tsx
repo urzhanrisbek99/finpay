@@ -2,6 +2,7 @@
 
 import { QrCode, Smartphone, CreditCard } from "lucide-react";
 import { Dialog, DialogContent } from "#shared/ui/dialog";
+import { useT } from "#shared/i18n";
 
 interface PaymentMethodModalProps {
   open: boolean;
@@ -18,14 +19,15 @@ export function PaymentMethodModal({
   onSelectTransfer,
   onSelectCard,
 }: PaymentMethodModalProps) {
+  const t = useT();
   return (
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="max-w-sm">
         <div className="space-y-4">
           <div>
-            <h2 className="text-base font-medium">New payment</h2>
+            <h2 className="text-base font-medium">{t.paymentMethod.title}</h2>
             <p className="text-muted-foreground mt-1 text-xs">
-              Choose how you want to pay
+              {t.paymentMethod.subtitle}
             </p>
           </div>
 
@@ -38,9 +40,11 @@ export function PaymentMethodModal({
                 <QrCode size={18} />
               </span>
               <span>
-                <span className="block text-sm font-medium">QR payment</span>
+                <span className="block text-sm font-medium">
+                  {t.paymentMethod.qrTitle}
+                </span>
                 <span className="text-muted-foreground block text-xs">
-                  Pay a merchant by generating a QR code
+                  {t.paymentMethod.qrDesc}
                 </span>
               </span>
             </button>
@@ -54,10 +58,10 @@ export function PaymentMethodModal({
               </span>
               <span>
                 <span className="block text-sm font-medium">
-                  Transfer by phone
+                  {t.paymentMethod.phoneTitle}
                 </span>
                 <span className="text-muted-foreground block text-xs">
-                  Send money to a contact&apos;s phone number
+                  {t.paymentMethod.phoneDesc}
                 </span>
               </span>
             </button>
@@ -71,10 +75,10 @@ export function PaymentMethodModal({
               </span>
               <span>
                 <span className="block text-sm font-medium">
-                  Transfer by card
+                  {t.paymentMethod.cardTitle}
                 </span>
                 <span className="text-muted-foreground block text-xs">
-                  Send money to any card number
+                  {t.paymentMethod.cardDesc}
                 </span>
               </span>
             </button>

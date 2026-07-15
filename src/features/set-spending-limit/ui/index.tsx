@@ -5,6 +5,7 @@ import { Dialog, DialogContent } from "#shared/ui/dialog";
 import { Button } from "#shared/ui/button";
 import { Input } from "#shared/ui/input";
 import { Label } from "#shared/ui/label";
+import { useT } from "#shared/i18n";
 import { cardModel, cardApi } from "#entities/card";
 
 interface SetSpendingLimitModalProps {
@@ -22,6 +23,7 @@ export function SetSpendingLimitModal({
   const [limit, setLimit] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const t = useT();
 
   const [wasOpen, setWasOpen] = useState(false);
   if (open !== wasOpen) {
@@ -37,7 +39,7 @@ export function SetSpendingLimitModal({
 
     const value = Number(limit);
     if (!value || value <= 0) {
-      setError("Enter a valid limit");
+      setError(t.spendingLimit.error);
       return;
     }
 
@@ -50,7 +52,7 @@ export function SetSpendingLimitModal({
     );
     if (apiError) {
       console.error("[set-spending-limit] update failed:", apiError);
-      setError("Could not update the limit. Please try again");
+      setError(t.spendingLimit.updateError);
       setIsLoading(false);
       return;
     }
@@ -71,14 +73,14 @@ export function SetSpendingLimitModal({
           className="space-y-4"
         >
           <div>
-            <h2 className="text-base font-medium">Monthly spending limit</h2>
+            <h2 className="text-base font-medium">{t.spendingLimit.title}</h2>
             <p className="text-muted-foreground mt-1 text-xs">
-              Payments and transfers are blocked once you reach it
+              {t.spendingLimit.subtitle}
             </p>
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="limit">Limit (₸)</Label>
+            <Label htmlFor="limit">{t.spendingLimit.limit}</Label>
             <Input
               id="limit"
               inputMode="numeric"
@@ -99,14 +101,14 @@ export function SetSpendingLimitModal({
               className="flex-1"
               onClick={onClose}
             >
-              Cancel
+              {t.common.cancel}
             </Button>
             <Button
               type="submit"
               className="flex-1 bg-violet-600 hover:bg-violet-700"
               disabled={isLoading}
             >
-              {isLoading ? "Saving..." : "Save"}
+              {isLoading ? t.common.saving : t.common.save}
             </Button>
           </div>
         </form>

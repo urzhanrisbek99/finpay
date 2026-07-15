@@ -94,7 +94,7 @@ describe("computeDashboardStats", () => {
 
   it("sums monthly income and its trend vs previous month", () => {
     expect(income).toEqual({
-      label: "Monthly income",
+      key: "income",
       amount: 1000,
       trend: "+100%",
       positive: true,
@@ -104,7 +104,7 @@ describe("computeDashboardStats", () => {
   it("sums expenses (incl. transfers + pending), excludes failed, inverts polarity", () => {
     // 200 + 100 + 50(pending) = 350; prev = 400 => (350-400)/400 = -12.5 -> -12%
     expect(expenses).toEqual({
-      label: "Monthly expenses",
+      key: "expenses",
       amount: 350,
       trend: `${MINUS}12%`,
       positive: true, // меньше прошлого месяца — хорошо
@@ -113,9 +113,9 @@ describe("computeDashboardStats", () => {
 
   it("reports pending count and amount without a polarity", () => {
     expect(pending).toEqual({
-      label: "Pending",
+      key: "pending",
       amount: 50,
-      trend: "1 txn",
+      count: 1,
       positive: null,
     });
   });

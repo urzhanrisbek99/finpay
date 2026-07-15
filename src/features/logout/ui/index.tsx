@@ -6,9 +6,11 @@ import { createBrowserClient } from "#shared/api/supabase/client";
 import { userModel } from "#entities/user";
 import { transactionModel } from "#entities/transaction";
 import { ROUTES } from "#shared/config";
+import { useT } from "#shared/i18n";
 
 export function LogoutButton() {
   const router = useRouter();
+  const t = useT();
   const setUser = userModel.useUserStore((s) => s.setUser);
   const resetTransactions = transactionModel.useTransactionStore(
     (s) => s.reset,
@@ -26,7 +28,7 @@ export function LogoutButton() {
 
   return (
     <button
-      title="Logout"
+      title={t.sidebar.logout}
       onClick={handleLogout}
       className="text-muted-foreground flex h-9 w-9 items-center justify-center rounded-lg transition-colors hover:bg-red-50 hover:text-red-500"
     >

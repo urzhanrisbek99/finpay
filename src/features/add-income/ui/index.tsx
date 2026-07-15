@@ -7,15 +7,13 @@ import { Button } from "#shared/ui/button";
 import { Input } from "#shared/ui/input";
 import { Label } from "#shared/ui/label";
 import { formatCurrency } from "#shared/lib";
+import { useT } from "#shared/i18n";
 import type { TransactionCategory } from "#shared/types";
 import { useAddIncome } from "../model";
 
 const QUICK_AMOUNTS = [50000, 100000, 250000, 500000];
 
-const CATEGORIES: { value: TransactionCategory; label: string }[] = [
-  { value: "salary", label: "Salary" },
-  { value: "other", label: "Other" },
-];
+const CATEGORY_KEYS = ["salary", "other"] as const;
 
 interface AddIncomeModalProps {
   open: boolean;
@@ -27,6 +25,7 @@ export function AddIncomeModal({ open, onClose }: AddIncomeModalProps) {
   const [source, setSource] = useState("");
   const [category, setCategory] = useState<TransactionCategory>("salary");
   const { state, error, add, reset } = useAddIncome();
+  const t = useT();
 
   const handleClose = () => {
     reset();
@@ -47,14 +46,14 @@ export function AddIncomeModal({ open, onClose }: AddIncomeModalProps) {
         {(state === "idle" || state === "failed") && (
           <div className="space-y-4">
             <div>
-              <h2 className="text-base font-medium">Add income</h2>
+              <h2 className="text-base font-medium">{t.addIncome.title}</h2>
               <p className="text-muted-foreground mt-1 text-xs">
-                Record money coming in — it updates your balance and stats
+                {t.addIncome.subtitle}
               </p>
             </div>
 
             <div className="space-y-1.5">
-              <Label>Amount (₸)</Label>
+              <Label>{t.addIncome.amount}</Label>
               <Input
                 type="number"
                 placeholder="100000"
@@ -75,28 +74,28 @@ export function AddIncomeModal({ open, onClose }: AddIncomeModalProps) {
             </div>
 
             <div className="space-y-1.5">
-              <Label>Source</Label>
+              <Label>{t.addIncome.source}</Label>
               <Input
-                placeholder="Employer, client, refund..."
+                placeholder={t.addIncome.sourcePlaceholder}
                 value={source}
                 onChange={(e) => setSource(e.target.value)}
               />
             </div>
 
             <div className="space-y-1.5">
-              <Label>Category</Label>
+              <Label>{t.addIncome.category}</Label>
               <div className="flex gap-2">
-                {CATEGORIES.map((c) => (
+                {CATEGORY_KEYS.map((c) => (
                   <button
-                    key={c.value}
-                    onClick={() => setCategory(c.value)}
+                    key={c}
+                    onClick={() => setCategory(c)}
                     className={`rounded-full px-3 py-1 text-xs transition-colors ${
-                      category === c.value
+                      category === c
                         ? "bg-violet-100 text-violet-600"
                         : "bg-muted text-muted-foreground hover:text-foreground"
                     }`}
                   >
-                    {c.label}
+                    {t.addIncome.categories[c]}
                   </button>
                 ))}
               </div>
@@ -109,7 +108,9 @@ export function AddIncomeModal({ open, onClose }: AddIncomeModalProps) {
               onClick={handleAdd}
               disabled={!amount}
             >
-              Add {amount ? formatCurrency(Number(amount)) : "income"}
+              {amount
+                ? t.addIncome.addCta(formatCurrency(Number(amount)))
+                : t.addIncome.addFallback}
             </Button>
           </div>
         )}
@@ -117,22 +118,26 @@ export function AddIncomeModal({ open, onClose }: AddIncomeModalProps) {
         {state === "loading" && (
           <div className="flex flex-col items-center gap-3 py-6">
             <Loader2 size={32} className="animate-spin text-violet-600" />
-            <p className="text-muted-foreground text-sm">Adding income...</p>
+            <p className="text-muted-foreground text-sm">
+              {t.addIncome.adding}
+            </p>
           </div>
         )}
 
         {state === "success" && (
           <div className="flex flex-col items-center gap-3 py-4">
             <CheckCircle size={48} className="text-green-500" />
-            <h2 className="text-base font-medium">Income added!</h2>
+            <h2 className="text-base font-medium">
+              {t.addIncome.successTitle}
+            </h2>
             <p className="text-muted-foreground text-center text-sm">
-              {formatCurrency(Number(amount))} added to your balance
+              {t.addIncome.successBody(formatCurrency(Number(amount)))}
             </p>
             <Button
               className="mt-2 w-full bg-violet-600 hover:bg-violet-700"
               onClick={handleClose}
             >
-              Done
+              {t.common.done}
             </Button>
           </div>
         )}

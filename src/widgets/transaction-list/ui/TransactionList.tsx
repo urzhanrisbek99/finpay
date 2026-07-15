@@ -3,7 +3,8 @@
 import { useMemo, useState } from "react";
 import { Building2, QrCode, Send, Clock, ShoppingBag } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "#shared/ui/card";
-import { formatCurrency, formatDate } from "#shared/lib";
+import { formatCurrency } from "#shared/lib";
+import { useT, useFormatDate } from "#shared/i18n";
 import { transactionModel } from "#entities/transaction";
 
 const categoryIcons: Record<string, React.ReactNode> = {
@@ -33,9 +34,15 @@ function TransactionRow({
 }: {
   transaction: transactionModel.Transaction;
 }) {
+  const t = useT();
+  const formatDate = useFormatDate();
   const icon = categoryIcons[transaction.category] ?? <QrCode size={15} />;
   const iconColor =
     categoryColors[transaction.category] ?? "bg-muted text-muted-foreground";
+  const statusLabel =
+    t.transactions.status[
+      transaction.status as keyof typeof t.transactions.status
+    ] ?? transaction.status;
 
   return (
     <div className="flex items-center gap-3 border-b py-2.5 last:border-0">
@@ -45,7 +52,9 @@ function TransactionRow({
         {icon}
       </div>
       <div className="min-w-0 flex-1">
-        <p className="truncate text-sm font-medium">{transaction.merchant}</p>
+        <p className="truncate text-sm font-medium">
+          {transactionModel.localizeMerchant(transaction, t)}
+        </p>
         {transaction.comment && (
           <p className="text-muted-foreground truncate text-xs italic">
             {transaction.comment}
@@ -63,27 +72,28 @@ function TransactionRow({
         <span
           className={`rounded-full px-2 py-0.5 text-xs ${statusColors[transaction.status]}`}
         >
-          {transaction.status}
+          {statusLabel}
         </span>
       </div>
     </div>
   );
 }
 
-const filters = ["All", "Income", "Expense"] as const;
+const filters = ["all", "income", "expense"] as const;
 type Filter = (typeof filters)[number];
 
 export function TransactionList() {
+  const t = useT();
   const transactions = transactionModel.useTransactionStore(
     (s) => s.transactions,
   );
   const isLoading = transactionModel.useTransactionStore((s) => s.isLoading);
-  const [filter, setFilter] = useState<Filter>("All");
+  const [filter, setFilter] = useState<Filter>("all");
 
   const visibleTransactions = useMemo(() => {
-    if (filter === "Income")
+    if (filter === "income")
       return transactions.filter((tx) => tx.type === "income");
-    if (filter === "Expense")
+    if (filter === "expense")
       return transactions.filter(
         (tx) => tx.type === "expense" || tx.type === "transfer",
       );
@@ -94,7 +104,7 @@ export function TransactionList() {
     <Card>
       <CardHeader className="flex flex-row items-center justify-between pb-2">
         <CardTitle className="text-sm font-medium">
-          Recent transactions
+          {t.transactions.recent}
         </CardTitle>
         <div className="flex gap-1">
           {filters.map((f) => (
@@ -107,7 +117,7 @@ export function TransactionList() {
                   : "bg-muted text-muted-foreground hover:text-foreground"
               }`}
             >
-              {f}
+              {t.transactions.filters[f]}
             </button>
           ))}
         </div>
@@ -128,8 +138,8 @@ export function TransactionList() {
         ) : visibleTransactions.length === 0 ? (
           <p className="text-muted-foreground py-6 text-center text-sm">
             {transactions.length === 0
-              ? "No transactions yet"
-              : `No ${filter.toLowerCase()} transactions`}
+              ? t.transactions.empty
+              : t.transactions.emptyFiltered(t.transactions.filters[filter])}
           </p>
         ) : (
           visibleTransactions.map((tx) => (
