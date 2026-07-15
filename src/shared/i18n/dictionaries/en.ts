@@ -104,6 +104,7 @@ export const en = {
     actions: "Card actions",
     freeze: "Freeze",
     unfreeze: "Unfreeze",
+    freezeError: "Couldn't change the card status. Try again.",
     showCvv: "Show CVV",
     reissue: "Reissue",
     remove: "Remove",
@@ -248,6 +249,7 @@ export const en = {
     submitting: "Submitting...",
     successTitle: "Request submitted!",
     successBody: "Your new card will arrive within 3-5 business days",
+    error: "Couldn't submit the request. Try again.",
   },
   removeCard: {
     title: "Remove card",
@@ -256,8 +258,9 @@ export const en = {
       `Are you sure you want to remove card ending in ${last4}? All pending transactions will be cancelled.`,
     removing: "Removing...",
     remove: "Remove card",
-    successTitle: "Request submitted!",
-    successBody: "Your card removal request has been submitted",
+    successTitle: "Card removed",
+    successBody: "Your card has been removed. You can add a new one any time.",
+    error: "Couldn't remove the card. Try again.",
   },
   spendingLimit: {
     title: "Monthly spending limit",
@@ -312,6 +315,10 @@ export const en = {
       emailNotConfirmed: "Confirm your email before signing in",
       rateLimit: "Too many attempts. Try again in a minute",
       validationFailed: "Check the entered details",
+      // Аккаунт в auth уже создан, а профиль — нет: логин сработает, но в
+      // приложении не будет ни имени, ни баланса. Молчать об этом нельзя.
+      profileCreationFailed:
+        "Your account was created, but we couldn't finish setting up the profile. Sign in to try again.",
       unknown: "Something went wrong. Try again",
     },
   },

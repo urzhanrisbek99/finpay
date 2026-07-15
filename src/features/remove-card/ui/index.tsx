@@ -4,8 +4,6 @@ import { useState } from "react";
 import { CheckCircle } from "lucide-react";
 import { Dialog, DialogContent } from "#shared/ui/dialog";
 import { Button } from "#shared/ui/button";
-import { removeCardApi } from "../api";
-import { createBrowserClient } from "#shared/api";
 import { useT } from "#shared/i18n";
 import { cardModel, cardApi } from "#entities/card";
 
@@ -14,9 +12,14 @@ interface RemoveCardModalProps {
   onClose: () => void;
 }
 
+// Удаление — действие самого владельца, оно выполняется сразу. Заявка
+// оператору здесь не заводится (в отличие от перевыпуска, который реально
+// занимает дни): раньше модалка делала и то и другое — писала pending-заявку
+// и тут же сносила карту, а экран успеха сообщал про «отправленную заявку».
 export function RemoveCardModal({ open, onClose }: RemoveCardModalProps) {
   const [confirmed, setConfirmed] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(false);
   const card = cardModel.useCardStore((s) => s.card);
   const setCard = cardModel.useCardStore((s) => s.setCard);
   const t = useT();
@@ -24,22 +27,24 @@ export function RemoveCardModal({ open, onClose }: RemoveCardModalProps) {
   const handleConfirm = async () => {
     if (!card) return;
     setIsLoading(true);
+    setError(false);
 
-    const supabase = createBrowserClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-    if (!user) return;
+    const { error: apiError } = await cardApi.deleteCard(card.id);
+    setIsLoading(false);
 
-    await removeCardApi.request(user.id, card.id);
-    await cardApi.deleteCard(card.id);
+    if (apiError) {
+      console.error("[remove-card] delete failed:", apiError);
+      setError(true);
+      return;
+    }
+
     setCard(null);
     setConfirmed(true);
-    setIsLoading(false);
   };
 
   const handleClose = () => {
     setConfirmed(false);
+    setError(false);
     onClose();
   };
 
@@ -60,6 +65,10 @@ export function RemoveCardModal({ open, onClose }: RemoveCardModalProps) {
                 {t.removeCard.notice(card?.number ?? "")}
               </p>
             </div>
+
+            {error && (
+              <p className="text-xs text-red-500">{t.removeCard.error}</p>
+            )}
 
             <div className="flex gap-2">
               <Button

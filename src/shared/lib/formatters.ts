@@ -7,30 +7,9 @@ export function formatCurrency(amount: number): string {
   );
 }
 
-export function formatDate(date: string | Date): string {
-  const d = new Date(date);
-  const now = new Date();
-  const isToday = d.toDateString() === now.toDateString();
-
-  const yesterday = new Date(now);
-  yesterday.setDate(yesterday.getDate() - 1);
-  const isYesterday = d.toDateString() === yesterday.toDateString();
-
-  const time = d.toLocaleTimeString("en-US", {
-    hour: "2-digit",
-    minute: "2-digit",
-    hour12: false,
-  });
-
-  if (isToday) return `Today, ${time}`;
-  if (isYesterday) return `Yesterday, ${time}`;
-  return d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
-}
-
-export function formatCardNumber(number: string): string {
-  const last4 = number.slice(-4);
-  return `•••• •••• •••• ${last4}`;
-}
+// Дату форматирует useFormatDate из shared/i18n — она знает текущую локаль.
+// Языконезависимого formatDate здесь намеренно нет: он захардкоживал en-US
+// и «Today»/«Yesterday» в обход словаря.
 
 export function getInitials(name: string): string {
   return name

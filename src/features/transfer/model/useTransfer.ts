@@ -5,6 +5,8 @@ import { transferApi } from "../api";
 import { userModel } from "#entities/user";
 import { transactionModel } from "#entities/transaction";
 import { recipientApi, recipientModel } from "#entities/recipient";
+import { TRANSACTION_LIMITS } from "#shared/config";
+import { formatCurrency } from "#shared/lib";
 
 type TransferState = "idle" | "loading" | "success" | "failed";
 
@@ -30,9 +32,22 @@ export function useTransfer() {
     ) => {
       if (!user) return;
       // Клиентские проверки — только для мгновенного фидбэка; настоящую
-      // валидацию (баланс, лимит) выполняет сервер в transfer_money.
-      if (amount < 100) {
-        setError("Minimum transfer amount is 100 ₸");
+      // валидацию (сумма, баланс, лимит, заморозка) выполняет сервер в
+      // transfer_money. Границы берём из общего конфига, а не литералом:
+      // те же числа зашиты в саму RPC.
+      if (
+        !Number.isFinite(amount) ||
+        amount < TRANSACTION_LIMITS.MIN_TRANSFER
+      ) {
+        setError(
+          `Minimum transfer amount is ${formatCurrency(TRANSACTION_LIMITS.MIN_TRANSFER)}`,
+        );
+        return;
+      }
+      if (amount > TRANSACTION_LIMITS.MAX_TRANSFER) {
+        setError(
+          `Maximum transfer amount is ${formatCurrency(TRANSACTION_LIMITS.MAX_TRANSFER)}`,
+        );
         return;
       }
       if (amount > user.balance) {

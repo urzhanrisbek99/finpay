@@ -5,9 +5,9 @@ import { CheckCircle } from "lucide-react";
 import { Dialog, DialogContent } from "#shared/ui/dialog";
 import { Button } from "#shared/ui/button";
 import { reissueCardApi } from "../api";
-import { createBrowserClient } from "#shared/api";
 import { useT } from "#shared/i18n";
 import { cardModel } from "#entities/card";
+import { userModel } from "#entities/user";
 
 interface ReissueCardModalProps {
   open: boolean;
@@ -17,26 +17,32 @@ interface ReissueCardModalProps {
 export function ReissueCardModal({ open, onClose }: ReissueCardModalProps) {
   const [confirmed, setConfirmed] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(false);
   const card = cardModel.useCardStore((s) => s.card);
+  // Профиль уже гидрирован из SSR — отдельный getUser() по сети не нужен.
+  const user = userModel.useUserStore((s) => s.user);
   const t = useT();
 
   const handleConfirm = async () => {
-    if (!card) return;
+    if (!card || !user) return;
     setIsLoading(true);
+    setError(false);
 
-    const supabase = createBrowserClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-    if (!user) return;
-
-    await reissueCardApi.request(user.id, card.id);
-    setConfirmed(true);
+    const { error: apiError } = await reissueCardApi.request(user.id, card.id);
     setIsLoading(false);
+
+    if (apiError) {
+      console.error("[reissue-card] request failed:", apiError);
+      setError(true);
+      return;
+    }
+
+    setConfirmed(true);
   };
 
   const handleClose = () => {
     setConfirmed(false);
+    setError(false);
     onClose();
   };
 
@@ -55,6 +61,8 @@ export function ReissueCardModal({ open, onClose }: ReissueCardModalProps) {
             <div className="rounded-xl border border-amber-200 bg-amber-50 p-4">
               <p className="text-xs text-amber-700">{t.reissue.notice}</p>
             </div>
+
+            {error && <p className="text-xs text-red-500">{t.reissue.error}</p>}
 
             <div className="flex gap-2">
               <Button

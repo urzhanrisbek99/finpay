@@ -29,33 +29,6 @@ export const qrPaymentApi = {
     return { data: result.transaction, error: null };
   },
 
-  subscribeToStatus: (
-    transactionId: string,
-    onStatusChange: (status: string) => void,
-  ) => {
-    const supabase = createBrowserClient();
-
-    const channel = supabase
-      .channel(`transaction-${transactionId}`)
-      .on(
-        "postgres_changes",
-        {
-          event: "UPDATE",
-          schema: "public",
-          table: "transactions",
-          filter: `id=eq.${transactionId}`,
-        },
-        (payload) => {
-          onStatusChange(payload.new.status);
-        },
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  },
-
   // Симуляция вебхука эквайера. Подтверждение и списание баланса делает
   // серверный RPC confirm_qr_payment атомарно и идемпотентно — клиент лишь
   // инициирует его (перенос самого триггера на сервер — отдельный шаг).

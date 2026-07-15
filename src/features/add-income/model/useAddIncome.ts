@@ -5,6 +5,8 @@ import { addIncomeApi } from "../api";
 import { userModel } from "#entities/user";
 import { transactionModel } from "#entities/transaction";
 import type { TransactionCategory } from "#shared/model";
+import { TRANSACTION_LIMITS } from "#shared/config";
+import { formatCurrency } from "#shared/lib";
 
 type AddIncomeState = "idle" | "loading" | "success" | "failed";
 
@@ -21,8 +23,13 @@ export function useAddIncome() {
   const add = useCallback(
     async (amount: number, source: string, category: TransactionCategory) => {
       if (!user) return;
-      if (!Number.isFinite(amount) || amount < 100) {
-        setError("Minimum income amount is 100 ₸");
+      if (
+        !Number.isFinite(amount) ||
+        amount < TRANSACTION_LIMITS.MIN_TRANSFER
+      ) {
+        setError(
+          `Minimum income amount is ${formatCurrency(TRANSACTION_LIMITS.MIN_TRANSFER)}`,
+        );
         return;
       }
 

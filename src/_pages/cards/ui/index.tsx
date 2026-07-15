@@ -23,16 +23,32 @@ export function Cards() {
   const [removeOpen, setRemoveOpen] = useState(false);
   const [addOpen, setAddOpen] = useState(false);
   const [limitOpen, setLimitOpen] = useState(false);
+  const [freezeError, setFreezeError] = useState(false);
+  const [freezePending, setFreezePending] = useState(false);
 
   const limit = card?.spending_limit ?? 0;
   const usedPercent =
     limit > 0 ? Math.min(100, Math.round((spent / limit) * 100)) : 0;
   const isOverLimit = limit > 0 && spent > limit;
 
+  // Оптимистично, но с откатом: запрос упал — возвращаем флаг обратно, иначе
+  // UI показывал бы заморозку, которой нет в БД (а её проверяет сервер).
+  // freezePending отсекает второй клик по не доехавшему первому: иначе два
+  // запроса ушли бы с одним и тем же card.is_frozen из замыкания.
   const handleToggleFreeze = async () => {
-    if (!card) return;
+    if (!card || freezePending) return;
+    setFreezeError(false);
+    setFreezePending(true);
     toggleFreeze();
-    await cardApi.toggleFreeze(card.id, !card.is_frozen);
+
+    const { error } = await cardApi.toggleFreeze(card.id, !card.is_frozen);
+    setFreezePending(false);
+
+    if (error) {
+      console.error("[cards] freeze toggle failed:", error);
+      toggleFreeze();
+      setFreezeError(true);
+    }
   };
 
   return (
@@ -95,10 +111,12 @@ export function Cards() {
               </CardTitle>
             </CardHeader>
             <CardContent>
+              {/* Все действия требуют карты: без неё кнопки недоступны. */}
               <div className="grid grid-cols-2 gap-2">
                 <button
                   onClick={handleToggleFreeze}
-                  className={`flex flex-col items-center gap-2 rounded-lg border p-3 transition-colors ${
+                  disabled={!card || freezePending}
+                  className={`flex flex-col items-center gap-2 rounded-lg border p-3 transition-colors disabled:pointer-events-none disabled:opacity-50 ${
                     card?.is_frozen
                       ? "border-violet-200 bg-violet-100 text-violet-600"
                       : "hover:bg-muted"
@@ -119,19 +137,27 @@ export function Cards() {
                 </button>
                 <button
                   onClick={() => setReissueOpen(true)}
-                  className="hover:bg-muted flex flex-col items-center gap-2 rounded-lg border p-3 transition-colors"
+                  disabled={!card}
+                  className="hover:bg-muted flex flex-col items-center gap-2 rounded-lg border p-3 transition-colors disabled:pointer-events-none disabled:opacity-50"
                 >
                   <RefreshCw size={18} />
                   <span className="text-xs">{t.cards.reissue}</span>
                 </button>
                 <button
                   onClick={() => setRemoveOpen(true)}
-                  className="flex flex-col items-center gap-2 rounded-lg border border-red-100 p-3 text-red-500 transition-colors hover:bg-red-50"
+                  disabled={!card}
+                  className="flex flex-col items-center gap-2 rounded-lg border border-red-100 p-3 text-red-500 transition-colors hover:bg-red-50 disabled:pointer-events-none disabled:opacity-50"
                 >
                   <Trash2 size={18} />
                   <span className="text-xs">{t.cards.remove}</span>
                 </button>
               </div>
+
+              {freezeError && (
+                <p className="mt-3 text-xs text-red-500">
+                  {t.cards.freezeError}
+                </p>
+              )}
             </CardContent>
           </Card>
 

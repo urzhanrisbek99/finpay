@@ -1,8 +1,6 @@
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { describe, expect, it } from "vitest";
 import {
   formatCurrency,
-  formatDate,
-  formatCardNumber,
   getInitials,
   isValidPhone,
   formatCardInput,
@@ -25,12 +23,6 @@ describe("formatCurrency", () => {
 
   it("formats zero", () => {
     expect(digitsOnly(formatCurrency(0))).toBe("0");
-  });
-});
-
-describe("formatCardNumber", () => {
-  it("masks all but the last four digits", () => {
-    expect(formatCardNumber("1234567812345678")).toBe("•••• •••• •••• 5678");
   });
 });
 
@@ -100,33 +92,5 @@ describe("formatPhone", () => {
     expect(formatPhone("702")).toBe("(702");
     expect(formatPhone("702123")).toBe("(702) 123");
     expect(formatPhone("70212345")).toBe("(702) 123-45");
-  });
-});
-
-describe("formatDate", () => {
-  afterEach(() => vi.useRealTimers());
-
-  it("labels same-day timestamps as Today", () => {
-    vi.useFakeTimers();
-    vi.setSystemTime(new Date("2026-07-14T12:00:00"));
-    expect(
-      formatDate(new Date("2026-07-14T09:30:00")).startsWith("Today,"),
-    ).toBe(true);
-  });
-
-  it("labels the previous day as Yesterday", () => {
-    vi.useFakeTimers();
-    vi.setSystemTime(new Date("2026-07-14T12:00:00"));
-    expect(
-      formatDate(new Date("2026-07-13T09:30:00")).startsWith("Yesterday,"),
-    ).toBe(true);
-  });
-
-  it("falls back to a month/day label for older dates", () => {
-    vi.useFakeTimers();
-    vi.setSystemTime(new Date("2026-07-14T12:00:00"));
-    const out = formatDate(new Date("2026-03-05T09:30:00"));
-    expect(out).not.toMatch(/Today|Yesterday/);
-    expect(out).toMatch(/[A-Za-z]{3}\s\d+/);
   });
 });

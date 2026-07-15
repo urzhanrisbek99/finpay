@@ -30,7 +30,6 @@ export const addCardApi = {
         type: input.type,
         is_frozen: false,
         spending_limit: input.spending_limit,
-        spent: 0,
       })
       // не возвращаем cvv обратно — колонка недоступна для прямого чтения
       .select(

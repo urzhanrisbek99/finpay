@@ -31,11 +31,23 @@ export function useRegister() {
     }
 
     if (data?.user) {
-      await userApi.createProfile({
+      // Профиль пишется от лица нового пользователя, поэтому без сессии
+      // (включено подтверждение почты) RLS вставку отклонит. Ошибку показываем,
+      // а не глотаем: иначе человек уходил на дашборд без профиля — без имени
+      // и без баланса.
+      const { error: profileError } = await userApi.createProfile({
         id: data.user.id,
         email,
         full_name: fullName,
       });
+
+      if (profileError) {
+        console.error("[register] profile creation failed:", profileError);
+        setError(t.auth.errors.profileCreationFailed);
+        setIsLoading(false);
+        return;
+      }
+
       router.push(ROUTES.DASHBOARD);
     }
 

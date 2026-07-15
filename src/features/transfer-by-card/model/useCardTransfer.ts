@@ -4,6 +4,8 @@ import { useState, useCallback } from "react";
 import { cardTransferApi } from "../api";
 import { userModel } from "#entities/user";
 import { transactionModel } from "#entities/transaction";
+import { TRANSACTION_LIMITS } from "#shared/config";
+import { formatCurrency } from "#shared/lib";
 
 type CardTransferState = "idle" | "loading" | "success" | "failed";
 
@@ -21,9 +23,21 @@ export function useCardTransfer() {
     async (amount: number, cardNumber: string, comment?: string) => {
       if (!user) return;
       // Клиентские проверки — только для мгновенного фидбэка; настоящую
-      // валидацию (баланс, лимит) выполняет сервер в transfer_money.
-      if (amount < 100) {
-        setError("Minimum transfer amount is 100 ₸");
+      // валидацию (сумма, баланс, лимит, заморозка) выполняет сервер в
+      // transfer_money.
+      if (
+        !Number.isFinite(amount) ||
+        amount < TRANSACTION_LIMITS.MIN_TRANSFER
+      ) {
+        setError(
+          `Minimum transfer amount is ${formatCurrency(TRANSACTION_LIMITS.MIN_TRANSFER)}`,
+        );
+        return;
+      }
+      if (amount > TRANSACTION_LIMITS.MAX_TRANSFER) {
+        setError(
+          `Maximum transfer amount is ${formatCurrency(TRANSACTION_LIMITS.MAX_TRANSFER)}`,
+        );
         return;
       }
       if (amount > user.balance) {
