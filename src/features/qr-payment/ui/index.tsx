@@ -3,7 +3,12 @@
 import { useState } from "react";
 import { QRCodeSVG } from "qrcode.react";
 import { CheckCircle, XCircle, Loader2 } from "lucide-react";
-import { Dialog, DialogContent } from "#shared/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  DialogDescription,
+} from "#shared/ui/dialog";
 import { Button } from "#shared/ui/button";
 import { Input } from "#shared/ui/input";
 import { Label } from "#shared/ui/label";
@@ -40,10 +45,12 @@ export function QRModal({ open, onClose }: QRModalProps) {
         {state === "idle" && (
           <div className="space-y-4">
             <div>
-              <h2 className="text-base font-medium">{t.qr.title}</h2>
-              <p className="text-muted-foreground mt-1 text-xs">
+              <DialogTitle className="text-base font-medium">
+                {t.qr.title}
+              </DialogTitle>
+              <DialogDescription className="text-muted-foreground mt-1 text-xs">
                 {t.qr.subtitle}
-              </p>
+              </DialogDescription>
             </div>
 
             <div className="space-y-1.5">
@@ -78,9 +85,9 @@ export function QRModal({ open, onClose }: QRModalProps) {
         {state === "pending" && transaction && (
           <div className="flex flex-col items-center gap-4 py-2">
             <div>
-              <h2 className="text-center text-base font-medium">
+              <DialogTitle className="text-center text-base font-medium">
                 {t.qr.scanTitle}
-              </h2>
+              </DialogTitle>
               <p className="text-muted-foreground mt-1 text-center text-xs">
                 {t.qr.scanSubtitle(
                   formatCurrency(transaction.amount),
@@ -111,7 +118,9 @@ export function QRModal({ open, onClose }: QRModalProps) {
         {state === "completed" && transaction && (
           <div className="flex flex-col items-center gap-3 py-4">
             <CheckCircle size={48} className="text-green-500" />
-            <h2 className="text-base font-medium">{t.qr.successTitle}</h2>
+            <DialogTitle className="text-base font-medium">
+              {t.qr.successTitle}
+            </DialogTitle>
             <p className="text-muted-foreground text-sm">
               {t.qr.paidTo(
                 formatCurrency(transaction.amount),
@@ -130,7 +139,9 @@ export function QRModal({ open, onClose }: QRModalProps) {
         {state === "failed" && (
           <div className="flex flex-col items-center gap-3 py-4">
             <XCircle size={48} className="text-red-500" />
-            <h2 className="text-base font-medium">{t.qr.failedTitle}</h2>
+            <DialogTitle className="text-base font-medium">
+              {t.qr.failedTitle}
+            </DialogTitle>
             <p className="text-muted-foreground text-xs">{error}</p>
             <Button variant="outline" className="mt-2 w-full" onClick={reset}>
               {t.common.tryAgain}

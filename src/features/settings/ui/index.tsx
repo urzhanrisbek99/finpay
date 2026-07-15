@@ -12,6 +12,7 @@ export function SettingsMenu() {
     <Popover.Root>
       <Popover.Trigger
         title={t.settings.title}
+        aria-label={t.settings.title}
         className="text-muted-foreground hover:text-foreground hover:bg-muted aria-expanded:bg-muted aria-expanded:text-foreground flex h-9 w-9 items-center justify-center rounded-lg transition-colors"
       >
         <Settings size={18} />

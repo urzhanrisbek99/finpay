@@ -2,7 +2,12 @@
 
 import { useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
-import { Dialog, DialogContent } from "#shared/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  DialogDescription,
+} from "#shared/ui/dialog";
 import { Button } from "#shared/ui/button";
 import { useT } from "#shared/i18n";
 import { cardApi } from "#entities/card";
@@ -62,10 +67,12 @@ export function ShowCVVModal({ open, onClose, cardId }: ShowCVVModalProps) {
       <DialogContent className="max-w-sm">
         <div className="space-y-4">
           <div>
-            <h2 className="text-base font-medium">{t.cvv.title}</h2>
-            <p className="text-muted-foreground mt-1 text-xs">
+            <DialogTitle className="text-base font-medium">
+              {t.cvv.title}
+            </DialogTitle>
+            <DialogDescription className="text-muted-foreground mt-1 text-xs">
               {t.cvv.subtitle}
-            </p>
+            </DialogDescription>
           </div>
 
           <div className="bg-muted flex flex-col items-center gap-3 rounded-xl p-6">

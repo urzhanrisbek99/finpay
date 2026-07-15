@@ -34,7 +34,11 @@ export function Sidebar() {
           <Link
             key={href}
             href={href}
+            // title рисует тултип, но как доступное имя это ненадёжный фолбэк:
+            // у иконочной кнопки имя задаёт aria-label.
             title={t.sidebar[key]}
+            aria-label={t.sidebar[key]}
+            aria-current={pathname === href ? "page" : undefined}
             className={cn(
               "text-muted-foreground hover:text-foreground hover:bg-muted flex h-9 w-9 items-center justify-center rounded-lg transition-colors",
               pathname === href && "bg-violet-100 text-violet-600",

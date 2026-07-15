@@ -5,6 +5,7 @@ import { Dialog as DialogPrimitive } from "@base-ui/react/dialog";
 
 import { cn } from "#shared/lib";
 import { Button } from "#shared/ui/button";
+import { useT } from "#shared/i18n";
 import { XIcon } from "lucide-react";
 
 function Dialog({ ...props }: DialogPrimitive.Root.Props) {
@@ -47,6 +48,11 @@ function DialogContent({
 }: DialogPrimitive.Popup.Props & {
   showCloseButton?: boolean;
 }) {
+  // Крестик — единственная иконочная кнопка компонента, и её имя читает только
+  // скринридер. Берём из словаря: захардкоженное "Close" звучало бы
+  // по-английски в русском интерфейсе.
+  const t = useT();
+
   return (
     <DialogPortal>
       <DialogOverlay />
@@ -71,7 +77,7 @@ function DialogContent({
             }
           >
             <XIcon />
-            <span className="sr-only">Close</span>
+            <span className="sr-only">{t.common.close}</span>
           </DialogPrimitive.Close>
         )}
       </DialogPrimitive.Popup>
@@ -97,6 +103,8 @@ function DialogFooter({
 }: React.ComponentProps<"div"> & {
   showCloseButton?: boolean;
 }) {
+  const t = useT();
+
   return (
     <div
       data-slot="dialog-footer"
@@ -109,7 +117,7 @@ function DialogFooter({
       {children}
       {showCloseButton && (
         <DialogPrimitive.Close render={<Button variant="outline" />}>
-          Close
+          {t.common.close}
         </DialogPrimitive.Close>
       )}
     </div>

@@ -1,7 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { Dialog, DialogContent } from "#shared/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  DialogDescription,
+} from "#shared/ui/dialog";
 import { Button } from "#shared/ui/button";
 import { Input } from "#shared/ui/input";
 import { Label } from "#shared/ui/label";
@@ -73,10 +78,12 @@ export function SetSpendingLimitModal({
           className="space-y-4"
         >
           <div>
-            <h2 className="text-base font-medium">{t.spendingLimit.title}</h2>
-            <p className="text-muted-foreground mt-1 text-xs">
+            <DialogTitle className="text-base font-medium">
+              {t.spendingLimit.title}
+            </DialogTitle>
+            <DialogDescription className="text-muted-foreground mt-1 text-xs">
               {t.spendingLimit.subtitle}
-            </p>
+            </DialogDescription>
           </div>
 
           <div className="space-y-2">

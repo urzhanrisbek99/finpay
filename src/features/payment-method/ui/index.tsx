@@ -1,7 +1,12 @@
 "use client";
 
 import { QrCode, Smartphone, CreditCard } from "lucide-react";
-import { Dialog, DialogContent } from "#shared/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  DialogDescription,
+} from "#shared/ui/dialog";
 import { useT } from "#shared/i18n";
 
 interface PaymentMethodModalProps {
@@ -25,10 +30,12 @@ export function PaymentMethodModal({
       <DialogContent className="max-w-sm">
         <div className="space-y-4">
           <div>
-            <h2 className="text-base font-medium">{t.paymentMethod.title}</h2>
-            <p className="text-muted-foreground mt-1 text-xs">
+            <DialogTitle className="text-base font-medium">
+              {t.paymentMethod.title}
+            </DialogTitle>
+            <DialogDescription className="text-muted-foreground mt-1 text-xs">
               {t.paymentMethod.subtitle}
-            </p>
+            </DialogDescription>
           </div>
 
           <div className="grid gap-2">

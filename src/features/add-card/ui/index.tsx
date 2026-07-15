@@ -2,7 +2,12 @@
 
 import { useState } from "react";
 import { CheckCircle } from "lucide-react";
-import { Dialog, DialogContent } from "#shared/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  DialogDescription,
+} from "#shared/ui/dialog";
 import { Button } from "#shared/ui/button";
 import { Input } from "#shared/ui/input";
 import { Label } from "#shared/ui/label";
@@ -162,10 +167,12 @@ export function AddCardModal({ open, onClose }: AddCardModalProps) {
             className="space-y-4"
           >
             <div>
-              <h2 className="text-base font-medium">{t.addCard.title}</h2>
-              <p className="text-muted-foreground mt-1 text-xs">
+              <DialogTitle className="text-base font-medium">
+                {t.addCard.title}
+              </DialogTitle>
+              <DialogDescription className="text-muted-foreground mt-1 text-xs">
                 {t.addCard.subtitle}
-              </p>
+              </DialogDescription>
             </div>
 
             <div className="space-y-2">
@@ -261,7 +268,9 @@ export function AddCardModal({ open, onClose }: AddCardModalProps) {
         ) : (
           <div className="flex flex-col items-center gap-3 py-4">
             <CheckCircle size={48} className="text-green-500" />
-            <h2 className="text-base font-medium">{t.addCard.successTitle}</h2>
+            <DialogTitle className="text-base font-medium">
+              {t.addCard.successTitle}
+            </DialogTitle>
             <p className="text-muted-foreground text-center text-sm">
               {t.addCard.successBody}
             </p>

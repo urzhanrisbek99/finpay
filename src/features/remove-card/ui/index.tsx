@@ -2,7 +2,12 @@
 
 import { useState } from "react";
 import { CheckCircle } from "lucide-react";
-import { Dialog, DialogContent } from "#shared/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  DialogDescription,
+} from "#shared/ui/dialog";
 import { Button } from "#shared/ui/button";
 import { useT } from "#shared/i18n";
 import { cardModel, cardApi } from "#entities/card";
@@ -54,10 +59,12 @@ export function RemoveCardModal({ open, onClose }: RemoveCardModalProps) {
         {!confirmed ? (
           <div className="space-y-4">
             <div>
-              <h2 className="text-base font-medium">{t.removeCard.title}</h2>
-              <p className="text-muted-foreground mt-1 text-xs">
+              <DialogTitle className="text-base font-medium">
+                {t.removeCard.title}
+              </DialogTitle>
+              <DialogDescription className="text-muted-foreground mt-1 text-xs">
                 {t.removeCard.subtitle}
-              </p>
+              </DialogDescription>
             </div>
 
             <div className="rounded-xl border border-red-200 bg-red-50 p-4">
@@ -90,9 +97,9 @@ export function RemoveCardModal({ open, onClose }: RemoveCardModalProps) {
         ) : (
           <div className="flex flex-col items-center gap-3 py-4">
             <CheckCircle size={48} className="text-green-500" />
-            <h2 className="text-base font-medium">
+            <DialogTitle className="text-base font-medium">
               {t.removeCard.successTitle}
-            </h2>
+            </DialogTitle>
             <p className="text-muted-foreground text-center text-sm">
               {t.removeCard.successBody}
             </p>

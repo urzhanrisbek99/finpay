@@ -2,7 +2,12 @@
 
 import { useState } from "react";
 import { Loader2, CheckCircle } from "lucide-react";
-import { Dialog, DialogContent } from "#shared/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  DialogDescription,
+} from "#shared/ui/dialog";
 import { Button } from "#shared/ui/button";
 import { Input } from "#shared/ui/input";
 import { Label } from "#shared/ui/label";
@@ -46,10 +51,12 @@ export function AddIncomeModal({ open, onClose }: AddIncomeModalProps) {
         {(state === "idle" || state === "failed") && (
           <div className="space-y-4">
             <div>
-              <h2 className="text-base font-medium">{t.addIncome.title}</h2>
-              <p className="text-muted-foreground mt-1 text-xs">
+              <DialogTitle className="text-base font-medium">
+                {t.addIncome.title}
+              </DialogTitle>
+              <DialogDescription className="text-muted-foreground mt-1 text-xs">
                 {t.addIncome.subtitle}
-              </p>
+              </DialogDescription>
             </div>
 
             <div className="space-y-1.5">
@@ -127,9 +134,9 @@ export function AddIncomeModal({ open, onClose }: AddIncomeModalProps) {
         {state === "success" && (
           <div className="flex flex-col items-center gap-3 py-4">
             <CheckCircle size={48} className="text-green-500" />
-            <h2 className="text-base font-medium">
+            <DialogTitle className="text-base font-medium">
               {t.addIncome.successTitle}
-            </h2>
+            </DialogTitle>
             <p className="text-muted-foreground text-center text-sm">
               {t.addIncome.successBody(formatCurrency(Number(amount)))}
             </p>

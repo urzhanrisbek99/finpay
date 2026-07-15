@@ -28,6 +28,7 @@ export function ThemeToggle() {
   return (
     <button
       title={t.sidebar.toggleTheme}
+      aria-label={t.sidebar.toggleTheme}
       onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
       className="text-muted-foreground hover:text-foreground hover:bg-muted flex h-9 w-9 items-center justify-center rounded-lg transition-colors"
     >

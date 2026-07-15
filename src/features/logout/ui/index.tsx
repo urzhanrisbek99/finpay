@@ -29,6 +29,7 @@ export function LogoutButton() {
   return (
     <button
       title={t.sidebar.logout}
+      aria-label={t.sidebar.logout}
       onClick={handleLogout}
       className="text-muted-foreground flex h-9 w-9 items-center justify-center rounded-lg transition-colors hover:bg-red-50 hover:text-red-500"
     >
