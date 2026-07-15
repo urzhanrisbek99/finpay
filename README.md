@@ -17,6 +17,7 @@ npm run dev        # Dev server on localhost:3000
 npm run build      # Production build (.next)
 npm run start      # Serve the production build
 npm run lint       # ESLint
+npm run lint:fsd   # Feature-Sliced Design boundary check (steiger)
 npm run typecheck  # Type check (tsc --noEmit)
 npm test           # Unit tests (Vitest)
 npm run test:watch # Vitest in watch mode
@@ -37,9 +38,13 @@ src/
   shared/            # Micro level: supabase clients, lib, config, ui-kit, types
 ```
 
-### State Management (Zustand)
+### State Management (Zustand, per-request)
 
-Each entity owns its store in `entity/model` using the store-hook style (`create((set) => …)`). Stores hold reactive state and are updated after API calls; loaders use a `hasLoaded` guard so shared data (profile, transactions, recipients) is fetched once in the app shell.
+Each entity owns its store in `entity/model`, but stores are **created per request, not as module singletons**: `createUserStore()` builds a vanilla Zustand store, a `UserStoreProvider` puts it in React Context, and `useUserStore(selector)` reads it. A module-level `create(…)` singleton is shared by every request the Node process handles — under SSR one user's balance could be rendered into another user's response. In a banking app that's not a theoretical concern, so the store's lifetime is bound to the render tree instead.
+
+Initial data is fetched **on the server** and hydrated into those stores: [`app/(dashboard)/layout.tsx`](<app/(dashboard)/layout.tsx>) does the auth gate, `DashboardShell` loads profile, transactions, recipients, and card in one `Promise.all`, and `StoreProvider` seeds the stores with the result. The client fetches nothing on mount — there are no loader hooks and no skeleton flash. While the server queries run, the route streams `AppSkeleton` from a `<Suspense>` boundary.
+
+This is why entity read methods are **client-agnostic** — they take an optional `client?: SupabaseClient` and default to the browser one, so the same `transactionApi.getAll` serves both the SSR layer (given the server client) and client-side refetches.
 
 ### Routing
 
@@ -72,9 +77,11 @@ TypeScript resolves: `#app`, `#shared`, `#entities`, `#features`, `#widgets`, `#
 The client never computes or writes a balance. Every money operation is a Postgres `security definer` function (see [`supabase/migrations/0006_money_functions.sql`](supabase/migrations/0006_money_functions.sql)) that:
 
 - derives the user from `auth.uid()` — the caller can't act as anyone else;
-- validates amount, balance, and the card's monthly limit **on the server**;
+- validates amount bounds, balance, card freeze, and the card's monthly limit **on the server**;
 - reads and debits the balance under `SELECT … FOR UPDATE`, so concurrent transfers can't race;
 - inserts the transaction and updates the balance in a **single transaction**.
+
+Client-side checks exist only for instant feedback; every one of them is repeated in SQL, because the browser is not a trust boundary. Freezing a card blocks spending in the database (see [`0008_enforce_card_freeze.sql`](supabase/migrations/0008_enforce_card_freeze.sql)) — including a re-check at QR capture, since a card can be frozen between authorization and settlement.
 
 The client's `UPDATE` privilege on `profiles` is **revoked** — the only path to a balance change is these functions. QR payments use an **authorize → capture** model: creating a QR reserves nothing, and confirmation re-checks funds under lock, so multiple pending QRs can't overdraw the account.
 
@@ -89,7 +96,9 @@ CVVs are never stored or readable in plaintext (see [`0002_card_cvv_encryption.s
 
 ### Row-Level Security
 
-Every table is guarded by RLS policies scoped to `auth.uid()`, so users only ever read and mutate their own rows.
+Every table has RLS enabled with policies scoped to `auth.uid()`, so users only ever read their own rows (see [`0000_init.sql`](supabase/migrations/0000_init.sql)).
+
+RLS answers "which rows", not "which verbs", so privileges are narrowed on top of it wherever a policy isn't enough. `profiles` loses `UPDATE` in `0006`, and `transactions` is read-only to the client ([`0010_lock_transactions.sql`](supabase/migrations/0010_lock_transactions.sql)) — an RLS policy would happily let you delete _your own_ rows, and the ledger is exactly where that's unacceptable: the monthly card limit is computed by summing your spending rows, so a client-side `DELETE` would reset the limit. Writes to the ledger belong to the `security definer` functions, which run as the owner and are unaffected by the revoke.
 
 > **Simulated:** QR confirmation is triggered client-side to emulate an acquirer webhook (settlement itself runs server-side and atomically). There is no real payment processor.
 
@@ -105,14 +114,16 @@ npm install
 NEXT_PUBLIC_SUPABASE_URL=your-project-url
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
 
-# 3. Apply the SQL migrations in supabase/migrations/ in order
-#    (Supabase Dashboard → SQL Editor, or `supabase db push`)
+# 3. Apply the SQL migrations in supabase/migrations/ in order, starting with
+#    0000_init.sql (Supabase Dashboard → SQL Editor, or `supabase db push`)
 
 # 4. Run
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000).
+Open [http://localhost:3000](http://localhost:3000), then register an account — new accounts start at a zero balance, so add income first to have something to move around.
+
+Apply the migrations **in order, each exactly once**. They're written as a history: `0000_init.sql` creates the schema with baseline grants, and later files deliberately tighten it (`0001` closes direct reads of `cards.cvv`, `0006` revokes `UPDATE` on `profiles`, `0010` makes `transactions` read-only to the client). Re-running an early file against an already-migrated database would hand back a privilege a later one took away — `0000` in particular is for empty databases only.
 
 ## Conventions
 
