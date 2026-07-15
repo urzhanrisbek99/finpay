@@ -5,8 +5,7 @@ import { formatCurrency } from "#shared/lib";
 import { useT } from "#shared/i18n";
 import { transactionModel } from "#entities/transaction";
 import { cardModel } from "#entities/card";
-
-type BudgetLevel = "on-track" | "trending-over" | "over-budget" | "no-budget";
+import { computeBudget, type BudgetLevel } from "../lib/budget";
 
 // Цвета уровня бюджета; подпись уровня берётся из словаря по ключу level.
 const BUDGET_META: Record<BudgetLevel, { text: string; bar: string }> = {
@@ -16,41 +15,14 @@ const BUDGET_META: Record<BudgetLevel, { text: string; bar: string }> = {
   "no-budget": { text: "text-muted-foreground", bar: "bg-muted-foreground/40" },
 };
 
-function getBudget(spent: number, limit: number) {
-  const now = new Date();
-  const day = now.getDate();
-  const daysInMonth = new Date(
-    now.getFullYear(),
-    now.getMonth() + 1,
-    0,
-  ).getDate();
-  const pace = day / daysInMonth;
-  const projected = pace > 0 ? Math.round(spent / pace) : spent;
-  const dailyAvg = Math.round(spent / day);
-
-  let level: BudgetLevel;
-  if (limit <= 0) level = "no-budget";
-  else if (spent > limit) level = "over-budget";
-  else if (projected > limit) level = "trending-over";
-  else level = "on-track";
-
-  const usedPercent =
-    limit > 0 ? Math.min(100, Math.round((spent / limit) * 100)) : 0;
-  const pacePercent = Math.min(100, Math.round(pace * 100));
-
-  return { level, projected, dailyAvg, usedPercent, pacePercent };
-}
-
 export function BudgetStatus() {
   const t = useT();
   const card = cardModel.useCardStore((s) => s.card);
   const { spent } = transactionModel.useMonthlySpent();
 
   const limit = card?.spending_limit ?? 0;
-  const { level, projected, dailyAvg, usedPercent, pacePercent } = getBudget(
-    spent,
-    limit,
-  );
+  const { level, projected, dailyAvg, usedPercent, pacePercent } =
+    computeBudget(spent, limit, new Date());
   const meta = BUDGET_META[level];
   const isOver = level === "over-budget";
   const remaining = Math.max(0, limit - spent);

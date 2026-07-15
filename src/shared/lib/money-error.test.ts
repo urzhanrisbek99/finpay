@@ -1,12 +1,14 @@
 import { describe, expect, it } from "vitest";
-import { en } from "#shared/i18n/dictionaries/en";
-import { ru } from "#shared/i18n/dictionaries/ru";
+import { getDictionary } from "#shared/i18n";
 import {
   MONEY_ERROR,
   MONEY_ERROR_UNKNOWN,
   getMoneyErrorMessage,
   toMoneyErrorCode,
 } from "./money-error";
+
+const en = getDictionary("en");
+const ru = getDictionary("ru");
 
 describe("toMoneyErrorCode", () => {
   it("returns null when there is no error", () => {

@@ -9,4 +9,6 @@ export {
 } from "./config";
 export { I18nProvider, useI18n, useT, useLocale } from "./context";
 export { useFormatDate } from "./format";
-export type { Messages } from "./dictionaries";
+// getDictionary — часть публичного API: словарь по локали нужен вне React
+// (например, тестам маппинга ошибок), где хуки недоступны.
+export { getDictionary, type Messages } from "./dictionaries";

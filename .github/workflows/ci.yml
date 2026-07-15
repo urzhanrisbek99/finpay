@@ -24,6 +24,11 @@ jobs:
       - name: Lint architecture (FSD)
         run: npm run lint:fsd
 
+      # lint-staged форматирует только staged-файлы и обходится флагом
+      # --no-verify, поэтому формат проверяем и здесь.
+      - name: Format
+        run: npm run format:check
+
       - name: Typecheck
         run: npm run typecheck
 

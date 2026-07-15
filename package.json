@@ -8,6 +8,8 @@
     "start": "next start",
     "lint": "eslint",
     "lint:fsd": "steiger ./src",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
