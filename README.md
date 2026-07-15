@@ -19,7 +19,8 @@ npm run start      # Serve the production build
 npm run lint       # ESLint
 npm run lint:fsd   # Feature-Sliced Design boundary check (steiger)
 npm run typecheck  # Type check (tsc --noEmit)
-npm test           # Unit tests (Vitest)
+npm run format     # Prettier
+npm test           # Unit tests + migrations against a real Postgres (Vitest)
 npm run test:watch # Vitest in watch mode
 ```
 
@@ -100,7 +101,22 @@ Every table has RLS enabled with policies scoped to `auth.uid()`, so users only 
 
 RLS answers "which rows", not "which verbs", so privileges are narrowed on top of it wherever a policy isn't enough. `profiles` loses `UPDATE` in `0006`, and `transactions` is read-only to the client ([`0010_lock_transactions.sql`](supabase/migrations/0010_lock_transactions.sql)) — an RLS policy would happily let you delete _your own_ rows, and the ledger is exactly where that's unacceptable: the monthly card limit is computed by summing your spending rows, so a client-side `DELETE` would reset the limit. Writes to the ledger belong to the `security definer` functions, which run as the owner and are unaffected by the revoke.
 
-> **Simulated:** QR confirmation is triggered client-side to emulate an acquirer webhook (settlement itself runs server-side and atomically). There is no real payment processor.
+### None of the above is taken on trust
+
+Everything in this section is asserted against a real PostgreSQL in [`supabase/tests/migrations.test.ts`](supabase/tests/migrations.test.ts) — PGlite, so the suite is `npm test` and needs no Docker:
+
+- the whole `migrations/` chain applies to an **empty** database, which is what makes "clone and run" a checked claim rather than a promise;
+- a direct `UPDATE` of `balance` is refused, and so are `INSERT`/`UPDATE`/`DELETE` on the ledger;
+- a frozen card blocks a transfer and a QR — **including one authorized before the freeze**;
+- the monthly limit rejects the transfer that would cross it;
+- QR reserves nothing, debits once, and a retried webhook does not debit twice;
+- several pending QRs cannot overdraw the balance;
+- one user sees zero rows of another's profile, ledger and card, and cannot move their money;
+- a CVV never rests in plaintext, decrypts for its owner, and returns null to anyone else.
+
+The suite earns its keep under mutation: drop the freeze check from `0008`, and the two freeze tests go red; re-grant writes on the ledger, and the ledger tests follow.
+
+> **Simulated:** QR confirmation is triggered client-side to emulate an acquirer webhook (settlement itself runs server-side and atomically). There is no real payment processor. The tests stub the parts of Supabase the migrations lean on — `auth.uid()`, the roles, and Vault — so they verify this project's SQL, not Supabase's own guarantees.
 
 ## Getting Started
 
@@ -131,7 +147,7 @@ Apply the migrations **in order, each exactly once**. They're written as a histo
 - **Styling** — Tailwind CSS v4; `cn()` (clsx + tailwind-merge) for class composition; `prettier-plugin-tailwindcss` orders classes.
 - **UI** — Base UI primitives with shadcn-style components in `shared/ui`.
 - **State** — Zustand stores per entity/feature.
-- **Tests** — Vitest, colocated as `*.test.ts`; business logic lives in pure functions.
+- **Tests** — Vitest. Unit tests sit next to the pure functions they cover (`*.test.ts`); the migration suite lives in `supabase/tests` and runs the real SQL against PGlite.
 - **TypeScript** — strict mode; the build fails on type errors.
 
 ## License

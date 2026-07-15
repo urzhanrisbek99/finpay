@@ -37,6 +37,7 @@
   "devDependencies": {
     "@commitlint/cli": "^21.0.2",
     "@commitlint/config-conventional": "^21.0.2",
+    "@electric-sql/pglite": "^0.5.4",
     "@feature-sliced/steiger-plugin": "^0.7.0",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
