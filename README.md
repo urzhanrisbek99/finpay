@@ -4,7 +4,7 @@
 - **Type:** Portfolio project — personal banking dashboard
 - **Stack:** Next.js 16 (App Router) · React 19 · TypeScript · Supabase (Postgres + Auth + RLS) · Zustand · Tailwind CSS v4 · Vitest
 - **Status:** Demo
-- **Live demo:** _add URL_
+- **Live demo:** https://finpay-urzhanrisbek99s-projects.vercel.app
 
 **Description:**
 
