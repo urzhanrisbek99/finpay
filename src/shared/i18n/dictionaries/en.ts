@@ -17,6 +17,20 @@ export const en = {
     loading: "Loading...",
     close: "Close",
   },
+  // Отказы денежных RPC. Сервер отдаёт код SQLSTATE, текст подставляется
+  // здесь — см. shared/lib/money-error.ts.
+  money: {
+    errors: {
+      amountTooSmall: (min: string) => `Minimum amount is ${min}`,
+      amountTooLarge: (max: string) => `Maximum amount is ${max}`,
+      insufficientBalance: "Not enough money on your balance",
+      cardFrozen: "Your card is frozen — unfreeze it to pay",
+      limitExceeded: "This exceeds your monthly card limit",
+      invalidAmount: "Enter a valid amount",
+      notAuthenticated: "Your session has expired. Sign in again",
+      unknown: "Payment failed. Try again",
+    },
+  },
   settings: {
     title: "Settings",
     language: "Language",

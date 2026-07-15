@@ -6,13 +6,20 @@ import { userModel } from "#entities/user";
 import { transactionModel } from "#entities/transaction";
 import { recipientApi, recipientModel } from "#entities/recipient";
 import { TRANSACTION_LIMITS } from "#shared/config";
-import { formatCurrency } from "#shared/lib";
+import {
+  getMoneyErrorMessage,
+  minAmountMessage,
+  maxAmountMessage,
+  MONEY_ERROR_UNKNOWN,
+} from "#shared/lib";
+import { useT } from "#shared/i18n";
 
 type TransferState = "idle" | "loading" | "success" | "failed";
 
 export function useTransfer() {
   const [state, setState] = useState<TransferState>("idle");
   const [error, setError] = useState<string | null>(null);
+  const t = useT();
 
   const user = userModel.useUserStore((s) => s.user);
   const setBalance = userModel.useUserStore((s) => s.setBalance);
@@ -39,34 +46,30 @@ export function useTransfer() {
         !Number.isFinite(amount) ||
         amount < TRANSACTION_LIMITS.MIN_TRANSFER
       ) {
-        setError(
-          `Minimum transfer amount is ${formatCurrency(TRANSACTION_LIMITS.MIN_TRANSFER)}`,
-        );
+        setError(minAmountMessage(t));
         return;
       }
       if (amount > TRANSACTION_LIMITS.MAX_TRANSFER) {
-        setError(
-          `Maximum transfer amount is ${formatCurrency(TRANSACTION_LIMITS.MAX_TRANSFER)}`,
-        );
+        setError(maxAmountMessage(t));
         return;
       }
       if (amount > user.balance) {
-        setError("Insufficient balance");
+        setError(t.money.errors.insufficientBalance);
         return;
       }
 
       setState("loading");
       setError(null);
 
-      const { data, balance, error } = await transferApi.send(
+      const { data, balance, errorCode } = await transferApi.send(
         amount,
         phone,
         comment,
       );
 
-      if (error || !data || balance === null) {
+      if (errorCode || !data || balance === null) {
         setState("failed");
-        setError(error);
+        setError(getMoneyErrorMessage(t, errorCode ?? MONEY_ERROR_UNKNOWN));
         return;
       }
 
@@ -87,7 +90,7 @@ export function useTransfer() {
 
       setState("success");
     },
-    [user, addTransaction, setBalance, upsertRecipient],
+    [user, addTransaction, setBalance, upsertRecipient, t],
   );
 
   const reset = useCallback(() => {

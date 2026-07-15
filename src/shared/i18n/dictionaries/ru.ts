@@ -15,6 +15,18 @@ export const ru: Messages = {
     loading: "Загрузка...",
     close: "Закрыть",
   },
+  money: {
+    errors: {
+      amountTooSmall: (min: string) => `Минимальная сумма — ${min}`,
+      amountTooLarge: (max: string) => `Максимальная сумма — ${max}`,
+      insufficientBalance: "Недостаточно средств на балансе",
+      cardFrozen: "Карта заморожена — разморозьте её для оплаты",
+      limitExceeded: "Превышен месячный лимит по карте",
+      invalidAmount: "Введите корректную сумму",
+      notAuthenticated: "Сессия истекла. Войдите заново",
+      unknown: "Не удалось выполнить операцию. Попробуйте ещё раз",
+    },
+  },
   settings: {
     title: "Настройки",
     language: "Язык",

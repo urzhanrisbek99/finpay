@@ -1,5 +1,6 @@
 import { createBrowserClient } from "#shared/api";
 import { transactionModel } from "#entities/transaction";
+import { toMoneyErrorCode, MONEY_ERROR_UNKNOWN } from "#shared/lib";
 
 type TransferResult = {
   transaction: transactionModel.Transaction;
@@ -7,6 +8,7 @@ type TransferResult = {
 };
 
 export const cardTransferApi = {
+  // Наружу отдаём код ошибки, а не message — текст подставит словарь.
   send: async (
     amount: number,
     cardNumber: string,
@@ -14,7 +16,7 @@ export const cardTransferApi = {
   ): Promise<{
     data: transactionModel.Transaction | null;
     balance: number | null;
-    error: string | null;
+    errorCode: string | null;
   }> => {
     const supabase = createBrowserClient();
 
@@ -32,11 +34,15 @@ export const cardTransferApi = {
       return {
         data: null,
         balance: null,
-        error: error?.message ?? "Transfer failed",
+        errorCode: toMoneyErrorCode(error) ?? MONEY_ERROR_UNKNOWN,
       };
     }
 
     const result = data as TransferResult;
-    return { data: result.transaction, balance: result.balance, error: null };
+    return {
+      data: result.transaction,
+      balance: result.balance,
+      errorCode: null,
+    };
   },
 };

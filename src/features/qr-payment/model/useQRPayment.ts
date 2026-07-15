@@ -6,6 +6,8 @@ import { userApi, userModel } from "#entities/user";
 import { transactionModel } from "#entities/transaction";
 import { createBrowserClient } from "#shared/api";
 import { POLLING_INTERVAL } from "#shared/config";
+import { getMoneyErrorMessage, MONEY_ERROR_UNKNOWN } from "#shared/lib";
+import { useT } from "#shared/i18n";
 
 type PaymentState = "idle" | "pending" | "completed" | "failed";
 
@@ -15,6 +17,7 @@ export function useQRPayment() {
     useState<transactionModel.Transaction | null>(null);
   const [error, setError] = useState<string | null>(null);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const t = useT();
 
   const user = userModel.useUserStore((s) => s.user);
   const userStore = userModel.useUserStoreApi();
@@ -70,20 +73,21 @@ export function useQRPayment() {
   const createPayment = useCallback(
     async (amount: number, merchant: string) => {
       if (!user) return;
-      // Мгновенный фидбэк; баланс и лимит окончательно проверяет сервер.
+      // Мгновенный фидбэк; баланс, заморозку и лимит окончательно проверяет
+      // сервер в create_qr_payment.
       if (amount > user.balance) {
         setState("failed");
-        setError("Insufficient balance");
+        setError(t.money.errors.insufficientBalance);
         return;
       }
       setState("pending");
       setError(null);
 
-      const { data, error } = await qrPaymentApi.create(amount, merchant);
+      const { data, errorCode } = await qrPaymentApi.create(amount, merchant);
 
-      if (error || !data) {
+      if (errorCode || !data) {
         setState("failed");
-        setError(error);
+        setError(getMoneyErrorMessage(t, errorCode ?? MONEY_ERROR_UNKNOWN));
         return;
       }
 
@@ -93,7 +97,7 @@ export function useQRPayment() {
       qrPaymentApi.simulateConfirm(data.id);
       startPolling(data.id);
     },
-    [user, addTransaction, startPolling],
+    [user, addTransaction, startPolling, t],
   );
 
   const reset = useCallback(() => {

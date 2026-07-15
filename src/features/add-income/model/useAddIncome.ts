@@ -6,13 +6,20 @@ import { userModel } from "#entities/user";
 import { transactionModel } from "#entities/transaction";
 import type { TransactionCategory } from "#shared/model";
 import { TRANSACTION_LIMITS } from "#shared/config";
-import { formatCurrency } from "#shared/lib";
+import {
+  getMoneyErrorMessage,
+  minAmountMessage,
+  maxAmountMessage,
+  MONEY_ERROR_UNKNOWN,
+} from "#shared/lib";
+import { useT } from "#shared/i18n";
 
 type AddIncomeState = "idle" | "loading" | "success" | "failed";
 
 export function useAddIncome() {
   const [state, setState] = useState<AddIncomeState>("idle");
   const [error, setError] = useState<string | null>(null);
+  const t = useT();
 
   const user = userModel.useUserStore((s) => s.user);
   const setBalance = userModel.useUserStore((s) => s.setBalance);
@@ -27,24 +34,28 @@ export function useAddIncome() {
         !Number.isFinite(amount) ||
         amount < TRANSACTION_LIMITS.MIN_TRANSFER
       ) {
-        setError(
-          `Minimum income amount is ${formatCurrency(TRANSACTION_LIMITS.MIN_TRANSFER)}`,
-        );
+        setError(minAmountMessage(t));
+        return;
+      }
+      // add_income тоже упирается в потолок — без этой проверки форма молча
+      // отправляла бы заведомо отклоняемую сумму.
+      if (amount > TRANSACTION_LIMITS.MAX_TRANSFER) {
+        setError(maxAmountMessage(t));
         return;
       }
 
       setState("loading");
       setError(null);
 
-      const { data, balance, error } = await addIncomeApi.add(
+      const { data, balance, errorCode } = await addIncomeApi.add(
         amount,
         source.trim() || "Income",
         category,
       );
 
-      if (error || !data || balance === null) {
+      if (errorCode || !data || balance === null) {
         setState("failed");
-        setError(error);
+        setError(getMoneyErrorMessage(t, errorCode ?? MONEY_ERROR_UNKNOWN));
         return;
       }
 
@@ -52,7 +63,7 @@ export function useAddIncome() {
       setBalance(balance);
       setState("success");
     },
-    [user, addTransaction, setBalance],
+    [user, addTransaction, setBalance, t],
   );
 
   const reset = useCallback(() => {
