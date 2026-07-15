@@ -1,6 +1,6 @@
-import { createBrowserClient } from "#shared/api/supabase/client";
+import { createBrowserClient } from "#shared/api";
 import { transactionModel } from "#entities/transaction";
-import type { TransactionCategory } from "#shared/types";
+import type { TransactionCategory } from "#shared/model";
 
 type IncomeResult = {
   transaction: transactionModel.Transaction;

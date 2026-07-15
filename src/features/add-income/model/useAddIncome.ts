@@ -4,7 +4,7 @@ import { useState, useCallback } from "react";
 import { addIncomeApi } from "../api";
 import { userModel } from "#entities/user";
 import { transactionModel } from "#entities/transaction";
-import type { TransactionCategory } from "#shared/types";
+import type { TransactionCategory } from "#shared/model";
 
 type AddIncomeState = "idle" | "loading" | "success" | "failed";
 

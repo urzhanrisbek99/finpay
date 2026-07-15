@@ -21,6 +21,9 @@ jobs:
       - name: Lint
         run: npm run lint
 
+      - name: Lint architecture (FSD)
+        run: npm run lint:fsd
+
       - name: Typecheck
         run: npm run typecheck
 

@@ -1,5 +1,10 @@
-import { createBrowserClient } from "#shared/api/supabase/client";
+import { createBrowserClient } from "#shared/api";
+import { ROUTES } from "#shared/config";
+import { toAuthErrorCode } from "../lib/auth-error";
 
+// Наружу отдаём код ошибки, а не message: сообщения Supabase существуют только
+// на английском, а показать их надо на языке интерфейса. Перевод кода в текст —
+// на стороне модели, у которой есть словарь.
 export const authApi = {
   signIn: async (email: string, password: string) => {
     const supabase = createBrowserClient();
@@ -7,7 +12,7 @@ export const authApi = {
       email,
       password,
     });
-    return { data, error: error ? error.message : null };
+    return { data, errorCode: toAuthErrorCode(error) };
   },
 
   signUp: async (email: string, password: string, fullName: string) => {
@@ -19,21 +24,22 @@ export const authApi = {
         data: { full_name: fullName },
       },
     });
-    return { data, error: error ? error.message : null };
+    return { data, errorCode: toAuthErrorCode(error) };
   },
 
-  signOut: async () => {
+  // Письмо ведёт на /auth/confirm, а не сразу на /reset-password: одноразовый
+  // секрет нужно обменять на сессию на сервере, иначе кука не выставится.
+  requestPasswordReset: async (email: string) => {
     const supabase = createBrowserClient();
-    const { error } = await supabase.auth.signOut();
-    return { error: error ? error.message : null };
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}${ROUTES.AUTH_CONFIRM}`,
+    });
+    return { errorCode: toAuthErrorCode(error) };
   },
 
-  getUser: async () => {
+  updatePassword: async (password: string) => {
     const supabase = createBrowserClient();
-    const {
-      data: { user },
-      error,
-    } = await supabase.auth.getUser();
-    return { user, error: error ? error.message : null };
+    const { error } = await supabase.auth.updateUser({ password });
+    return { errorCode: toAuthErrorCode(error) };
   },
 };

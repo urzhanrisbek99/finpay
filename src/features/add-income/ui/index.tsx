@@ -8,7 +8,7 @@ import { Input } from "#shared/ui/input";
 import { Label } from "#shared/ui/label";
 import { formatCurrency } from "#shared/lib";
 import { useT } from "#shared/i18n";
-import type { TransactionCategory } from "#shared/types";
+import type { TransactionCategory } from "#shared/model";
 import { useAddIncome } from "../model";
 
 const QUICK_AMOUNTS = [50000, 100000, 250000, 500000];

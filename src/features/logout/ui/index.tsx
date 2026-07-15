@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { LogOut } from "lucide-react";
-import { createBrowserClient } from "#shared/api/supabase/client";
+import { createBrowserClient } from "#shared/api";
 import { userModel } from "#entities/user";
 import { transactionModel } from "#entities/transaction";
 import { ROUTES } from "#shared/config";

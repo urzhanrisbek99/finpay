@@ -1,5 +1,5 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { createBrowserClient } from "#shared/api/supabase/client";
+import { createBrowserClient } from "#shared/api";
 import type { Card } from "../model/types";
 
 // cards закрыт табличным SELECT — читаем только разрешённые колонки (без cvv).

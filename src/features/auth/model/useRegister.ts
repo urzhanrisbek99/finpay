@@ -3,13 +3,16 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { authApi } from "../api";
+import { getAuthErrorMessage } from "../lib/auth-error";
 import { userApi } from "#entities/user";
 import { ROUTES } from "#shared/config";
+import { useT } from "#shared/i18n";
 
 export function useRegister() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
+  const t = useT();
 
   const register = async (
     email: string,
@@ -19,10 +22,10 @@ export function useRegister() {
     setIsLoading(true);
     setError(null);
 
-    const { data, error } = await authApi.signUp(email, password, fullName);
+    const { data, errorCode } = await authApi.signUp(email, password, fullName);
 
-    if (error) {
-      setError(error);
+    if (errorCode) {
+      setError(getAuthErrorMessage(t, errorCode));
       setIsLoading(false);
       return;
     }

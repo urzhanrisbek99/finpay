@@ -1,4 +1,4 @@
-import { createBrowserClient } from "#shared/api/supabase/client";
+import { createBrowserClient } from "#shared/api";
 
 export const removeCardApi = {
   request: async (

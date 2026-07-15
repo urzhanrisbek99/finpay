@@ -3,7 +3,7 @@
 import { createContext, useContext, useState, type ReactNode } from "react";
 import { createStore } from "zustand/vanilla";
 import { useStore } from "zustand";
-import type { TransactionStatus } from "#shared/types";
+import type { TransactionStatus } from "#shared/model";
 import type { Transaction } from "./types";
 
 export type TransactionState = {

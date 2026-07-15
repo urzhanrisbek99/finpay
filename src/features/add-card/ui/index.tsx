@@ -6,7 +6,7 @@ import { Dialog, DialogContent } from "#shared/ui/dialog";
 import { Button } from "#shared/ui/button";
 import { Input } from "#shared/ui/input";
 import { Label } from "#shared/ui/label";
-import { createBrowserClient } from "#shared/api/supabase/client";
+import { createBrowserClient } from "#shared/api";
 import { useT, type Messages } from "#shared/i18n";
 import { cardModel, type Card } from "#entities/card";
 import { addCardApi, type AddCardInput } from "../api";

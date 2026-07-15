@@ -1,4 +1,4 @@
-import { createBrowserClient } from "#shared/api/supabase/client";
+import { createBrowserClient } from "#shared/api";
 import type { Card } from "#entities/card";
 
 export type AddCardInput = {

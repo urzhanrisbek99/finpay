@@ -5,7 +5,7 @@ import { CheckCircle } from "lucide-react";
 import { Dialog, DialogContent } from "#shared/ui/dialog";
 import { Button } from "#shared/ui/button";
 import { removeCardApi } from "../api";
-import { createBrowserClient } from "#shared/api/supabase/client";
+import { createBrowserClient } from "#shared/api";
 import { useT } from "#shared/i18n";
 import { cardModel, cardApi } from "#entities/card";
 

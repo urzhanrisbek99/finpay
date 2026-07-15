@@ -4,7 +4,7 @@ import { useState, useCallback, useEffect, useRef } from "react";
 import { qrPaymentApi } from "../api";
 import { userApi, userModel } from "#entities/user";
 import { transactionModel } from "#entities/transaction";
-import { createBrowserClient } from "#shared/api/supabase/client";
+import { createBrowserClient } from "#shared/api";
 import { POLLING_INTERVAL } from "#shared/config";
 
 type PaymentState = "idle" | "pending" | "completed" | "failed";

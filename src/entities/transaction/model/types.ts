@@ -3,7 +3,7 @@ import type {
   TransactionType,
   TransactionCategory,
   TransactionMethod,
-} from "#shared/types";
+} from "#shared/model";
 
 export type Transaction = {
   id: string;

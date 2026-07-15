@@ -30,10 +30,23 @@ export async function proxy(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const isAuthPage =
-    request.nextUrl.pathname.startsWith("/login") ||
-    request.nextUrl.pathname.startsWith("/register");
+  const { pathname } = request.nextUrl;
 
+  // Приземление ссылки из письма. Пропускаем в обе стороны: без сессии сюда
+  // приходят по ссылке, а с сессией — если письмо открыли уже залогиненным.
+  // Любой редирект отсюда обрывает сброс пароля до verifyOtp.
+  if (pathname.startsWith(ROUTES.AUTH_CONFIRM)) {
+    return supabaseResponse;
+  }
+
+  const isAuthPage =
+    pathname.startsWith(ROUTES.LOGIN) ||
+    pathname.startsWith(ROUTES.REGISTER) ||
+    pathname.startsWith(ROUTES.FORGOT_PASSWORD);
+
+  // ROUTES.RESET_PASSWORD намеренно не в isAuthPage: туда попадают уже с
+  // сессией из письма, и правило «залогинен → на дашборд» не дало бы задать
+  // пароль. Без сессии эта страница отсекается общим правилом ниже.
   if (!user && !isAuthPage) {
     return NextResponse.redirect(new URL(ROUTES.LOGIN, request.url));
   }

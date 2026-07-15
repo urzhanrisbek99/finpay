@@ -284,6 +284,36 @@ export const en = {
     passwordsMismatch: "Passwords do not match",
     creatingAccount: "Creating account...",
     haveAccount: "Already have an account?",
+    forgotTitle: "Reset your password",
+    forgotSubtitle: "We'll email you a link to set a new password",
+    sendResetLink: "Send reset link",
+    sendingResetLink: "Sending...",
+    backToSignIn: "Back to sign in",
+    checkYourEmail: "Check your email",
+    // Нейтральная формулировка: не подтверждает, что аккаунт существует.
+    resetLinkSent:
+      "If an account exists for that address, we've sent a link to reset the password.",
+    resetTitle: "Set a new password",
+    resetSubtitle: "Choose a password you haven't used before",
+    newPassword: "New password",
+    updatePassword: "Update password",
+    updatingPassword: "Updating...",
+    // Минимум приходит аргументом, иначе текст разойдётся с PASSWORD_MIN_LENGTH.
+    passwordTooShort: (min: number) =>
+      `Password must be at least ${min} characters`,
+    resetLinkInvalid: "This link is invalid or has expired. Request a new one.",
+    // Supabase отдаёт свои сообщения только по-английски, поэтому в UI идёт
+    // наш текст по коду ошибки.
+    errors: {
+      invalidCredentials: "Wrong email or password",
+      emailExists: "An account with this email already exists",
+      weakPassword: "Password is too weak — pick a longer one",
+      samePassword: "The new password matches the old one",
+      emailNotConfirmed: "Confirm your email before signing in",
+      rateLimit: "Too many attempts. Try again in a minute",
+      validationFailed: "Check the entered details",
+      unknown: "Something went wrong. Try again",
+    },
   },
 };
 
