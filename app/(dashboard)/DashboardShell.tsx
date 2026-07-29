@@ -6,9 +6,7 @@ import { transactionApi } from "#entities/transaction";
 import { recipientApi } from "#entities/recipient";
 import { cardApi } from "#entities/card";
 
-// Async server component: тянет начальные данные и гидрирует сторы. Стоит под
-// <Suspense> в layout, поэтому пока идут запросы — показывается AppSkeleton.
-// Запросы делают entity-методы (client-agnostic), сюда передаём серверный клиент.
+// Async server component под <Suspense>: тянет начальные данные и гидрирует сторы.
 export async function DashboardShell({
   userId,
   children,

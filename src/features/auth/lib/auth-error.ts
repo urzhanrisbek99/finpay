@@ -1,11 +1,7 @@
 import type { Messages } from "#shared/i18n";
 
-// Код, которым подменяем отсутствующий: у сетевого сбоя code нет, но потерять
-// сам факт ошибки нельзя.
 export const AUTH_ERROR_UNKNOWN = "unknown";
 
-// Структурный тип вместо импорта AuthError: в этой версии supabase-js он
-// не экспортируется.
 type ErrorWithCode = { code?: string };
 
 export function toAuthErrorCode(error: ErrorWithCode | null): string | null {
@@ -13,9 +9,6 @@ export function toAuthErrorCode(error: ErrorWithCode | null): string | null {
   return error.code ?? AUTH_ERROR_UNKNOWN;
 }
 
-// Сообщения Supabase приходят только на английском, поэтому в UI показываем
-// свой текст по коду. Незнакомый код падает в общий фолбэк — так англоязычная
-// строка от сервера не утечёт в русский интерфейс.
 export function getAuthErrorMessage(t: Messages, code: string): string {
   switch (code) {
     case "invalid_credentials":

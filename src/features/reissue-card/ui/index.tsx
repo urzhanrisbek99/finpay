@@ -24,7 +24,6 @@ export function ReissueCardModal({ open, onClose }: ReissueCardModalProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(false);
   const card = cardModel.useCardStore((s) => s.card);
-  // Профиль уже гидрирован из SSR — отдельный getUser() по сети не нужен.
   const user = userModel.useUserStore((s) => s.user);
   const t = useT();
 

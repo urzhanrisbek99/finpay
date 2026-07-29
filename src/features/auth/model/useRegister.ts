@@ -31,10 +31,6 @@ export function useRegister() {
     }
 
     if (data?.user) {
-      // Профиль пишется от лица нового пользователя, поэтому без сессии
-      // (включено подтверждение почты) RLS вставку отклонит. Ошибку показываем,
-      // а не глотаем: иначе человек уходил на дашборд без профиля — без имени
-      // и без баланса.
       const { error: profileError } = await userApi.createProfile({
         id: data.user.id,
         email,

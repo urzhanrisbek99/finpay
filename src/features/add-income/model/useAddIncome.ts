@@ -37,8 +37,6 @@ export function useAddIncome() {
         setError(minAmountMessage(t));
         return;
       }
-      // add_income тоже упирается в потолок — без этой проверки форма молча
-      // отправляла бы заведомо отклоняемую сумму.
       if (amount > TRANSACTION_LIMITS.MAX_TRANSFER) {
         setError(maxAmountMessage(t));
         return;

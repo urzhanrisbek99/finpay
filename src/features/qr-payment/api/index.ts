@@ -3,9 +3,6 @@ import { transactionModel } from "#entities/transaction";
 import { toMoneyErrorCode, MONEY_ERROR_UNKNOWN } from "#shared/lib";
 
 export const qrPaymentApi = {
-  // Создаём pending-платёж через RPC: сервер проверяет баланс, заморозку и
-  // лимит и берёт user_id из auth.uid(). Баланс на этом шаге ещё не
-  // списывается. Наружу отдаём код ошибки — текст подставит словарь.
   create: async (
     amount: number,
     merchant: string,
@@ -31,9 +28,6 @@ export const qrPaymentApi = {
     return { data: result.transaction, errorCode: null };
   },
 
-  // Симуляция вебхука эквайера. Подтверждение и списание баланса делает
-  // серверный RPC confirm_qr_payment атомарно и идемпотентно — клиент лишь
-  // инициирует его (перенос самого триггера на сервер — отдельный шаг).
   simulateConfirm: (transactionId: string): void => {
     setTimeout(async () => {
       const supabase = createBrowserClient();

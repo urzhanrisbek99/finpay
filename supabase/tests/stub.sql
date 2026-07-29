@@ -1,16 +1,3 @@
--- Окружение Supabase, на которое опираются миграции, — в объёме, нужном для
--- их проверки на голом Postgres: роли anon/authenticated, схема auth с
--- auth.users и auth.uid(), pgcrypto в extensions и минимальный Vault.
---
--- auth.uid() читает GUC request.jwt.claim.sub — так же, как настоящий
--- Supabase достаёт subject из JWT. Значит тест может «стать» пользователем,
--- выставив этот параметр, и RLS с security definer функциями ведут себя как
--- в бою.
---
--- ВАЖНО: vault здесь хранит секрет открытым. Тест проверяет НАШУ логику
--- (триггер шифрует, RPC отдаёт CVV только владельцу), а не стойкость самого
--- Vault — это ответственность Supabase.
-
 create schema if not exists auth;
 create schema if not exists extensions;
 create schema if not exists vault;

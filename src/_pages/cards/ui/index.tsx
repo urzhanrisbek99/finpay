@@ -31,10 +31,6 @@ export function Cards() {
     limit > 0 ? Math.min(100, Math.round((spent / limit) * 100)) : 0;
   const isOverLimit = limit > 0 && spent > limit;
 
-  // Оптимистично, но с откатом: запрос упал — возвращаем флаг обратно, иначе
-  // UI показывал бы заморозку, которой нет в БД (а её проверяет сервер).
-  // freezePending отсекает второй клик по не доехавшему первому: иначе два
-  // запроса ушли бы с одним и тем же card.is_frozen из замыкания.
   const handleToggleFreeze = async () => {
     if (!card || freezePending) return;
     setFreezeError(false);

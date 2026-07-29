@@ -3,8 +3,6 @@ import { createBrowserClient } from "#shared/api";
 import type { User } from "../model/types";
 
 export const userApi = {
-  // Читаем и с клиента (браузерный клиент по умолчанию), и из SSR
-  // (передаётся серверный клиент из layout).
   getProfile: async (
     userId: string,
     client?: SupabaseClient,
@@ -23,9 +21,7 @@ export const userApi = {
     };
   },
 
-  // Баланс меняется только серверными RPC (transfer_money / add_income /
-  // confirm_qr_payment). Прямого updateBalance у клиента больше нет —
-  // право на UPDATE profiles отозвано в миграции 0006.
+  // Баланс меняют только серверные RPC: UPDATE на profiles отозван в 0006.
   createProfile: async (profile: {
     id: string;
     email: string;

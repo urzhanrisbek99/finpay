@@ -20,8 +20,6 @@ describe("toAuthErrorCode", () => {
     );
   });
 
-  // У сетевого сбоя code нет — но потерять сам факт ошибки нельзя, иначе
-  // форма решит, что вход удался.
   it("falls back to the unknown code when the error carries none", () => {
     expect(toAuthErrorCode({})).toBe(AUTH_ERROR_UNKNOWN);
   });
@@ -56,8 +54,6 @@ describe("getAuthErrorMessage", () => {
     expect(messages).not.toContain(en.auth.errors.unknown);
   });
 
-  // Ради этого маппинг и существует: сообщения Supabase есть только на
-  // английском, и незнакомый код не должен протащить их в интерфейс.
   it("falls back for unknown codes instead of leaking English", () => {
     expect(getAuthErrorMessage(en, "some_new_supabase_code")).toBe(
       en.auth.errors.unknown,

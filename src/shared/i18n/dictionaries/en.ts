@@ -1,7 +1,3 @@
-// Английский словарь — источник истины для типов. Русский словарь (ru.ts)
-// обязан удовлетворять типу `Messages`, поэтому пропущенный ключ вызовет
-// ошибку компиляции. Динамические строки описаны функциями — это даёт
-// типобезопасную интерполяцию и корректный порядок слов при переводе.
 export const en = {
   localeName: {
     en: "English",
@@ -17,8 +13,6 @@ export const en = {
     loading: "Loading...",
     close: "Close",
   },
-  // Отказы денежных RPC. Сервер отдаёт код SQLSTATE, текст подставляется
-  // здесь — см. shared/lib/money-error.ts.
   money: {
     errors: {
       amountTooSmall: (min: string) => `Minimum amount is ${min}`,
@@ -76,8 +70,6 @@ export const en = {
     status: { completed: "completed", pending: "pending", failed: "failed" },
     today: (time: string) => `Today, ${time}`,
     yesterday: (time: string) => `Yesterday, ${time}`,
-    // Системные подписи переводов (merchant в БД хранится по-английски —
-    // локализуется при отображении по type/method транзакции).
     transferToCard: (last4: string) => `Transfer to card •••• ${last4}`,
     transferToPhone: (phone: string) => `Transfer to ${phone}`,
   },
@@ -307,7 +299,6 @@ export const en = {
     sendingResetLink: "Sending...",
     backToSignIn: "Back to sign in",
     checkYourEmail: "Check your email",
-    // Нейтральная формулировка: не подтверждает, что аккаунт существует.
     resetLinkSent:
       "If an account exists for that address, we've sent a link to reset the password.",
     resetTitle: "Set a new password",
@@ -315,12 +306,9 @@ export const en = {
     newPassword: "New password",
     updatePassword: "Update password",
     updatingPassword: "Updating...",
-    // Минимум приходит аргументом, иначе текст разойдётся с PASSWORD_MIN_LENGTH.
     passwordTooShort: (min: number) =>
       `Password must be at least ${min} characters`,
     resetLinkInvalid: "This link is invalid or has expired. Request a new one.",
-    // Supabase отдаёт свои сообщения только по-английски, поэтому в UI идёт
-    // наш текст по коду ошибки.
     errors: {
       invalidCredentials: "Wrong email or password",
       emailExists: "An account with this email already exists",
@@ -329,8 +317,6 @@ export const en = {
       emailNotConfirmed: "Confirm your email before signing in",
       rateLimit: "Too many attempts. Try again in a minute",
       validationFailed: "Check the entered details",
-      // Аккаунт в auth уже создан, а профиль — нет: логин сработает, но в
-      // приложении не будет ни имени, ни баланса. Молчать об этом нельзя.
       profileCreationFailed:
         "Your account was created, but we couldn't finish setting up the profile. Sign in to try again.",
       unknown: "Something went wrong. Try again",
@@ -338,6 +324,4 @@ export const en = {
   },
 };
 
-// Тип берётся без `as const`: значения остаются `string`, а не литералами,
-// поэтому русский словарь обязан повторить структуру, но со своими строками.
 export type Messages = typeof en;

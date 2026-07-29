@@ -25,8 +25,6 @@ export function useResetPassword() {
       return;
     }
 
-    // Ссылка из письма уже дала сессию, так что после смены пароля пользователь
-    // залогинен — вести его снова на /login незачем.
     router.push(ROUTES.DASHBOARD);
     setIsLoading(false);
   };

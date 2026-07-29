@@ -3,7 +3,6 @@ import { createBrowserClient } from "#shared/api";
 import type { Recipient } from "../model/types";
 
 export const recipientApi = {
-  // Читаем и с клиента, и из SSR (передаётся серверный клиент из layout).
   getAll: async (
     userId: string,
     client?: SupabaseClient,

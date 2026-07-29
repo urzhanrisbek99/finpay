@@ -3,8 +3,6 @@ import { createBrowserClient } from "#shared/api";
 import type { Transaction } from "../model/types";
 
 export const transactionApi = {
-  // Читаем и с клиента, и из SSR (передаётся серверный клиент из layout).
-  // Запись транзакций идёт через серверные RPC в features, не здесь.
   getAll: async (
     userId: string,
     client?: SupabaseClient,

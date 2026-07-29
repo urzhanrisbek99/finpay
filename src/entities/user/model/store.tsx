@@ -13,8 +13,6 @@ export type UserState = {
   setLoading: (isLoading: boolean) => void;
 };
 
-// Per-request фабрика: один стор на дерево рендера, а не синглтон на процесс —
-// иначе при SSR состояние утекало бы между запросами разных пользователей.
 export const createUserStore = (
   initial?: Partial<Pick<UserState, "user" | "isLoading">>,
 ) =>

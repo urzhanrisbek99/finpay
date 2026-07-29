@@ -9,9 +9,8 @@ import {
   sumBetween,
 } from "./stats";
 
-// Все даты — локальные (без Z), чтобы тесты не зависели от таймзоны раннера.
 const NOW = new Date("2026-07-14T12:00:00");
-const MINUS = "−"; // тот же знак, что использует formatTrend для минуса
+const MINUS = "−";
 
 const tx = (o: Partial<Transaction>): Transaction => ({
   id: Math.random().toString(36).slice(2),

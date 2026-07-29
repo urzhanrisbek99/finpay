@@ -38,10 +38,6 @@ export function useTransfer() {
       saveName?: string,
     ) => {
       if (!user) return;
-      // Клиентские проверки — только для мгновенного фидбэка; настоящую
-      // валидацию (сумма, баланс, лимит, заморозка) выполняет сервер в
-      // transfer_money. Границы берём из общего конфига, а не литералом:
-      // те же числа зашиты в саму RPC.
       if (
         !Number.isFinite(amount) ||
         amount < TRANSACTION_LIMITS.MIN_TRANSFER

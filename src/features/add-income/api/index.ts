@@ -9,8 +9,6 @@ type IncomeResult = {
 };
 
 export const addIncomeApi = {
-  // Вставка транзакции и зачисление на баланс — атомарно в RPC add_income.
-  // Наружу отдаём код ошибки, а не message — текст подставит словарь.
   add: async (
     amount: number,
     source: string,

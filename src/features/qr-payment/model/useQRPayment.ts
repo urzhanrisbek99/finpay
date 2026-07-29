@@ -35,8 +35,6 @@ export function useQRPayment() {
     }
   }, []);
 
-  // Баланс списывает сервер (confirm_qr_payment). После подтверждения просто
-  // подтягиваем авторитетное значение из БД — клиент ничего не считает сам.
   const syncBalance = useCallback(async () => {
     const { user: current, setBalance } = userStore.getState();
     if (!current) return;
@@ -73,8 +71,6 @@ export function useQRPayment() {
   const createPayment = useCallback(
     async (amount: number, merchant: string) => {
       if (!user) return;
-      // Мгновенный фидбэк; баланс, заморозку и лимит окончательно проверяет
-      // сервер в create_qr_payment.
       if (amount > user.balance) {
         setState("failed");
         setError(t.money.errors.insufficientBalance);

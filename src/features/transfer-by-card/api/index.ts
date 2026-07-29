@@ -8,7 +8,6 @@ type TransferResult = {
 };
 
 export const cardTransferApi = {
-  // Наружу отдаём код ошибки, а не message — текст подставит словарь.
   send: async (
     amount: number,
     cardNumber: string,
@@ -20,7 +19,6 @@ export const cardTransferApi = {
   }> => {
     const supabase = createBrowserClient();
 
-    // храним только последние 4 цифры получателя — полный номер не сохраняем
     const last4 = cardNumber.replace(/\D/g, "").slice(-4);
 
     const { data, error } = await supabase.rpc("transfer_money", {

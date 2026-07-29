@@ -17,10 +17,6 @@ interface RemoveCardModalProps {
   onClose: () => void;
 }
 
-// Удаление — действие самого владельца, оно выполняется сразу. Заявка
-// оператору здесь не заводится (в отличие от перевыпуска, который реально
-// занимает дни): раньше модалка делала и то и другое — писала pending-заявку
-// и тут же сносила карту, а экран успеха сообщал про «отправленную заявку».
 export function RemoveCardModal({ open, onClose }: RemoveCardModalProps) {
   const [confirmed, setConfirmed] = useState(false);
   const [isLoading, setIsLoading] = useState(false);

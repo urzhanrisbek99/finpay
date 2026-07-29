@@ -86,7 +86,6 @@ export function AddCardModal({ open, onClose }: AddCardModalProps) {
     const month = Number(mm);
     if (expiry.replace(/\D/g, "").length !== 4 || month < 1 || month > 12)
       return { ok: false, error: t.addCard.errors.invalidExpiry };
-    // конец указанного месяца: new Date(y, month, 0) = последний день месяца
     const expDate = new Date(2000 + Number(yy), month, 0, 23, 59, 59);
     if (expDate < new Date())
       return { ok: false, error: t.addCard.errors.expired };

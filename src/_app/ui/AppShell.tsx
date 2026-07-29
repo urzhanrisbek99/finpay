@@ -13,8 +13,6 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const segment = useSelectedLayoutSegment();
   const maxWidth = MAX_WIDTH_BY_SEGMENT[segment ?? ""] ?? DEFAULT_MAX_WIDTH;
 
-  // Профиль, транзакции и получатели уже загружены на сервере в layout и
-  // прокинуты в сторы через StoreProvider — здесь ничего грузить не нужно.
   return (
     <>
       <div className={`mx-auto ${maxWidth}`}>

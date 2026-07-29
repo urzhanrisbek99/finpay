@@ -7,7 +7,6 @@ import { transactionModel } from "#entities/transaction";
 import { cardModel } from "#entities/card";
 import { computeBudget, type BudgetLevel } from "../lib/budget";
 
-// Цвета уровня бюджета; подпись уровня берётся из словаря по ключу level.
 const BUDGET_META: Record<BudgetLevel, { text: string; bar: string }> = {
   "on-track": { text: "text-green-600", bar: "bg-green-500" },
   "trending-over": { text: "text-amber-600", bar: "bg-amber-500" },

@@ -4,10 +4,6 @@ import { useSelectedLayoutSegment } from "next/navigation";
 import { Skeleton as S } from "#shared/ui/skeleton";
 import { Card, CardContent, CardHeader } from "#shared/ui/card";
 
-// Suspense-фолбэк для (dashboard): показывается, пока layout тянет начальные
-// данные из Supabase. Через useSelectedLayoutSegment понимает, какой маршрут
-// грузится, и рисует скелетон именно этой страницы — поэтому на /cards виден
-// скелетон карт, а не дашборда.
 export function AppSkeleton() {
   const segment = useSelectedLayoutSegment();
 
@@ -18,7 +14,6 @@ export function AppSkeleton() {
         ? TransfersContent
         : DashboardContent;
 
-  // Ширина контента совпадает с AppShell (dashboard — max-w-6xl, остальное — 4xl).
   const maxWidth =
     segment === "cards" || segment === "transfers" ? "max-w-4xl" : "max-w-6xl";
 

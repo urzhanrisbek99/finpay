@@ -8,9 +8,6 @@ type TransferResult = {
 };
 
 export const transferApi = {
-  // user_id, проверка суммы, баланса, заморозки и лимита, списание — всё внутри
-  // RPC transfer_money. Наружу отдаём код ошибки, а не message: сообщения
-  // Postgres английские, а показать их надо на языке интерфейса.
   send: async (
     amount: number,
     phone: string,

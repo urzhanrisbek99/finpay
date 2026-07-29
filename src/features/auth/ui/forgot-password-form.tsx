@@ -10,8 +10,6 @@ import { Label } from "#shared/ui/label";
 import { useT } from "#shared/i18n";
 import { ROUTES } from "#shared/config";
 
-// linkError приходит со страницы: /auth/confirm отправляет сюда, когда
-// одноразовый секрет не сошёлся, чтобы человек сразу запросил новое письмо.
 export function ForgotPasswordForm({
   linkError = false,
 }: {

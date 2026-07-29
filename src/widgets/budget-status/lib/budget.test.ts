@@ -3,7 +3,7 @@ import { computeBudget } from "./budget";
 
 // 15 июля — ровно середина 31-дневного месяца, поэтому темп ≈ 48%.
 const midJuly = new Date("2026-07-15T12:00:00");
-// 2 февраля 2026 — 28 дней в месяце: ловит захардкоженные 30/31.
+// 2 февраля 2026 — 28 дней в месяце
 const earlyFeb = new Date("2026-02-02T12:00:00");
 
 describe("computeBudget", () => {
@@ -14,12 +14,10 @@ describe("computeBudget", () => {
   });
 
   it("stays on-track when the pace lands under the limit", () => {
-    // 100k за 15 дней → прогноз ~207k при лимите 300k.
     expect(computeBudget(100_000, 300_000, midJuly).level).toBe("on-track");
   });
 
   it("warns trending-over while still under the limit", () => {
-    // 100k за 15 дней → прогноз ~207k: лимит 150k ещё не превышен, но будет.
     const b = computeBudget(100_000, 150_000, midJuly);
     expect(b.level).toBe("trending-over");
     expect(b.projected).toBeGreaterThan(150_000);

@@ -9,8 +9,6 @@ const INTL_LOCALE: Record<Locale, string> = {
   ru: "ru-RU",
 };
 
-// Локализованное форматирование даты для транзакций: «Сегодня, 14:30»,
-// «Вчера, ...» или короткая дата в локали текущего языка.
 export function useFormatDate() {
   const { locale, t } = useI18n();
 

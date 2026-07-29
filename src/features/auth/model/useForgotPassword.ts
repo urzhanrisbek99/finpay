@@ -20,8 +20,6 @@ export function useForgotPassword() {
     if (errorCode) {
       setError(getAuthErrorMessage(t, errorCode));
     } else {
-      // Экран успеха намеренно не сообщает, найден ли аккаунт: иначе форма
-      // становится оракулом для перебора зарегистрированных адресов.
       setIsSent(true);
     }
 

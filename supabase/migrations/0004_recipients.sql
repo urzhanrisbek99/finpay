@@ -1,9 +1,6 @@
--- Сохранённые получатели переводов («частые переводы»): имя + номер.
---
--- Схема проекта управляется в Supabase Dashboard; этот файл — источник
--- истины для изменений. Выполнить в SQL Editor (или через supabase db push).
+-- Сохранённые получатели переводов: имя + номер.
 
--- 1. Таблица. Один номер на пользователя не повторяется (unique).
+-- 1. Таблица. Один номер на пользователя (unique).
 create table if not exists public.recipients (
   id uuid primary key default gen_random_uuid(),
   user_id uuid not null references auth.users (id) on delete cascade,

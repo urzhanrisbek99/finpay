@@ -1,30 +1,10 @@
--- Денежные операции — только на сервере, атомарно.
---
--- До этой миграции баланс менял браузер: клиент сам считал new_balance и
--- слал его в profiles.balance. Любой мог из devtools выставить себе любой
--- баланс, а вставка транзакции и списание не были атомарны.
---
--- Здесь всё это закрывается тем же приёмом, что уже применён для CVV
--- (security definer + фильтр по auth.uid()): деньги двигают только эти
--- функции, а прямой UPDATE баланса у клиента отзывается.
---
--- Выполнить в SQL Editor целиком.
-
--- Минимальная сумма перевода/дохода. Держим в синхроне с
--- TRANSACTION_LIMITS.MIN_TRANSFER (shared/config/constants.ts).
-
--- 0. Забираем у клиента право менять баланс напрямую.
---    Единственный путь изменить profiles.balance — функции ниже.
---    INSERT профиля оставляем, но без колонки balance: стартовый баланс
---    задаёт DEFAULT, а не клиент (иначе можно вписать себе миллиард на регистрации).
 alter table public.profiles alter column balance set default 1240500;
 
 revoke update on public.profiles from anon, authenticated;
 revoke insert on public.profiles from anon, authenticated;
 grant insert (id, email, full_name) on public.profiles to authenticated;
 
--- 1. Помощник: сколько потрачено в текущем месяце (расходы + переводы, кроме failed).
---    Совпадает с клиентской логикой isSpending и SQL getMonthlySpent.
+-- 1. Расход за текущий месяц: расходы и переводы, кроме failed.
 create or replace function public.current_month_spent(p_user_id uuid)
 returns numeric
 language sql
@@ -39,9 +19,7 @@ as $$
     and created_at >= date_trunc('month', now());
 $$;
 
--- 2. Перевод (по телефону или по карте). Сервер сам берёт user_id из auth.uid(),
---    проверяет баланс и месячный лимит карты, вставляет транзакцию и списывает
---    баланс — всё в одной транзакции под блокировкой строки профиля.
+-- 2. Перевод
 create or replace function public.transfer_money(
   p_amount numeric,
   p_merchant text,
@@ -164,8 +142,7 @@ begin
 end;
 $$;
 
--- 4. QR-платёж: создаём pending-транзакцию (баланс ещё НЕ трогаем), но уже
---    проверяем баланс и лимит, чтобы нельзя было создать заведомо неоплатимый QR.
+-- 4. QR
 create or replace function public.create_qr_payment(
   p_amount numeric,
   p_merchant text
@@ -219,13 +196,6 @@ begin
 end;
 $$;
 
--- 5. Подтверждение QR-платежа (симуляция вебхука эквайера) по модели
---    authorize → capture: pending → completed + списание баланса.
---    Лочим профиль и транзакцию (FOR UPDATE), поэтому:
---      * параллельные confirm сериализуются — двойного списания нет;
---      * идемпотентность: не-pending платёж возвращаем как есть;
---      * при capture ПЕРЕПРОВЕРЯЕМ средства — если нескольких pending-QR не
---        хватает на суммарный баланс, лишний падает в failed, а не в минус.
 create or replace function public.confirm_qr_payment(p_transaction_id uuid)
 returns jsonb
 language plpgsql
@@ -256,7 +226,7 @@ begin
     raise exception 'Payment not found';
   end if;
 
-  -- Уже обработан (completed/failed) — идемпотентно возвращаем как есть.
+  -- Уже обработан (completed/failed)
   if v_tx.status <> 'pending' then
     return jsonb_build_object('transaction', to_jsonb(v_tx), 'balance', v_balance);
   end if;
@@ -284,8 +254,6 @@ begin
 end;
 $$;
 
--- 6. Гранты: денежные функции доступны только аутентифицированным.
---    current_month_spent — внутренний помощник, наружу не выдаём.
 revoke execute on function public.current_month_spent(uuid) from anon, public, authenticated;
 
 revoke execute on function public.transfer_money(numeric, text, text, text) from anon, public;

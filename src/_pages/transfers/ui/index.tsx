@@ -36,7 +36,6 @@ type TransferMethod = "phone" | "qr" | "card";
 
 const METHOD_KEYS: TransferMethod[] = ["phone", "qr", "card"];
 
-// Иконка и цвет метода — язык-нейтральны; подпись берётся из словаря по ключу.
 const METHOD_META: Record<TransferMethod, { icon: LucideIcon; color: string }> =
   {
     phone: { icon: Smartphone, color: "bg-violet-100 text-violet-600" },
@@ -54,7 +53,6 @@ export function Transfers() {
     (s) => s.transactions,
   );
   const transactions = allTransactions.filter((tx) => tx.type === "transfer");
-  // Данные (транзакции, получатели) гидрируются из SSR — грузить нечего.
   const recipients = recipientModel.useRecipientStore((s) => s.recipients);
   const t = useT();
   const formatDate = useFormatDate();

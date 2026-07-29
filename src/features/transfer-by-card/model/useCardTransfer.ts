@@ -29,9 +29,6 @@ export function useCardTransfer() {
   const send = useCallback(
     async (amount: number, cardNumber: string, comment?: string) => {
       if (!user) return;
-      // Клиентские проверки — только для мгновенного фидбэка; настоящую
-      // валидацию (сумма, баланс, лимит, заморозка) выполняет сервер в
-      // transfer_money.
       if (
         !Number.isFinite(amount) ||
         amount < TRANSACTION_LIMITS.MIN_TRANSFER

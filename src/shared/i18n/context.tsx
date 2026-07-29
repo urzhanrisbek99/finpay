@@ -24,9 +24,6 @@ type I18nContextValue = {
 
 const I18nContext = createContext<I18nContextValue | null>(null);
 
-// Клиентский провайдер. Начальная локаль приходит с сервера (из куки), поэтому
-// SSR и первый клиентский рендер совпадают — гидрация без мигания. Переключение
-// меняет состояние (мгновенный ре-рендер), пишет куку и обновляет <html lang>.
 export function I18nProvider({
   initialLocale,
   children,

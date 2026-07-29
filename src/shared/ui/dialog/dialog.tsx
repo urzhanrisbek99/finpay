@@ -48,9 +48,6 @@ function DialogContent({
 }: DialogPrimitive.Popup.Props & {
   showCloseButton?: boolean;
 }) {
-  // Крестик — единственная иконочная кнопка компонента, и её имя читает только
-  // скринридер. Берём из словаря: захардкоженное "Close" звучало бы
-  // по-английски в русском интерфейсе.
   const t = useT();
 
   return (

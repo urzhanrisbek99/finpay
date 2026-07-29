@@ -16,10 +16,6 @@ function PasswordInput({
 
   return (
     <div className="relative">
-      {/* Раскрытый пароль живёт в type="text", а такое поле браузер отдаёт
-          проверке орфографии (Chrome Enhanced Spell Check, Microsoft Editor
-          шлют содержимое на свои серверы) и правит автокоррекцией на мобильных.
-          type="password" от этого защищён сам, text — нет. */}
       <Input
         type={isVisible ? "text" : "password"}
         spellCheck={false}

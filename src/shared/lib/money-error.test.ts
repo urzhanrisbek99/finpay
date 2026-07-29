@@ -10,23 +10,52 @@ import {
 const en = getDictionary("en");
 const ru = getDictionary("ru");
 
+describe("error codes can survive PostgREST", () => {
+  it("uses no SQLSTATE class that PostgREST reserves for itself", () => {
+    for (const code of Object.values(MONEY_ERROR)) {
+      expect(code.startsWith("PT")).toBe(false);
+    }
+  });
+
+  it("keeps every code inside the convention that was actually verified", () => {
+    for (const code of Object.values(MONEY_ERROR)) {
+      expect(code).toMatch(/^(FP\d{3}|28000)$/);
+    }
+  });
+});
+
 describe("toMoneyErrorCode", () => {
   it("returns null when there is no error", () => {
     expect(toMoneyErrorCode(null)).toBe(null);
   });
 
   it("passes the SQLSTATE through", () => {
-    expect(toMoneyErrorCode({ code: MONEY_ERROR.CARD_FROZEN })).toBe("PT103");
+    expect(toMoneyErrorCode({ code: MONEY_ERROR.CARD_FROZEN })).toBe(
+      MONEY_ERROR.CARD_FROZEN,
+    );
   });
 
-  // Сетевой сбой приходит без code — факт ошибки терять нельзя, иначе вызов
-  // будет засчитан как успешный.
   it("falls back to the unknown code when the error carries none", () => {
     expect(toMoneyErrorCode({})).toBe(MONEY_ERROR_UNKNOWN);
   });
 });
 
 describe("getMoneyErrorMessage", () => {
+  it("turns the response the server really sends into the right sentence", () => {
+    const wire = {
+      code: "FP104",
+      details: null,
+      hint: null,
+      message: "Monthly card limit exceeded",
+    };
+    const code = toMoneyErrorCode(wire);
+
+    expect(code).toBe(MONEY_ERROR.LIMIT_EXCEEDED);
+    expect(getMoneyErrorMessage(ru, code!)).toBe(ru.money.errors.limitExceeded);
+    expect(getMoneyErrorMessage(en, code!)).toBe(en.money.errors.limitExceeded);
+    expect(getMoneyErrorMessage(ru, code!)).not.toBe(ru.money.errors.unknown);
+  });
+
   it("maps each known code to a distinct message", () => {
     const codes = [
       MONEY_ERROR.AMOUNT_TOO_SMALL,
@@ -52,8 +81,6 @@ describe("getMoneyErrorMessage", () => {
     ).toBe("5000000");
   });
 
-  // Внутренние коды пользователь из интерфейса не спровоцирует, а детали
-  // чужой кухни ему не нужны — их место в общем фолбэке.
   it("hides internal codes behind the generic fallback", () => {
     for (const code of [
       MONEY_ERROR.PROFILE_NOT_FOUND,
@@ -65,8 +92,6 @@ describe("getMoneyErrorMessage", () => {
     }
   });
 
-  // Ради этого всё и затевалось: незнакомый код не должен протащить в UI
-  // английский текст от Postgres.
   it("falls back for unknown codes instead of leaking raw text", () => {
     expect(getMoneyErrorMessage(en, "42P01")).toBe(en.money.errors.unknown);
     expect(getMoneyErrorMessage(en, MONEY_ERROR_UNKNOWN)).toBe(

@@ -7,10 +7,6 @@ export function formatCurrency(amount: number): string {
   );
 }
 
-// Дату форматирует useFormatDate из shared/i18n — она знает текущую локаль.
-// Языконезависимого formatDate здесь намеренно нет: он захардкоживал en-US
-// и «Today»/«Yesterday» в обход словаря.
-
 export function getInitials(name: string): string {
   return name
     .trim()
@@ -34,7 +30,7 @@ export function formatCardInput(digits: string): string {
   );
 }
 
-// валидный номер карты: ровно 16 цифр (формат, без проверки Луна — как isValidPhone)
+// валидный номер карты: ровно 16 цифр
 export function isValidCardNumber(digits: string): boolean {
   return /^\d{16}$/.test(digits.replace(/\D/g, ""));
 }

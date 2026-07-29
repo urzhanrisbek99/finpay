@@ -1,20 +1,3 @@
--- Заморозка карты и верхний потолок перевода — на сервере.
---
--- До этой миграции cards.is_frozen был чисто декоративным: кнопка «Freeze»
--- меняла цвет карточки, но ни одна денежная функция флаг не читала — с
--- «замороженной» карты спокойно уходили переводы и QR-платежи.
---
--- Заморозка гейтит любой расход, а не только операции с картой: месячный
--- лимит карты в 0006 уже работает именно так (ограничивает и переводы по
--- телефону), карта в этой модели — единственный расходный инструмент счёта.
---
--- Заодно вводится MAX_TRANSFER: до сих пор верхней границы перевода не
--- существовало. Держим в синхроне с TRANSACTION_LIMITS.MAX_TRANSFER
--- (shared/config/constants.ts).
---
--- Выполнить в SQL Editor целиком.
-
--- 1. Перевод: + проверка заморозки и максимума. Заменяет версию из 0006.
 create or replace function public.transfer_money(
   p_amount numeric,
   p_merchant text,
@@ -132,7 +115,6 @@ begin
   where user_id = v_uid
   limit 1;
 
-  -- coalesce: карты может не быть вовсе (v_frozen = null) — это не «заморожена».
   if coalesce(v_frozen, false) then
     raise exception 'Your card is frozen';
   end if;
@@ -154,9 +136,7 @@ begin
 end;
 $$;
 
--- 3. Подтверждение QR: заморозка перепроверяется на capture — карту могли
---    заморозить между созданием и оплатой. Платёж уходит в failed, а не
---    списывается. Заменяет версию из 0006.
+-- 3. Заморозка перепроверяется на capture: карту могли заморозить после создания.
 create or replace function public.confirm_qr_payment(p_transaction_id uuid)
 returns jsonb
 language plpgsql
@@ -173,7 +153,6 @@ begin
     raise exception 'Not authenticated' using errcode = '28000';
   end if;
 
-  -- Порядок блокировок всегда profile → transaction (без дедлоков).
   select balance into v_balance
   from public.profiles
   where id = v_uid
@@ -188,7 +167,6 @@ begin
     raise exception 'Payment not found';
   end if;
 
-  -- Уже обработан (completed/failed) — идемпотентно возвращаем как есть.
   if v_tx.status <> 'pending' then
     return jsonb_build_object('transaction', to_jsonb(v_tx), 'balance', v_balance);
   end if;
@@ -198,8 +176,6 @@ begin
   where user_id = v_uid
   limit 1;
 
-  -- Недостаточно средств или карта заморожена на момент оплаты — отклоняем,
-  -- баланс не трогаем.
   if v_tx.amount > v_balance or coalesce(v_frozen, false) then
     update public.transactions
     set status = 'failed'

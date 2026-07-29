@@ -1,8 +1,5 @@
 import type { ReactNode } from "react";
 
-// Общий каркас для всех четырёх экранов входа. Живёт внутри слайса, а не в
-// shared/ui: это брендинг auth-страниц, а не переиспользуемый примитив, и
-// наружу через public API не выходит.
 export function AuthCard({
   title,
   subtitle,

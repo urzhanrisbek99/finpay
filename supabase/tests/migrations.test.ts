@@ -5,20 +5,6 @@ import { readFileSync, readdirSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
-// Миграции прогоняются на настоящем Postgres (PGlite — это Postgres,
-// собранный в WASM: никакого Docker, старт за секунду). Проверяем два разных
-// утверждения:
-//
-//   1. Папка migrations/ разворачивает пустую базу целиком. Историю схема
-//      получила задним числом (0000_init), и без такого прогона «склонируй и
-//      примени миграции» из README остаётся непроверенным обещанием.
-//   2. Гарантии, ради которых всё это написано, действительно держатся:
-//      деньги двигает только сервер, заморозка блокирует расход, лимит не
-//      обходится, журнал только на чтение, чужое не видно.
-//
-// Окружение Supabase (роли, auth.uid(), Vault) поднимает stub.sql — см.
-// оговорки там.
-
 const HERE = dirname(fileURLToPath(import.meta.url));
 const MIGRATIONS = join(HERE, "..", "migrations");
 
@@ -27,12 +13,10 @@ const BOB = "22222222-2222-2222-2222-222222222222";
 
 let db: PGlite;
 
-/** Ошибка Postgres несёт SQLSTATE — по нему клиент и различает причины отказа. */
 function sqlstate(e: unknown): string | undefined {
   return (e as { code?: string }).code;
 }
 
-/** Выполнить блок от лица пользователя: как это делает PostgREST по JWT. */
 async function as(uid: string | null, sql: string) {
   await db.exec(`
     select set_config('request.jwt.claim.sub', ${uid ? `'${uid}'` : "''"}, false);
@@ -45,7 +29,6 @@ async function as(uid: string | null, sql: string) {
   }
 }
 
-/** Как as(), но с одним значением в ответе. */
 async function askAs<T>(uid: string, sql: string): Promise<T> {
   await db.exec(`
     select set_config('request.jwt.claim.sub', '${uid}', false);
@@ -66,7 +49,6 @@ async function balanceOf(uid: string): Promise<number> {
   return Number(r.rows[0]?.v ?? NaN);
 }
 
-/** Ожидаем отказ с конкретным SQLSTATE. Прошедший вызов — это провал теста. */
 async function expectRejection(fn: () => Promise<unknown>, code: string) {
   let raised: unknown;
   try {
@@ -90,8 +72,6 @@ beforeAll(async () => {
     .filter((f) => f.endsWith(".sql"))
     .sort();
 
-  // Сам факт, что цепочка прикладывается к пустой базе без ошибок, — это уже
-  // утверждение из README, поэтому падение здесь должно валить тесты.
   for (const f of files) {
     try {
       await db.exec(readFileSync(join(MIGRATIONS, f), "utf8"));
@@ -106,7 +86,6 @@ beforeAll(async () => {
   `);
 });
 
-// Каждый тест начинает с чистого профиля Алисы: тесты не зависят от порядка.
 beforeEach(async () => {
   await db.exec(`
     delete from public.transactions;
@@ -191,21 +170,21 @@ describe("transfer bounds", () => {
   it("rejects below the minimum", async () => {
     await expectRejection(
       () => as(ALICE, `select public.transfer_money(50, 'x', 'phone');`),
-      "PT100",
+      "FP100",
     );
   });
 
   it("rejects above the maximum", async () => {
     await expectRejection(
       () => as(ALICE, `select public.transfer_money(6000000, 'x', 'phone');`),
-      "PT101",
+      "FP101",
     );
   });
 
   it("rejects more than the balance", async () => {
     await expectRejection(
       () => as(ALICE, `select public.transfer_money(500000, 'x', 'phone');`),
-      "PT102",
+      "FP102",
     );
     expect(await balanceOf(ALICE)).toBe(200000);
   });
@@ -225,7 +204,7 @@ describe("a frozen card blocks spending", () => {
   it("blocks a transfer", async () => {
     await expectRejection(
       () => as(ALICE, `select public.transfer_money(1000, 'x', 'phone');`),
-      "PT103",
+      "FP103",
     );
     expect(await balanceOf(ALICE)).toBe(200000);
   });
@@ -233,12 +212,10 @@ describe("a frozen card blocks spending", () => {
   it("blocks creating a QR payment", async () => {
     await expectRejection(
       () => as(ALICE, `select public.create_qr_payment(1000, 'Cafe');`),
-      "PT103",
+      "FP103",
     );
   });
 
-  // Карту могут заморозить между авторизацией и списанием — на capture
-  // проверка повторяется, иначе заморозка обходится задержкой оплаты.
   it("rejects at capture a QR authorized before the freeze", async () => {
     await as(ALICE, `update public.cards set is_frozen = false;`);
     const tx = await askAs<string>(
@@ -268,13 +245,11 @@ describe("the monthly card limit", () => {
     );
     await expectRejection(
       () => as(ALICE, `select public.transfer_money(1000, 'x', 'phone');`),
-      "PT104",
+      "FP104",
     );
   });
 });
 
-// Лимит считается суммой расходных строк, поэтому право писать в журнал —
-// это право обнулить себе лимит.
 describe("the ledger is read-only to the client", () => {
   beforeEach(async () => {
     await as(ALICE, `select public.add_income(200000, 'Salary', 'salary');`);
@@ -331,8 +306,6 @@ describe("QR follows authorize then capture", () => {
     expect(await balanceOf(ALICE)).toBe(195000);
   });
 
-  // Несколько pending-QR суммарно могут превысить баланс: средства
-  // перепроверяются на capture, поэтому лишний падает в failed, а не в минус.
   it("cannot overdraw through several pending codes", async () => {
     const a = await askAs<string>(
       ALICE,
@@ -377,11 +350,9 @@ describe("row-level security isolates users", () => {
   });
 
   it("will not move another user's money", async () => {
-    // Боб аутентифицирован, но без профиля: RPC берёт user_id из auth.uid(),
-    // поэтому дотянуться до чужого баланса неоткуда.
     await expectRejection(
       () => as(BOB, `select public.transfer_money(1000, 'x', 'phone');`),
-      "PT105",
+      "FP105",
     );
     expect(await balanceOf(ALICE)).toBe(200000);
   });

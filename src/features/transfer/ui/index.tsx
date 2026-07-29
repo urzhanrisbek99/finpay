@@ -39,8 +39,6 @@ export function TransferModal({
   const recipients = recipientModel.useRecipientStore((s) => s.recipients);
   const t = useT();
 
-  // правка состояния во время рендера (вместо эффекта): на переходе
-  // закрыто→открыто подставляем номер и имя уже сохранённого получателя
   if (open !== prevOpen) {
     setPrevOpen(open);
     if (open) {

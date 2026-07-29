@@ -9,7 +9,6 @@ export default async function DashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
-  // Быстрый auth-гейт вне Suspense: редирект отрабатывает до показа скелетона.
   const supabase = await createServerClient();
   const {
     data: { user },
@@ -19,7 +18,6 @@ export default async function DashboardLayout({
     redirect("/login");
   }
 
-  // Данные грузятся внутри Suspense — пока идут запросы, стримится AppSkeleton.
   return (
     <Suspense fallback={<AppSkeleton />}>
       <DashboardShell userId={user.id}>{children}</DashboardShell>

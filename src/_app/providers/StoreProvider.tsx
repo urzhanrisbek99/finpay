@@ -6,9 +6,7 @@ import { transactionModel } from "#entities/transaction";
 import { recipientModel } from "#entities/recipient";
 import { cardModel } from "#entities/card";
 
-// Композиция per-request сторов, гидрируемых данными, полученными на сервере
-// (см. app/(dashboard)/layout.tsx). Живёт в app-слое, потому что связывает
-// несколько entity вместе.
+// Композиция per-request сторов, гидрируемых данными с сервера.
 export function StoreProvider({
   user,
   transactions,

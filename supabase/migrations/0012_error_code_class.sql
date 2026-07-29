@@ -1,5 +1,4 @@
 
-
 create or replace function public.transfer_money(
   p_amount numeric,
   p_merchant text,
@@ -23,13 +22,13 @@ begin
     raise exception 'Not authenticated' using errcode = '28000';
   end if;
   if p_amount is null or p_amount < 100 then
-    raise exception 'Minimum transfer amount is 100' using errcode = 'PT100';
+    raise exception 'Minimum transfer amount is 100' using errcode = 'FP100';
   end if;
   if p_amount > 5000000 then
-    raise exception 'Maximum transfer amount is 5000000' using errcode = 'PT101';
+    raise exception 'Maximum transfer amount is 5000000' using errcode = 'FP101';
   end if;
   if p_method not in ('phone', 'card') then
-    raise exception 'Invalid transfer method' using errcode = 'PT106';
+    raise exception 'Invalid transfer method' using errcode = 'FP106';
   end if;
 
   select balance into v_balance
@@ -38,10 +37,10 @@ begin
   for update;
 
   if v_balance is null then
-    raise exception 'Profile not found' using errcode = 'PT105';
+    raise exception 'Profile not found' using errcode = 'FP105';
   end if;
   if p_amount > v_balance then
-    raise exception 'Insufficient balance' using errcode = 'PT102';
+    raise exception 'Insufficient balance' using errcode = 'FP102';
   end if;
 
   select is_frozen, spending_limit into v_frozen, v_limit
@@ -50,13 +49,13 @@ begin
   limit 1;
 
   if coalesce(v_frozen, false) then
-    raise exception 'Card is frozen' using errcode = 'PT103';
+    raise exception 'Card is frozen' using errcode = 'FP103';
   end if;
 
   if v_limit is not null then
     v_spent := public.current_month_spent(v_uid);
     if v_spent + p_amount > v_limit then
-      raise exception 'Monthly card limit exceeded' using errcode = 'PT104';
+      raise exception 'Monthly card limit exceeded' using errcode = 'FP104';
     end if;
   end if;
 
@@ -95,14 +94,14 @@ begin
     raise exception 'Not authenticated' using errcode = '28000';
   end if;
   if p_amount is null or p_amount < 100 then
-    raise exception 'Minimum income amount is 100' using errcode = 'PT100';
+    raise exception 'Minimum income amount is 100' using errcode = 'FP100';
   end if;
   if p_amount > 5000000 then
-    raise exception 'Maximum income amount is 5000000' using errcode = 'PT101';
+    raise exception 'Maximum income amount is 5000000' using errcode = 'FP101';
   end if;
   if p_category not in
      ('food', 'transport', 'shopping', 'subscription', 'transfer', 'salary', 'other') then
-    raise exception 'Invalid category' using errcode = 'PT107';
+    raise exception 'Invalid category' using errcode = 'FP107';
   end if;
 
   select balance into v_balance
@@ -111,7 +110,7 @@ begin
   for update;
 
   if v_balance is null then
-    raise exception 'Profile not found' using errcode = 'PT105';
+    raise exception 'Profile not found' using errcode = 'FP105';
   end if;
 
   insert into public.transactions
@@ -151,15 +150,15 @@ begin
     raise exception 'Not authenticated' using errcode = '28000';
   end if;
   if p_amount is null or p_amount <= 0 then
-    raise exception 'Invalid amount' using errcode = 'PT108';
+    raise exception 'Invalid amount' using errcode = 'FP108';
   end if;
 
   select balance into v_balance from public.profiles where id = v_uid;
   if v_balance is null then
-    raise exception 'Profile not found' using errcode = 'PT105';
+    raise exception 'Profile not found' using errcode = 'FP105';
   end if;
   if p_amount > v_balance then
-    raise exception 'Insufficient balance' using errcode = 'PT102';
+    raise exception 'Insufficient balance' using errcode = 'FP102';
   end if;
 
   select is_frozen, spending_limit into v_frozen, v_limit
@@ -168,13 +167,13 @@ begin
   limit 1;
 
   if coalesce(v_frozen, false) then
-    raise exception 'Card is frozen' using errcode = 'PT103';
+    raise exception 'Card is frozen' using errcode = 'FP103';
   end if;
 
   if v_limit is not null then
     v_spent := public.current_month_spent(v_uid);
     if v_spent + p_amount > v_limit then
-      raise exception 'Monthly card limit exceeded' using errcode = 'PT104';
+      raise exception 'Monthly card limit exceeded' using errcode = 'FP104';
     end if;
   end if;
 
@@ -204,6 +203,7 @@ begin
     raise exception 'Not authenticated' using errcode = '28000';
   end if;
 
+  -- Порядок блокировок всегда profile → transaction (без дедлоков).
   select balance into v_balance
   from public.profiles
   where id = v_uid
@@ -215,7 +215,7 @@ begin
   for update;
 
   if not found then
-    raise exception 'Payment not found' using errcode = 'PT109';
+    raise exception 'Payment not found' using errcode = 'FP109';
   end if;
 
   if v_tx.status <> 'pending' then
@@ -227,6 +227,8 @@ begin
   where user_id = v_uid
   limit 1;
 
+  -- Недостаточно средств или карта заморожена на момент оплаты — отклоняем,
+  -- баланс не трогаем.
   if v_tx.amount > v_balance or coalesce(v_frozen, false) then
     update public.transactions
     set status = 'failed'
