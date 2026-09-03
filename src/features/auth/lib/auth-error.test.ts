@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { getDictionary } from "#shared/i18n";
 import {
+  AUTH_ERROR_NETWORK,
   AUTH_ERROR_UNKNOWN,
   getAuthErrorMessage,
   toAuthErrorCode,
@@ -47,11 +48,21 @@ describe("getAuthErrorMessage", () => {
       "email_not_confirmed",
       "over_request_rate_limit",
       "validation_failed",
+      AUTH_ERROR_NETWORK,
     ];
     const messages = codes.map((code) => getAuthErrorMessage(en, code));
 
     expect(new Set(messages).size).toBe(codes.length);
     expect(messages).not.toContain(en.auth.errors.unknown);
+  });
+
+  it("tells an unreachable server apart from a generic failure", () => {
+    expect(getAuthErrorMessage(en, AUTH_ERROR_NETWORK)).toBe(
+      en.auth.errors.network,
+    );
+    expect(getAuthErrorMessage(en, AUTH_ERROR_NETWORK)).not.toBe(
+      en.auth.errors.unknown,
+    );
   });
 
   it("falls back for unknown codes instead of leaking English", () => {
@@ -74,6 +85,7 @@ describe("getAuthErrorMessage", () => {
       "over_email_send_rate_limit",
       "over_request_rate_limit",
       "validation_failed",
+      AUTH_ERROR_NETWORK,
       AUTH_ERROR_UNKNOWN,
     ];
 

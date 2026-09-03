@@ -1,8 +1,9 @@
 import type { Messages } from "#shared/i18n";
 
 export const AUTH_ERROR_UNKNOWN = "unknown";
+export const AUTH_ERROR_NETWORK = "network";
 
-type ErrorWithCode = { code?: string };
+export type ErrorWithCode = { code?: string };
 
 export function toAuthErrorCode(error: ErrorWithCode | null): string | null {
   if (!error) return null;
@@ -27,6 +28,8 @@ export function getAuthErrorMessage(t: Messages, code: string): string {
       return t.auth.errors.rateLimit;
     case "validation_failed":
       return t.auth.errors.validationFailed;
+    case AUTH_ERROR_NETWORK:
+      return t.auth.errors.network;
     default:
       return t.auth.errors.unknown;
   }
