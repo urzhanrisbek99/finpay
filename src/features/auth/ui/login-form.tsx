@@ -32,8 +32,9 @@ export function LoginForm() {
     >
       <div className="space-y-4">
         <div className="space-y-1.5">
-          <Label>{t.auth.email}</Label>
+          <Label htmlFor="login-email">{t.auth.email}</Label>
           <Input
+            id="login-email"
             type="email"
             autoComplete="email"
             placeholder="you@email.com"
@@ -44,7 +45,7 @@ export function LoginForm() {
 
         <div className="space-y-1.5">
           <div className="flex items-center justify-between">
-            <Label>{t.auth.password}</Label>
+            <Label htmlFor="login-password">{t.auth.password}</Label>
             <Link
               href={ROUTES.FORGOT_PASSWORD}
               className="text-xs font-medium text-violet-600"
@@ -53,6 +54,7 @@ export function LoginForm() {
             </Link>
           </div>
           <PasswordInput
+            id="login-password"
             autoComplete="current-password"
             placeholder="••••••••"
             value={password}

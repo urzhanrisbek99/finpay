@@ -69,8 +69,11 @@ export function CardTransferModal({ open, onClose }: CardTransferModalProps) {
             </div>
 
             <div className="space-y-1.5">
-              <Label>{t.cardTransfer.cardNumber}</Label>
+              <Label htmlFor="card-transfer-number">
+                {t.cardTransfer.cardNumber}
+              </Label>
               <Input
+                id="card-transfer-number"
                 type="text"
                 inputMode="numeric"
                 placeholder="4821 1234 5678 9012"
@@ -80,8 +83,11 @@ export function CardTransferModal({ open, onClose }: CardTransferModalProps) {
             </div>
 
             <div className="space-y-1.5">
-              <Label>{t.cardTransfer.amount}</Label>
+              <Label htmlFor="card-transfer-amount">
+                {t.cardTransfer.amount}
+              </Label>
               <Input
+                id="card-transfer-amount"
                 type="number"
                 placeholder="10000"
                 value={amount}
@@ -101,8 +107,11 @@ export function CardTransferModal({ open, onClose }: CardTransferModalProps) {
             </div>
 
             <div className="space-y-1.5">
-              <Label>{t.cardTransfer.comment}</Label>
+              <Label htmlFor="card-transfer-comment">
+                {t.cardTransfer.comment}
+              </Label>
               <Input
+                id="card-transfer-comment"
                 placeholder={t.cardTransfer.commentPlaceholder}
                 value={comment}
                 onChange={(e) => setComment(e.target.value)}

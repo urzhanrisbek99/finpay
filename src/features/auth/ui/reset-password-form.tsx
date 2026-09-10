@@ -33,8 +33,9 @@ export function ResetPasswordForm() {
     <AuthCard title={t.auth.resetTitle} subtitle={t.auth.resetSubtitle}>
       <div className="space-y-4">
         <div className="space-y-1.5">
-          <Label>{t.auth.newPassword}</Label>
+          <Label htmlFor="reset-password">{t.auth.newPassword}</Label>
           <PasswordInput
+            id="reset-password"
             autoComplete="new-password"
             placeholder="••••••••"
             value={password}
@@ -43,8 +44,11 @@ export function ResetPasswordForm() {
         </div>
 
         <div className="space-y-1.5">
-          <Label>{t.auth.confirmPassword}</Label>
+          <Label htmlFor="reset-confirm-password">
+            {t.auth.confirmPassword}
+          </Label>
           <PasswordInput
+            id="reset-confirm-password"
             autoComplete="new-password"
             placeholder="••••••••"
             value={confirmPassword}

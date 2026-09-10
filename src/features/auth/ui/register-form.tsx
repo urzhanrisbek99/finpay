@@ -48,8 +48,9 @@ export function RegisterForm() {
     >
       <div className="space-y-4">
         <div className="space-y-1.5">
-          <Label>{t.auth.fullName}</Label>
+          <Label htmlFor="register-name">{t.auth.fullName}</Label>
           <Input
+            id="register-name"
             autoComplete="name"
             placeholder="Urzhan Rysbek"
             value={fullName}
@@ -58,8 +59,9 @@ export function RegisterForm() {
         </div>
 
         <div className="space-y-1.5">
-          <Label>{t.auth.email}</Label>
+          <Label htmlFor="register-email">{t.auth.email}</Label>
           <Input
+            id="register-email"
             type="email"
             autoComplete="email"
             placeholder="you@email.com"
@@ -69,8 +71,9 @@ export function RegisterForm() {
         </div>
 
         <div className="space-y-1.5">
-          <Label>{t.auth.password}</Label>
+          <Label htmlFor="register-password">{t.auth.password}</Label>
           <PasswordInput
+            id="register-password"
             autoComplete="new-password"
             placeholder="••••••••"
             value={password}
@@ -79,8 +82,11 @@ export function RegisterForm() {
         </div>
 
         <div className="space-y-1.5">
-          <Label>{t.auth.confirmPassword}</Label>
+          <Label htmlFor="register-confirm-password">
+            {t.auth.confirmPassword}
+          </Label>
           <PasswordInput
+            id="register-confirm-password"
             autoComplete="new-password"
             placeholder="••••••••"
             value={confirmPassword}

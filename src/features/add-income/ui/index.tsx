@@ -60,8 +60,9 @@ export function AddIncomeModal({ open, onClose }: AddIncomeModalProps) {
             </div>
 
             <div className="space-y-1.5">
-              <Label>{t.addIncome.amount}</Label>
+              <Label htmlFor="income-amount">{t.addIncome.amount}</Label>
               <Input
+                id="income-amount"
                 type="number"
                 placeholder="100000"
                 value={amount}
@@ -81,8 +82,9 @@ export function AddIncomeModal({ open, onClose }: AddIncomeModalProps) {
             </div>
 
             <div className="space-y-1.5">
-              <Label>{t.addIncome.source}</Label>
+              <Label htmlFor="income-source">{t.addIncome.source}</Label>
               <Input
+                id="income-source"
                 placeholder={t.addIncome.sourcePlaceholder}
                 value={source}
                 onChange={(e) => setSource(e.target.value)}
@@ -90,12 +92,18 @@ export function AddIncomeModal({ open, onClose }: AddIncomeModalProps) {
             </div>
 
             <div className="space-y-1.5">
-              <Label>{t.addIncome.category}</Label>
-              <div className="flex gap-2">
+              <Label id="income-category-label">{t.addIncome.category}</Label>
+              <div
+                role="group"
+                aria-labelledby="income-category-label"
+                className="flex gap-2"
+              >
                 {CATEGORY_KEYS.map((c) => (
                   <button
                     key={c}
+                    type="button"
                     onClick={() => setCategory(c)}
+                    aria-pressed={category === c}
                     className={`rounded-full px-3 py-1 text-xs transition-colors ${
                       category === c
                         ? "bg-violet-100 text-violet-600"

@@ -32,8 +32,9 @@ export function ForgotPasswordForm({
       {!isSent && (
         <div className="space-y-4">
           <div className="space-y-1.5">
-            <Label>{t.auth.email}</Label>
+            <Label htmlFor="forgot-email">{t.auth.email}</Label>
             <Input
+              id="forgot-email"
               type="email"
               autoComplete="email"
               placeholder="you@email.com"

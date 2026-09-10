@@ -54,8 +54,9 @@ export function QRModal({ open, onClose }: QRModalProps) {
             </div>
 
             <div className="space-y-1.5">
-              <Label>{t.qr.amount}</Label>
+              <Label htmlFor="qr-amount">{t.qr.amount}</Label>
               <Input
+                id="qr-amount"
                 type="number"
                 placeholder="10000"
                 value={amount}
@@ -64,8 +65,9 @@ export function QRModal({ open, onClose }: QRModalProps) {
             </div>
 
             <div className="space-y-1.5">
-              <Label>{t.qr.merchant}</Label>
+              <Label htmlFor="qr-merchant">{t.qr.merchant}</Label>
               <Input
+                id="qr-merchant"
                 placeholder={t.qr.merchantPlaceholder}
                 value={merchant}
                 onChange={(e) => setMerchant(e.target.value)}

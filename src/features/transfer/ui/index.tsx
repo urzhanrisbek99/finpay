@@ -102,12 +102,13 @@ export function TransferModal({
             </div>
 
             <div className="space-y-1.5">
-              <Label>{t.transfer.phone}</Label>
+              <Label htmlFor="transfer-phone">{t.transfer.phone}</Label>
               <div className="flex">
                 <span className="bg-muted text-muted-foreground flex items-center rounded-l-lg border border-r-0 px-3 text-sm">
                   +7
                 </span>
                 <Input
+                  id="transfer-phone"
                   type="tel"
                   inputMode="numeric"
                   placeholder="(702) 000-00-00"
@@ -123,8 +124,9 @@ export function TransferModal({
             </div>
 
             <div className="space-y-1.5">
-              <Label>{t.transfer.amount}</Label>
+              <Label htmlFor="transfer-amount">{t.transfer.amount}</Label>
               <Input
+                id="transfer-amount"
                 type="number"
                 placeholder="10000"
                 value={amount}
@@ -144,8 +146,9 @@ export function TransferModal({
             </div>
 
             <div className="space-y-1.5">
-              <Label>{t.transfer.comment}</Label>
+              <Label htmlFor="transfer-comment">{t.transfer.comment}</Label>
               <Input
+                id="transfer-comment"
                 placeholder={t.transfer.commentPlaceholder}
                 value={comment}
                 onChange={(e) => setComment(e.target.value)}
@@ -154,10 +157,11 @@ export function TransferModal({
 
             {phoneValid && (
               <div className="space-y-1.5">
-                <Label>
+                <Label htmlFor="transfer-recipient-name">
                   {alreadySaved ? t.transfer.recipientName : t.transfer.saveAs}
                 </Label>
                 <Input
+                  id="transfer-recipient-name"
                   placeholder={t.transfer.namePlaceholder}
                   value={saveName}
                   onChange={(e) => handleNameChange(e.target.value)}
