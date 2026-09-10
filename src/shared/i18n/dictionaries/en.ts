@@ -80,7 +80,7 @@ export const en = {
     vsLastMonth: "vs last month",
     tooltip: "Spent",
     changeLine: (less: boolean, pct: number) =>
-      `${less ? "↓" : "↑"} ${pct > 0 ? "+" : ""}${pct}% ${less ? "less" : "more"} spent`,
+      `${less ? "↓" : "↑"} ${Math.abs(pct)}% ${less ? "less" : "more"} spent`,
   },
   budget: {
     monthly: "Monthly budget",

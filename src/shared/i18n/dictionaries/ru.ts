@@ -92,7 +92,7 @@ export const ru: Messages = {
     vsLastMonth: "к прошлому месяцу",
     tooltip: "Потрачено",
     changeLine: (less: boolean, pct: number) =>
-      `${less ? "↓" : "↑"} ${pct > 0 ? "+" : ""}${pct}% ${less ? "меньше" : "больше"} расходов`,
+      `${less ? "↓" : "↑"} ${Math.abs(pct)}% ${less ? "меньше" : "больше"} расходов`,
   },
   budget: {
     monthly: "Бюджет на месяц",

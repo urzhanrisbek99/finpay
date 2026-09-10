@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { getDictionary } from "#shared/i18n";
 import type { Transaction } from "./types";
 import {
   computeBalanceTrend,
@@ -160,5 +161,32 @@ describe("computeBalanceTrend", () => {
 
   it("caps at 100% when the derived starting balance is non-positive", () => {
     expect(computeBalanceTrend(txs, 500, NOW)).toBe(100);
+  });
+});
+
+describe("the spending change line", () => {
+  const en = getDictionary("en");
+  const ru = getDictionary("ru");
+
+  it("states a drop once, not three times over", () => {
+    expect(en.spending.changeLine(true, -10)).toBe("↓ 10% less spent");
+    expect(ru.spending.changeLine(true, -10)).toBe("↓ 10% меньше расходов");
+  });
+
+  it("states a rise without a stray sign", () => {
+    expect(en.spending.changeLine(false, 24)).toBe("↑ 24% more spent");
+    expect(ru.spending.changeLine(false, 24)).toBe("↑ 24% больше расходов");
+  });
+
+  it("reads correctly for the percentage computeSpendingChart actually returns", () => {
+    const txs = [
+      tx({ type: "expense", amount: 200, created_at: "2026-06-10T12:00:00" }),
+      tx({ type: "expense", amount: 180, created_at: "2026-07-10T12:00:00" }),
+    ];
+    const { changePct } = computeSpendingChart(txs, "Month", NOW);
+    expect(changePct).toBe(-10);
+    expect(en.spending.changeLine(changePct <= 0, changePct)).toBe(
+      "↓ 10% less spent",
+    );
   });
 });
