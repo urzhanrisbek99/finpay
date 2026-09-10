@@ -10,6 +10,76 @@
 
 FinPay is a personal banking dashboard — money transfers (by phone, card, and QR), card management, and spending analytics. It treats a toy domain with real fintech rigor: **money moves only on the server, atomically**, and card CVVs are **encrypted at rest**.
 
+## Demo account
+
+Open the [live demo](https://finpay-urzhanrisbek99s-projects.vercel.app) and sign in with:
+
+```
+Email:    demo@finpay.app
+Password: FinPayDemo2026!
+```
+
+It holds a Visa card with a 600 000 ₸ monthly limit and a few months of activity — salary and freelance income, transfers by phone and by card, QR payments, and one failed charge. Registering your own account works too, but it opens empty: balance starts at zero and `add_income` is the only way money enters the system, which is the design rather than a missing seed.
+
+Anything done in the demo adds to its history without rewriting it: the ledger is append-only to clients ([`0010_lock_transactions.sql`](supabase/migrations/0010_lock_transactions.sql)), so transactions can be created but never edited or deleted from the browser.
+
+The history itself comes from [`supabase/seed/demo.sql`](supabase/seed/demo.sql), run once in the Supabase SQL editor. It exists because the app has no way to write it: `created_at` is whatever `now()` was when the RPC ran, and the client cannot insert into the ledger at all — which is exactly the property the seed has to step around, and the reason it runs as `postgres` rather than through the app. Dates are relative to the run, so the demo stays recent; re-running it replaces everything before today and leaves today's activity alone.
+
+## Screenshots
+
+### Dashboard
+
+Balance, month-to-date income and expenses, and pending authorizations across the top; a spending chart, the monthly budget against the card's limit, and the ledger below. Every figure here is derived — the stat cards, the chart buckets, and the budget projection are computed from the transaction list by pure functions in [`stats.ts`](src/entities/transaction/model/stats.ts) and [`budget.ts`](src/widgets/budget-status/lib/budget.ts), with the clock passed in so they can be unit-tested without React.
+
+![FinPay dashboard](docs/screenshots/dashboard.png)
+
+### Paying and transferring
+
+`New payment` opens a method chooser; each method is its own FSD feature slice with its own hook, API module, and error mapping. The transfer form validates the number and amount inline, and offers to save the recipient — but the amount bounds, the balance check, the freeze check, and the monthly limit are all re-run in SQL before anything moves.
+
+| New payment                                                 | Transfer by phone                                   |
+| ----------------------------------------------------------- | --------------------------------------------------- |
+| ![Payment method chooser](docs/screenshots/new-payment.png) | ![Transfer by phone](docs/screenshots/transfer.png) |
+
+QR follows a real **authorize → capture** flow. Generating the code inserts a `pending` transaction and reserves nothing; the balance moves only on capture, which re-checks funds and the card's freeze state under a row lock. That's why the `Pending` stat card is populated while the code is on screen.
+
+![QR payment](docs/screenshots/qr.png)
+
+### Cards
+
+One card per account, with freeze, reissue, removal, and a monthly spending limit that the database enforces on every transfer and QR payment — not just in the UI. The progress bar is the same `current_month_spent` sum the SQL functions check against.
+
+![Cards](docs/screenshots/cards.png)
+
+Revealing the CVV is the one read that cannot go through the table. The plaintext column is nulled by a trigger on write, and the ciphertext is hidden from direct reads by column-level grants, so the value comes back through a `security definer` RPC that decrypts with a key held in Supabase Vault and refuses any card that isn't the caller's.
+
+| Reveal CVV                            | Spending limit                                         |
+| ------------------------------------- | ------------------------------------------------------ |
+| ![Card CVV](docs/screenshots/cvv.png) | ![Spending limit](docs/screenshots/spending-limit.png) |
+
+### Transfers
+
+Frequent recipients, a breakdown of the month by method, and the transfer history.
+
+![Transfers](docs/screenshots/transfers.png)
+
+### Theme and language
+
+Dark mode via `next-themes`, and a full English/Russian dictionary — including the money errors, which arrive from Postgres as `FP1xx` SQLSTATE codes and are translated on the client rather than shown as raw database text.
+
+| Dark theme                                         | Russian                                              |
+| -------------------------------------------------- | ---------------------------------------------------- |
+| ![Dark theme](docs/screenshots/dashboard-dark.png) | ![Russian locale](docs/screenshots/dashboard-ru.png) |
+
+<details>
+<summary>Sign in and settings</summary>
+
+| Sign in                                | Settings                                   |
+| -------------------------------------- | ------------------------------------------ |
+| ![Sign in](docs/screenshots/login.png) | ![Settings](docs/screenshots/settings.png) |
+
+</details>
+
 ## Commands
 
 ```bash
