@@ -13,6 +13,7 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
+    "commit": "node scripts/commit.mjs",
     "prepare": "husky"
   },
   "dependencies": {
@@ -46,6 +47,8 @@
     "@types/react-dom": "^19",
     "@typescript-eslint/eslint-plugin": "^8.62.0",
     "@typescript-eslint/parser": "^8.62.0",
+    "commitizen": "^4.3.2",
+    "cz-conventional-changelog": "^3.3.0",
     "eslint": "^9",
     "eslint-config-next": "16.2.9",
     "eslint-config-prettier": "^10.1.8",
@@ -67,5 +70,10 @@
     "*.{json,md,css}": [
       "prettier --write"
     ]
+  },
+  "config": {
+    "commitizen": {
+      "path": "cz-conventional-changelog"
+    }
   }
 }

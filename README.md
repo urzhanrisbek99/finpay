@@ -94,7 +94,10 @@ npm run typecheck  # Type check (tsc --noEmit)
 npm run format     # Prettier
 npm test           # Unit tests + migrations against a real Postgres (Vitest)
 npm run test:watch # Vitest in watch mode
+npm run commit     # Run every check, then compose a Conventional Commit
 ```
+
+`npm run commit` is the intended way to commit. It refuses to start with an empty index, runs the five gates CI runs before the build — ESLint, FSD boundaries, Prettier, TypeScript, tests — and only then opens the [Commitizen](https://commitizen-tools.github.io/commitizen/) prompt for the type, scope, subject and body. A failing gate prints its output and stops, so a broken commit is never written in the first place rather than caught after the fact. `npm run commit -- --skip-checks` skips the gates when the change genuinely doesn't warrant 20 seconds of them; the husky hooks still run either way.
 
 ## Architecture
 
@@ -235,7 +238,7 @@ Both are `NEXT_PUBLIC_` because the browser genuinely needs them, and the anon k
 
 ## Conventions
 
-- **Commits** — [Conventional Commits](https://www.conventionalcommits.org/), enforced by commitlint + husky; lint-staged runs ESLint + Prettier on staged files.
+- **Commits** — [Conventional Commits](https://www.conventionalcommits.org/), composed by Commitizen through `npm run commit` and enforced by commitlint + husky, so the same convention is both generated and validated; lint-staged runs ESLint + Prettier on staged files.
 - **Styling** — Tailwind CSS v4; `cn()` (clsx + tailwind-merge) for class composition; `prettier-plugin-tailwindcss` orders classes.
 - **UI** — Base UI primitives with shadcn-style components in `shared/ui`.
 - **State** — Zustand stores per entity/feature.
