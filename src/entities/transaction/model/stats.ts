@@ -36,6 +36,17 @@ const monthStart = (now: Date, timeZone: string, offset = 0) => {
   return zonedMonthStart(timeZone, year, month + offset);
 };
 
+export function sameSpanLastMonth(
+  now: Date,
+  timeZone: string,
+): { from: Date; to: Date } {
+  const thisMonth = monthStart(now, timeZone);
+  const from = monthStart(now, timeZone, -1);
+  const elapsed = now.getTime() - thisMonth.getTime();
+  const to = new Date(Math.min(from.getTime() + elapsed, thisMonth.getTime()));
+  return { from, to };
+}
+
 export function sumBetween(
   transactions: Transaction[],
   from: Date,
@@ -62,18 +73,13 @@ export function computeDashboardStats(
   timeZone: string,
 ): DashboardStat[] {
   const thisMonth = monthStart(now, timeZone);
-  const prevMonth = monthStart(now, timeZone, -1);
+  const prev = sameSpanLastMonth(now, timeZone);
 
   const income = sumBetween(transactions, thisMonth, now, isIncome);
-  const prevIncome = sumBetween(transactions, prevMonth, thisMonth, isIncome);
+  const prevIncome = sumBetween(transactions, prev.from, prev.to, isIncome);
 
   const expenses = sumBetween(transactions, thisMonth, now, isExpense);
-  const prevExpenses = sumBetween(
-    transactions,
-    prevMonth,
-    thisMonth,
-    isExpense,
-  );
+  const prevExpenses = sumBetween(transactions, prev.from, prev.to, isExpense);
 
   const pending = transactions.filter((tx) => tx.status === "pending");
   const pendingAmount = pending.reduce((sum, tx) => sum + tx.amount, 0);
@@ -194,7 +200,8 @@ export function computeSpendingChart(
   });
 
   const thisMonth = monthlySpending(transactions, 0, now, timeZone);
-  const lastMonth = monthlySpending(transactions, -1, now, timeZone);
+  const prev = sameSpanLastMonth(now, timeZone);
+  const lastMonth = sumBetween(transactions, prev.from, prev.to, isExpense);
   const changePct =
     lastMonth === 0
       ? thisMonth > 0

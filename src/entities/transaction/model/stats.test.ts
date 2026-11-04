@@ -7,6 +7,7 @@ import {
   computeSpendingChart,
   formatTrend,
   isSpending,
+  sameSpanLastMonth,
   sumBetween,
 } from "./stats";
 
@@ -220,5 +221,42 @@ describe("calendar boundaries follow the viewer's time zone", () => {
     const utc = computeSpendingChart([spend], "Week", nowUtc, "UTC");
     expect(utc.data.at(-1)).toEqual({ label: "Sat", amount: 0 });
     expect(utc.data.at(-2)).toEqual({ label: "Fri", amount: 70 });
+  });
+});
+
+describe("month-over-month trends compare like with like", () => {
+  const fourthOfJuly = new Date("2026-07-04T12:00:00Z");
+  const txs = [
+    tx({ type: "income", amount: 800, created_at: "2026-07-02T09:00:00Z" }),
+    tx({ type: "income", amount: 400, created_at: "2026-06-02T09:00:00Z" }),
+    tx({ type: "income", amount: 5000, created_at: "2026-06-20T09:00:00Z" }),
+    tx({ type: "expense", amount: 90, created_at: "2026-07-03T09:00:00Z" }),
+    tx({ type: "expense", amount: 100, created_at: "2026-06-03T09:00:00Z" }),
+    tx({ type: "expense", amount: 900, created_at: "2026-06-25T09:00:00Z" }),
+  ];
+
+  it("measures the first days of July against the first days of June", () => {
+    const [income, expenses] = computeDashboardStats(txs, fourthOfJuly, "UTC");
+    expect(income.trend).toBe("+100%");
+    expect(expenses.trend).toBe(`${MINUS}10%`);
+  });
+
+  it("does the same for the spending chart's change line", () => {
+    const { changePct } = computeSpendingChart(
+      txs,
+      "Week",
+      fourthOfJuly,
+      "UTC",
+    );
+    expect(changePct).toBe(-10);
+  });
+
+  it("caps the span at the end of a shorter previous month", () => {
+    const { from, to } = sameSpanLastMonth(
+      new Date("2026-03-31T12:00:00Z"),
+      "UTC",
+    );
+    expect(from.toISOString()).toBe("2026-02-01T00:00:00.000Z");
+    expect(to.toISOString()).toBe("2026-03-01T00:00:00.000Z");
   });
 });
