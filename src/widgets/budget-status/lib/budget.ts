@@ -1,3 +1,5 @@
+import { daysInMonth, zonedDate } from "#shared/lib";
+
 export type BudgetLevel =
   | "on-track"
   | "trending-over"
@@ -12,15 +14,15 @@ export type Budget = {
   pacePercent: number;
 };
 
-export function computeBudget(spent: number, limit: number, now: Date): Budget {
-  const day = now.getDate();
-  const daysInMonth = new Date(
-    now.getFullYear(),
-    now.getMonth() + 1,
-    0,
-  ).getDate();
+export function computeBudget(
+  spent: number,
+  limit: number,
+  now: Date,
+  timeZone: string,
+): Budget {
+  const { year, month, day } = zonedDate(now, timeZone);
 
-  const pace = day / daysInMonth;
+  const pace = day / daysInMonth(year, month);
   const projected = Math.round(spent / pace);
   const dailyAvg = Math.round(spent / day);
 

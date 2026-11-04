@@ -1,4 +1,5 @@
 import type { Locale } from "#shared/i18n";
+import { zonedDate, zonedMidnight, zonedMonthStart } from "#shared/lib";
 import type { Transaction } from "./types";
 
 export type DashboardStatKey = "income" | "expenses" | "pending";
@@ -30,8 +31,10 @@ export const isExpense = (tx: Transaction) =>
 export const isSpending = (tx: Transaction) =>
   isExpense(tx) && tx.status !== "failed";
 
-const startOfDay = (d: Date) =>
-  new Date(d.getFullYear(), d.getMonth(), d.getDate());
+const monthStart = (now: Date, timeZone: string, offset = 0) => {
+  const { year, month } = zonedDate(now, timeZone);
+  return zonedMonthStart(timeZone, year, month + offset);
+};
 
 export function sumBetween(
   transactions: Transaction[],
@@ -56,23 +59,19 @@ export function formatTrend(current: number, previous: number): string {
 export function computeDashboardStats(
   transactions: Transaction[],
   now: Date,
+  timeZone: string,
 ): DashboardStat[] {
-  const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
-  const prevMonthStart = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+  const thisMonth = monthStart(now, timeZone);
+  const prevMonth = monthStart(now, timeZone, -1);
 
-  const income = sumBetween(transactions, monthStart, now, isIncome);
-  const prevIncome = sumBetween(
-    transactions,
-    prevMonthStart,
-    monthStart,
-    isIncome,
-  );
+  const income = sumBetween(transactions, thisMonth, now, isIncome);
+  const prevIncome = sumBetween(transactions, prevMonth, thisMonth, isIncome);
 
-  const expenses = sumBetween(transactions, monthStart, now, isExpense);
+  const expenses = sumBetween(transactions, thisMonth, now, isExpense);
   const prevExpenses = sumBetween(
     transactions,
-    prevMonthStart,
-    monthStart,
+    prevMonth,
+    thisMonth,
     isExpense,
   );
 
@@ -104,47 +103,45 @@ export function computeDashboardStats(
 export function buildBuckets(
   period: ChartPeriod,
   now: Date,
+  timeZone: string,
   locale: Locale = "en",
 ): Bucket[] {
   const buckets: Bucket[] = [];
-  const today = startOfDay(now);
+  const { year, month, day } = zonedDate(now, timeZone);
   const loc = intl(locale);
+  const midnight = (offsetDays: number) =>
+    zonedMidnight(timeZone, year, month, day + offsetDays);
 
   if (period === "Week") {
     for (let i = 6; i >= 0; i--) {
-      const from = new Date(today);
-      from.setDate(today.getDate() - i);
-      const to = new Date(from);
-      to.setDate(from.getDate() + 1);
+      const from = midnight(-i);
       buckets.push({
-        label: from.toLocaleDateString(loc, { weekday: "short" }),
+        label: from.toLocaleDateString(loc, { weekday: "short", timeZone }),
         from,
-        to,
+        to: midnight(-i + 1),
       });
     }
   } else if (period === "Month") {
     for (let i = 3; i >= 0; i--) {
-      const from = new Date(today);
-      from.setDate(today.getDate() - (i + 1) * 7 + 1);
-      const to = new Date(from);
-      to.setDate(from.getDate() + 7);
+      const start = -(i + 1) * 7 + 1;
+      const from = midnight(start);
       buckets.push({
         label: from.toLocaleDateString(loc, {
           month: "short",
           day: "numeric",
+          timeZone,
         }),
         from,
-        to,
+        to: midnight(start + 7),
       });
     }
   } else {
     for (let i = 11; i >= 0; i--) {
-      const from = new Date(today.getFullYear(), today.getMonth() - i, 1);
-      const to = new Date(from.getFullYear(), from.getMonth() + 1, 1);
+      const from = zonedMonthStart(timeZone, year, month - i);
       buckets.push({
-        label: from.toLocaleDateString(loc, { month: "short" }),
+        label: from.toLocaleDateString(loc, { month: "short", timeZone }),
         from,
-        to,
+        to: zonedMonthStart(timeZone, year, month - i + 1),
       });
     }
   }
@@ -155,17 +152,19 @@ export function buildBuckets(
 export function computeMonthlySpent(
   transactions: Transaction[],
   now: Date,
+  timeZone: string,
 ): number {
-  return monthlySpending(transactions, 0, now);
+  return monthlySpending(transactions, 0, now, timeZone);
 }
 
 function monthlySpending(
   transactions: Transaction[],
   offset: number,
   now: Date,
+  timeZone: string,
 ): number {
-  const from = new Date(now.getFullYear(), now.getMonth() + offset, 1);
-  const to = new Date(now.getFullYear(), now.getMonth() + offset + 1, 1);
+  const from = monthStart(now, timeZone, offset);
+  const to = monthStart(now, timeZone, offset + 1);
 
   return transactions.reduce((sum, tx) => {
     if (!isSpending(tx)) return sum;
@@ -178,9 +177,10 @@ export function computeSpendingChart(
   transactions: Transaction[],
   period: ChartPeriod,
   now: Date,
+  timeZone: string,
   locale: Locale = "en",
 ): { data: ChartPoint[]; thisMonth: number; changePct: number } {
-  const buckets = buildBuckets(period, now, locale);
+  const buckets = buildBuckets(period, now, timeZone, locale);
 
   const data: ChartPoint[] = buckets.map((bucket) => {
     const amount = transactions.reduce((sum, tx) => {
@@ -193,8 +193,8 @@ export function computeSpendingChart(
     return { label: bucket.label, amount };
   });
 
-  const thisMonth = monthlySpending(transactions, 0, now);
-  const lastMonth = monthlySpending(transactions, -1, now);
+  const thisMonth = monthlySpending(transactions, 0, now, timeZone);
+  const lastMonth = monthlySpending(transactions, -1, now, timeZone);
   const changePct =
     lastMonth === 0
       ? thisMonth > 0
@@ -205,13 +205,17 @@ export function computeSpendingChart(
   return { data, thisMonth, changePct };
 }
 
-function netFlowThisMonth(transactions: Transaction[], now: Date): number {
-  const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+function netFlowThisMonth(
+  transactions: Transaction[],
+  now: Date,
+  timeZone: string,
+): number {
+  const from = monthStart(now, timeZone);
 
   return transactions.reduce((sum, tx) => {
     if (tx.status === "failed") return sum;
     const created = new Date(tx.created_at);
-    if (created < monthStart) return sum;
+    if (created < from) return sum;
     if (isIncome(tx)) return sum + tx.amount;
     if (isExpense(tx)) return sum - tx.amount;
     return sum;
@@ -222,8 +226,9 @@ export function computeBalanceTrend(
   transactions: Transaction[],
   currentBalance: number,
   now: Date,
+  timeZone: string,
 ): number {
-  const netFlow = netFlowThisMonth(transactions, now);
+  const netFlow = netFlowThisMonth(transactions, now, timeZone);
   const startBalance = currentBalance - netFlow;
   if (startBalance <= 0) return netFlow > 0 ? 100 : 0;
   return Math.round((netFlow / startBalance) * 1000) / 10;

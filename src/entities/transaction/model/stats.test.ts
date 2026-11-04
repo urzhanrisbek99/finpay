@@ -11,6 +11,7 @@ import {
 } from "./stats";
 
 const NOW = new Date("2026-07-14T12:00:00");
+const TZ = Intl.DateTimeFormat().resolvedOptions().timeZone;
 const MINUS = "−";
 
 const tx = (o: Partial<Transaction>): Transaction => ({
@@ -90,7 +91,7 @@ describe("computeDashboardStats", () => {
     }),
   ];
 
-  const [income, expenses, pending] = computeDashboardStats(txs, NOW);
+  const [income, expenses, pending] = computeDashboardStats(txs, NOW, TZ);
 
   it("sums monthly income and its trend vs previous month", () => {
     expect(income).toEqual({
@@ -130,7 +131,7 @@ describe("computeSpendingChart", () => {
   ];
 
   it("builds 7 daily buckets for the week, newest last", () => {
-    const { data } = computeSpendingChart(txs, "Week", NOW);
+    const { data } = computeSpendingChart(txs, "Week", NOW, TZ);
     expect(data).toHaveLength(7);
     expect(data[6].amount).toBe(300); // сегодня
     expect(data[3].amount).toBe(100); // 3 дня назад
@@ -138,11 +139,11 @@ describe("computeSpendingChart", () => {
   });
 
   it("builds 12 monthly buckets for the year", () => {
-    expect(computeSpendingChart(txs, "Year", NOW).data).toHaveLength(12);
+    expect(computeSpendingChart(txs, "Year", NOW, TZ).data).toHaveLength(12);
   });
 
   it("computes month-over-month spending and change %", () => {
-    const { thisMonth, changePct } = computeSpendingChart(txs, "Week", NOW);
+    const { thisMonth, changePct } = computeSpendingChart(txs, "Week", NOW, TZ);
     expect(thisMonth).toBe(400); // 300 + 100, доход исключён
     expect(changePct).toBe(100); // (400 - 200) / 200
   });
@@ -156,11 +157,11 @@ describe("computeBalanceTrend", () => {
 
   it("expresses this-month net flow as a % of the starting balance", () => {
     // netFlow = 700; start = 1700 - 700 = 1000; 700/1000 = 70%
-    expect(computeBalanceTrend(txs, 1700, NOW)).toBe(70);
+    expect(computeBalanceTrend(txs, 1700, NOW, TZ)).toBe(70);
   });
 
   it("caps at 100% when the derived starting balance is non-positive", () => {
-    expect(computeBalanceTrend(txs, 500, NOW)).toBe(100);
+    expect(computeBalanceTrend(txs, 500, NOW, TZ)).toBe(100);
   });
 });
 
@@ -183,10 +184,41 @@ describe("the spending change line", () => {
       tx({ type: "expense", amount: 200, created_at: "2026-06-10T12:00:00" }),
       tx({ type: "expense", amount: 180, created_at: "2026-07-10T12:00:00" }),
     ];
-    const { changePct } = computeSpendingChart(txs, "Month", NOW);
+    const { changePct } = computeSpendingChart(txs, "Month", NOW, TZ);
     expect(changePct).toBe(-10);
     expect(en.spending.changeLine(changePct <= 0, changePct)).toBe(
       "↓ 10% less spent",
     );
+  });
+});
+
+describe("calendar boundaries follow the viewer's time zone", () => {
+  const nowUtc = new Date("2026-08-01T03:00:00Z");
+
+  it("counts an evening-of-July-31-UTC salary in August for Almaty", () => {
+    const salary = tx({
+      type: "income",
+      amount: 500,
+      created_at: "2026-07-31T21:00:00Z",
+    });
+    const [utc] = computeDashboardStats([salary], nowUtc, "UTC");
+    expect(utc.amount).toBe(0);
+
+    const [almaty] = computeDashboardStats([salary], nowUtc, "Asia/Almaty");
+    expect(almaty.amount).toBe(500);
+  });
+
+  it("labels and fills the week buckets by local day", () => {
+    const spend = tx({
+      type: "expense",
+      amount: 70,
+      created_at: "2026-07-31T21:00:00Z",
+    });
+    const almaty = computeSpendingChart([spend], "Week", nowUtc, "Asia/Almaty");
+    expect(almaty.data.at(-1)).toEqual({ label: "Sat", amount: 70 });
+
+    const utc = computeSpendingChart([spend], "Week", nowUtc, "UTC");
+    expect(utc.data.at(-1)).toEqual({ label: "Sat", amount: 0 });
+    expect(utc.data.at(-2)).toEqual({ label: "Fri", amount: 70 });
   });
 });

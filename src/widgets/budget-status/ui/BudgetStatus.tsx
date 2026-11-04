@@ -2,7 +2,7 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "#shared/ui/card";
 import { formatCurrency } from "#shared/lib";
-import { useT } from "#shared/i18n";
+import { useT, useTimeZone } from "#shared/i18n";
 import { transactionModel } from "#entities/transaction";
 import { cardModel } from "#entities/card";
 import { computeBudget, type BudgetLevel } from "../lib/budget";
@@ -16,12 +16,13 @@ const BUDGET_META: Record<BudgetLevel, { text: string; bar: string }> = {
 
 export function BudgetStatus() {
   const t = useT();
+  const timeZone = useTimeZone();
   const card = cardModel.useCardStore((s) => s.card);
   const { spent } = transactionModel.useMonthlySpent();
 
   const limit = card?.spending_limit ?? 0;
   const { level, projected, dailyAvg, usedPercent, pacePercent } =
-    computeBudget(spent, limit, new Date());
+    computeBudget(spent, limit, new Date(), timeZone);
   const meta = BUDGET_META[level];
   const isOver = level === "over-budget";
   const remaining = Math.max(0, limit - spent);

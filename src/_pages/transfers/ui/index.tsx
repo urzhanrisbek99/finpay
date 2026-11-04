@@ -5,8 +5,13 @@ import { TransferModal } from "#features/transfer";
 import { QRModal } from "#features/qr-payment";
 import { CardTransferModal } from "#features/transfer-by-card";
 import { Card, CardContent, CardHeader, CardTitle } from "#shared/ui/card";
-import { formatCurrency, getInitials } from "#shared/lib";
-import { useT, useFormatDate } from "#shared/i18n";
+import {
+  formatCurrency,
+  getInitials,
+  zonedDate,
+  zonedMonthStart,
+} from "#shared/lib";
+import { useT, useFormatDate, useTimeZone } from "#shared/i18n";
 import { transactionModel } from "#entities/transaction";
 import { recipientModel } from "#entities/recipient";
 import {
@@ -56,6 +61,7 @@ export function Transfers() {
   const recipients = recipientModel.useRecipientStore((s) => s.recipients);
   const t = useT();
   const formatDate = useFormatDate();
+  const timeZone = useTimeZone();
 
   const openTransfer = (phone?: string) => {
     setInitialPhone(phone);
@@ -68,11 +74,8 @@ export function Transfers() {
     else setCardOpen(true);
   };
 
-  const monthStart = new Date(
-    new Date().getFullYear(),
-    new Date().getMonth(),
-    1,
-  );
+  const today = zonedDate(new Date(), timeZone);
+  const monthStart = zonedMonthStart(timeZone, today.year, today.month);
   const monthTransfers = transactions.filter(
     (tx) => tx.status !== "failed" && new Date(tx.created_at) >= monthStart,
   );

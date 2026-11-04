@@ -29,7 +29,7 @@ The history itself comes from [`supabase/seed/demo.sql`](supabase/seed/demo.sql)
 
 ### Dashboard
 
-Balance, month-to-date income and expenses, and pending authorizations across the top; a spending chart, the monthly budget against the card's limit, and the ledger below. Every figure here is derived — the stat cards, the chart buckets, and the budget projection are computed from the transaction list by pure functions in [`stats.ts`](src/entities/transaction/model/stats.ts) and [`budget.ts`](src/widgets/budget-status/lib/budget.ts), with the clock passed in so they can be unit-tested without React.
+Balance, month-to-date income and expenses, and pending authorizations across the top; a spending chart, the monthly budget against the card's limit, and the ledger below. Every figure here is derived — the stat cards, the chart buckets, and the budget projection are computed from the transaction list by pure functions in [`stats.ts`](src/entities/transaction/model/stats.ts) and [`budget.ts`](src/widgets/budget-status/lib/budget.ts), with the clock and the viewer's time zone passed in so they can be unit-tested without React.
 
 The budget reads `Trending over` here because it extrapolates the month from the daily average rather than waiting for the limit to be crossed — 270 730 ₸ spent by the tenth projects to 812 190 ₸ against a 600 000 ₸ limit.
 
@@ -140,7 +140,11 @@ entities/transaction/
   index.ts   # Public API (barrel export)
 ```
 
-Features follow the same layout (`ui / model / api`) and expose only their public API through `index.ts`. Pure, deterministic business logic (trends, spending buckets, balance flow) is extracted into modules like `stats.ts` with the **clock injected as an argument**, so it's unit-testable without React.
+Features follow the same layout (`ui / model / api`) and expose only their public API through `index.ts`. Pure, deterministic business logic (trends, spending buckets, balance flow) is extracted into modules like `stats.ts` with the **clock and the time zone injected as arguments**, so it's unit-testable without React.
+
+### Time zones
+
+The server renders in UTC; the viewer is wherever they are. Anything calendar-shaped — "today", the start of the month, a week bucket, the budget's day-of-month pace — is computed in the **viewer's** zone by the helpers in [`zoned.ts`](src/shared/lib/zoned.ts), never in the runtime's. The zone travels like the locale: the root layout reads a `tz` cookie (validated, falling back to `Asia/Almaty`), the client renders with that value during hydration via `useSyncExternalStore`'s server snapshot, then switches to the browser's real zone and writes it back to the cookie. Server HTML and the first client render therefore always agree, and from the second visit on they agree on the right zone. The SQL monthly limit still counts the month in UTC — for a viewer east of Greenwich the limit resets a few hours after their local midnight.
 
 ### Path Aliases
 

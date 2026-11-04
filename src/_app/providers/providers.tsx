@@ -5,9 +5,11 @@ import { I18nProvider, type Locale } from "#shared/i18n";
 
 export function Providers({
   locale,
+  timeZone,
   children,
 }: {
   locale: Locale;
+  timeZone: string;
   children: React.ReactNode;
 }) {
   return (
@@ -17,7 +19,9 @@ export function Providers({
       enableSystem
       disableTransitionOnChange
     >
-      <I18nProvider initialLocale={locale}>{children}</I18nProvider>
+      <I18nProvider initialLocale={locale} initialTimeZone={timeZone}>
+        {children}
+      </I18nProvider>
     </ThemeProvider>
   );
 }

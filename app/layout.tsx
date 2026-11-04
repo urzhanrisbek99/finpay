@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Providers } from "#app";
-import { getServerLocale } from "#shared/i18n/server";
+import { getServerLocale, getServerTimeZone } from "#shared/i18n/server";
 import "#app/styles/globals.css";
 
 const geistSans = Geist({
@@ -24,7 +24,10 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const locale = await getServerLocale();
+  const [locale, timeZone] = await Promise.all([
+    getServerLocale(),
+    getServerTimeZone(),
+  ]);
 
   return (
     <html
@@ -33,7 +36,9 @@ export default async function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="flex min-h-full flex-col" suppressHydrationWarning>
-        <Providers locale={locale}>{children}</Providers>
+        <Providers locale={locale} timeZone={timeZone}>
+          {children}
+        </Providers>
       </body>
     </html>
   );

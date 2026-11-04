@@ -11,3 +11,7 @@ export const LOCALE_COOKIE_MAX_AGE = 60 * 60 * 24 * 365;
 export function isLocale(value: unknown): value is Locale {
   return typeof value === "string" && LOCALES.includes(value as Locale);
 }
+
+export const DEFAULT_TIME_ZONE = "Asia/Almaty";
+
+export const TIME_ZONE_COOKIE = "tz";
