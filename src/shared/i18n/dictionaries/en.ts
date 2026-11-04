@@ -318,8 +318,6 @@ export const en = {
       rateLimit: "Too many attempts. Try again in a minute",
       validationFailed: "Check the entered details",
       network: "Can't reach the server. Check your connection and try again",
-      profileCreationFailed:
-        "Your account was created, but we couldn't finish setting up the profile. Sign in to try again.",
       unknown: "Something went wrong. Try again",
     },
   },

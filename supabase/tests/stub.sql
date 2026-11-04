@@ -15,7 +15,8 @@ end $$;
 
 create table if not exists auth.users (
   id uuid primary key default extensions.gen_random_uuid(),
-  email text
+  email text,
+  raw_user_meta_data jsonb
 );
 
 create or replace function auth.uid()

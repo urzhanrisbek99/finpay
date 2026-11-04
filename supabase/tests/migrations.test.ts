@@ -92,11 +92,68 @@ beforeEach(async () => {
     delete from public.cards;
     delete from public.profiles;
   `);
-  await as(
-    ALICE,
+  await db.exec(
     `insert into public.profiles (id, email, full_name)
        values ('${ALICE}', 'alice@test.io', 'Asel Nurlan');`,
   );
+});
+
+describe("registration creates the profile in the same transaction", () => {
+  const CAROL = "33333333-3333-3333-3333-333333333333";
+
+  beforeEach(async () => {
+    await db.exec(`delete from auth.users where id = '${CAROL}';`);
+  });
+
+  it("inserts a zero-balance profile named from the signup metadata", async () => {
+    await db.exec(`
+      insert into auth.users (id, email, raw_user_meta_data)
+      values ('${CAROL}', 'carol@test.io', '{"full_name": "Carol Danvers"}');
+    `);
+    const r = await db.query<{ full_name: string; balance: string }>(
+      `select full_name, balance::text from public.profiles where id = '${CAROL}'`,
+    );
+    expect(r.rows).toEqual([{ full_name: "Carol Danvers", balance: "0" }]);
+  });
+
+  it("falls back to the email name when the metadata has none", async () => {
+    await db.exec(
+      `insert into auth.users (id, email) values ('${CAROL}', 'carol@test.io');`,
+    );
+    const r = await db.query<{ full_name: string }>(
+      `select full_name from public.profiles where id = '${CAROL}'`,
+    );
+    expect(r.rows[0]?.full_name).toBe("carol");
+  });
+
+  it("no longer lets the client insert a profile itself", async () => {
+    await expectRejection(
+      () =>
+        as(
+          BOB,
+          `insert into public.profiles (id, email, full_name)
+             values ('${BOB}', 'bob@test.io', 'Bob');`,
+        ),
+      INSUFFICIENT_PRIVILEGE,
+    );
+  });
+});
+
+describe("cards hold the invariants the money functions assume", () => {
+  const card = (limit: number) =>
+    `insert into public.cards
+       (user_id, number, holder_name, expires_at, type, spending_limit)
+     values ('${ALICE}', '4242', 'ASEL NURLAN', '12/28', 'visa', ${limit});`;
+
+  it("allows one card per user", async () => {
+    await as(ALICE, card(500000));
+    await expectRejection(() => as(ALICE, card(500000)), "23505");
+  });
+
+  it("rejects a zero or negative spending limit", async () => {
+    await expectRejection(() => as(ALICE, card(0)), "23514");
+    await expectRejection(() => as(ALICE, card(-1)), "23514");
+  });
 });
 
 describe("migrations apply to an empty database", () => {

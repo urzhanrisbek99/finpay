@@ -4,7 +4,6 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { authApi } from "../api";
 import { getAuthErrorMessage } from "../lib/auth-error";
-import { userApi } from "#entities/user";
 import { ROUTES } from "#shared/config";
 import { useT } from "#shared/i18n";
 
@@ -31,19 +30,6 @@ export function useRegister() {
     }
 
     if (data?.user) {
-      const { error: profileError } = await userApi.createProfile({
-        id: data.user.id,
-        email,
-        full_name: fullName,
-      });
-
-      if (profileError) {
-        console.error("[register] profile creation failed:", profileError);
-        setError(t.auth.errors.profileCreationFailed);
-        setIsLoading(false);
-        return;
-      }
-
       router.push(ROUTES.DASHBOARD);
     }
 

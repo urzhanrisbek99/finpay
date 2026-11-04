@@ -20,18 +20,4 @@ export const userApi = {
       error: error ? error.message : null,
     };
   },
-
-  // Баланс меняют только серверные RPC: UPDATE на profiles отозван в 0006.
-  createProfile: async (profile: {
-    id: string;
-    email: string;
-    full_name: string;
-  }): Promise<{ error: string | null }> => {
-    const supabase = createBrowserClient();
-
-    // balance не передаём — стартовое значение задаёт DEFAULT в БД.
-    const { error } = await supabase.from("profiles").insert(profile);
-
-    return { error: error ? error.message : null };
-  },
 };

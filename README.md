@@ -187,6 +187,8 @@ Everything in this section is asserted against a real PostgreSQL in [`supabase/t
 - QR reserves nothing, debits once, and a retried webhook does not debit twice;
 - several pending QRs cannot overdraw the balance;
 - one user sees zero rows of another's profile, ledger and card, and cannot move their money;
+- signing up creates the profile in the same transaction as the auth user, via a trigger, so a half-registered account cannot exist — and the client can no longer insert a profile at all;
+- a second card for the same user and a zero or negative spending limit are refused by constraints, because the money functions read "the" card and treat any limit as real;
 - a CVV never rests in plaintext, decrypts for its owner, and returns null to anyone else.
 
 The suite earns its keep under mutation: drop the freeze check from `0008`, and the two freeze tests go red; re-grant writes on the ledger, and the ledger tests follow.
