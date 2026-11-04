@@ -39,12 +39,12 @@ begin
   join (values
     (1,  9,  'expense',  18400, 'Magnum Cash&Carry',            'food',         'completed', 'qr',    null,            null),
     (1,  20, 'expense',  2900,  'Yandex Go',                    'transport',    'completed', 'qr',    null,            null),
+    (1,  10, 'income',   850000,'Salary — TechCorp',            'salary',       'completed', null,    null,            null),
     (2,  8,  'expense',  1900,  'Coffee Boom',                  'food',         'completed', 'qr',    null,            null),
     (2,  10, 'expense',  4490,  'Netflix',                      'subscription', 'completed', 'card',  null,            null),
     (3,  13, 'transfer', 15000, 'Transfer to +77012345678',     'transfer',     'completed', 'phone', 'Rent share',    null),
     (3,  19, 'expense',  7850,  'Wolt',                         'food',         'completed', 'qr',    null,            null),
     (4,  18, 'expense',  3200,  'Yandex Go',                    'transport',    'completed', 'qr',    null,            null),
-    (5,  10, 'income',   850000,'Salary — TechCorp',            'salary',       'completed', null,    null,            null),
     (5,  12, 'expense',  2290,  'Spotify',                      'subscription', 'completed', 'card',  null,            null),
     (6,  11, 'expense',  24800, 'Magnum Cash&Carry',            'food',         'completed', 'qr',    null,            null),
     (7,  9,  'expense',  2100,  'Coffee Boom',                  'food',         'completed', 'qr',    null,            null),

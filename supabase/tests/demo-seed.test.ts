@@ -47,11 +47,11 @@ describe("the demo seed", () => {
     expect(ledger.every((tx) => new Date(tx.created_at) < today)).toBe(true);
   });
 
-  it("pays the salary on the 5th of every month, Almaty time", () => {
+  it("pays the salary on the 1st of every month, Almaty time", () => {
     const salaries = ledger.filter((tx) => tx.category === "salary");
     expect(salaries.length).toBeGreaterThanOrEqual(3);
     for (const tx of salaries) {
-      expect(zonedDate(new Date(tx.created_at), TZ).day).toBe(5);
+      expect(zonedDate(new Date(tx.created_at), TZ).day).toBe(1);
     }
   });
 
