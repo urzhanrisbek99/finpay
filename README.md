@@ -31,7 +31,7 @@ The history itself comes from [`supabase/seed/demo.sql`](supabase/seed/demo.sql)
 
 Balance, month-to-date income and expenses, and pending authorizations across the top; a spending chart, the monthly budget against the card's limit, and the ledger below. Every figure here is derived — the stat cards, the chart buckets, and the budget projection are computed from the transaction list by pure functions in [`stats.ts`](src/entities/transaction/model/stats.ts) and [`budget.ts`](src/widgets/budget-status/lib/budget.ts), with the clock and the viewer's time zone passed in so they can be unit-tested without React.
 
-The budget reads `Trending over` here because it extrapolates the month from the daily average rather than waiting for the limit to be crossed — 270 730 ₸ spent by the tenth projects to 812 190 ₸ against a 600 000 ₸ limit.
+The budget extrapolates the month from the daily average rather than waiting for the limit to be crossed: 48 200 ₸ spent by the fourth projects to 361 500 ₸ against a 600 000 ₸ limit, so it reads `On track`. A pace that projects past the limit switches it to `Trending over` while there is still money left, which is the point of a warning. The trends beside it compare this month so far with the same days of the last one — November 1–4 against October 1–4, not against all of October.
 
 ![FinPay dashboard](docs/screenshots/dashboard.png)
 
