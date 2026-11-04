@@ -11,17 +11,9 @@ export function Header() {
   const openNewPayment = usePaymentMethodStore((state) => state.open);
   const t = useT();
 
-  const getGreeting = () => {
-    const hour = new Date().getHours();
-    if (hour < 12) return t.header.goodMorning;
-    if (hour < 18) return t.header.goodAfternoon;
-    return t.header.goodEvening;
-  };
-
   return (
     <div className="mb-6 flex items-center justify-between">
       <div>
-        <p className="text-muted-foreground text-xs">{getGreeting()}</p>
         <h1 className="text-base font-medium">
           {user?.full_name ?? t.header.loading}
         </h1>

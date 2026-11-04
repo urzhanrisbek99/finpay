@@ -1,36 +1,42 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { Plus } from "lucide-react";
 import { SpendingChart } from "#widgets/spending-chart";
 import { BudgetStatus } from "#widgets/budget-status";
 import { TransactionList } from "#widgets/transaction-list";
 import { UserBalance } from "#entities/user";
-import { QRModal } from "#features/qr-payment";
-import { TransferModal } from "#features/transfer";
 import { AddIncomeModal } from "#features/add-income";
 import { userModel } from "#entities/user";
 import { transactionModel } from "#entities/transaction";
-import { ROUTES } from "#shared/config";
 import { formatCurrency } from "#shared/lib";
 import { useT } from "#shared/i18n";
 
 export function Dashboard() {
   const t = useT();
   const user = userModel.useUserStore((s) => s.user);
-  const router = useRouter();
   const statsCards = transactionModel.useDashboardStats();
   const balanceTrend = transactionModel.useBalanceTrend(user?.balance ?? 0);
 
-  const [qrOpen, setQrOpen] = useState(false);
-  const [transferOpen, setTransferOpen] = useState(false);
   const [incomeOpen, setIncomeOpen] = useState(false);
 
   return (
     <>
       <div className="animate-in fade-in duration-500 ease-out">
         <div className="mb-6 grid grid-cols-4 gap-4">
-          <UserBalance balance={user?.balance ?? 0} trend={balanceTrend} />
+          <UserBalance
+            balance={user?.balance ?? 0}
+            trend={balanceTrend}
+            action={
+              <button
+                onClick={() => setIncomeOpen(true)}
+                className="flex items-center gap-1 rounded-full bg-white px-2.5 py-1 text-xs font-medium text-violet-700 transition-colors hover:bg-violet-50"
+              >
+                <Plus size={12} />
+                {t.dashboard.addIncome}
+              </button>
+            }
+          />
 
           {statsCards.map((card) => (
             <div key={card.key} className="bg-background rounded-xl border p-4">
@@ -57,55 +63,14 @@ export function Dashboard() {
           ))}
         </div>
 
-        <div className="mb-6 grid grid-cols-3 gap-4">
-          <div className="col-span-2">
-            <SpendingChart />
-          </div>
-          <div className="bg-background rounded-xl border p-4">
-            <p className="mb-3 text-sm font-medium">
-              {t.dashboard.quickActions}
-            </p>
-            <div className="flex flex-col gap-2">
-              <button
-                onClick={() => setQrOpen(true)}
-                className="flex items-center gap-2 rounded-lg bg-violet-100 px-3 py-2 text-left text-sm text-violet-600 transition-colors hover:bg-violet-200"
-              >
-                {t.dashboard.qrPayment}
-              </button>
-              <button
-                onClick={() => setTransferOpen(true)}
-                className="bg-muted hover:bg-muted-foreground/15 flex items-center gap-2 rounded-lg px-3 py-2 text-left text-sm transition-colors"
-              >
-                {t.dashboard.transferByPhone}
-              </button>
-              <button
-                onClick={() => setIncomeOpen(true)}
-                className="flex items-center gap-2 rounded-lg bg-green-100 px-3 py-2 text-left text-sm text-green-700 transition-colors hover:bg-green-200"
-              >
-                {t.dashboard.addIncome}
-              </button>
-              <button
-                onClick={() => router.push(ROUTES.CARDS)}
-                className="bg-muted hover:bg-muted-foreground/15 flex items-center gap-2 rounded-lg px-3 py-2 text-left text-sm transition-colors"
-              >
-                {t.dashboard.myCard}
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <div className="mb-6">
+        <div className="mb-6 grid grid-cols-2 gap-4">
+          <SpendingChart />
           <BudgetStatus />
         </div>
 
         <TransactionList />
       </div>
 
-      <QRModal open={qrOpen} onClose={() => setQrOpen(false)} />
-      <TransferModal
-        open={transferOpen}
-        onClose={() => setTransferOpen(false)}
-      />
       <AddIncomeModal open={incomeOpen} onClose={() => setIncomeOpen(false)} />
     </>
   );

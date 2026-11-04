@@ -40,9 +40,6 @@ export const ru: Messages = {
     logout: "Выйти",
   },
   header: {
-    goodMorning: "Доброе утро",
-    goodAfternoon: "Добрый день",
-    goodEvening: "Добрый вечер",
     loading: "Загрузка...",
     newPayment: "Новый платёж",
   },
@@ -51,11 +48,7 @@ export const ru: Messages = {
     trend: (sign: string, pct: number) => `${sign}${pct}% за месяц`,
   },
   dashboard: {
-    quickActions: "Быстрые действия",
-    qrPayment: "Оплата по QR",
-    transferByPhone: "Перевод по телефону",
     addIncome: "Добавить доход",
-    myCard: "Моя карта",
     stats: {
       income: "Доход за месяц",
       expenses: "Расходы за месяц",

@@ -38,9 +38,6 @@ export const en = {
     logout: "Logout",
   },
   header: {
-    goodMorning: "Good morning",
-    goodAfternoon: "Good afternoon",
-    goodEvening: "Good evening",
     loading: "Loading...",
     newPayment: "New payment",
   },
@@ -49,11 +46,7 @@ export const en = {
     trend: (sign: string, pct: number) => `${sign}${pct}% this month`,
   },
   dashboard: {
-    quickActions: "Quick actions",
-    qrPayment: "QR payment",
-    transferByPhone: "Transfer by phone",
     addIncome: "Add income",
-    myCard: "My card",
     stats: {
       income: "Monthly income",
       expenses: "Monthly expenses",
